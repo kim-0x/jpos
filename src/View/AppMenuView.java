@@ -4,12 +4,11 @@ import Model.*;
 import Service.LoginService;
 import Utils.UserBuilder;
 
-public class AppMenuView {
+public class AppMenuView implements AppMenu {
     private final LoginService loginService;
 
     public AppMenuView(LoginService loginService) {
         this.loginService = loginService;
-        this.displayWelcomeMessage();
     }
 
     /**
@@ -20,8 +19,10 @@ public class AppMenuView {
      * POSTCONDITION: the menu is shown and a valid selection is returned once entered; otherwise the
      * method keeps prompting until the user quits.
      */
+    @Override
     public int selectAppMenu() {
         var currentLoginUser = loginService.getCurrentUserLogin();
+        this.displayCurrentUserGreeting(currentLoginUser.getUsername());
         User user = UserBuilder.createUser(currentLoginUser.getUsername(), "", currentLoginUser.getRole());
         if (user == null) {
             IO.println("Invalid user role. Access denied.");
@@ -47,9 +48,8 @@ public class AppMenuView {
         }
     }
 
-    private void displayWelcomeMessage() {
-        var currentLoginUser = loginService.getCurrentUserLogin();
-        IO.println("Hello, " + currentLoginUser.getUsername());
+    private void displayCurrentUserGreeting(String username) {
+        IO.println("Hello, " + username);
     }
 
     private String[] getAccessFeatures(User user) {

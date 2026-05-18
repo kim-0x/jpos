@@ -4,16 +4,19 @@ import Model.LoginUser;
 import Model.User;
 import Service.LoginService;
 import Service.UserService;
+import Utils.WelcomeMessage;
 
 import java.util.Arrays;
 
 public class UserView {
     private final LoginService loginService;
     private final UserService userService;
+    private final AppMenu appMenu;
 
-    public UserView(LoginService loginService, UserService userService) {
+    public UserView(LoginService loginService, UserService userService, AppMenu appMenu) {
         this.loginService = loginService;
         this.userService = userService;
+        this.appMenu = appMenu;
     }
 
     public void loginForm() {
@@ -86,5 +89,63 @@ public class UserView {
         for (User user : allUsers) {
             System.out.printf("%-35s %20s %10s%n", user.getId(), user.getUsername(), user.getRole());
         }
+    }
+
+    public void createSession() {
+        this.loginForm();
+        int option = -1;
+        while (true) {
+            int selectedOption = option;
+            if (option == -1) {
+                selectedOption = appMenu.selectAppMenu();
+            }
+
+            this.dispatchSelectedOption(selectedOption);
+
+            var choice = IO.readln("Select an option to start or type 'quit', 'logout' to exit main menu: ");
+            if (choice.equals("logout")) {
+                IO.println("Logout...");
+                loginService.signOut();
+                this.clear();
+                WelcomeMessage.displayWelcomeMessage();
+                this.loginForm();
+                option = -1;
+                continue;
+            }
+
+            if (choice.equalsIgnoreCase("quit")) {
+                return;
+            }
+
+            option = Integer.parseInt(choice);
+        }
+    }
+
+    private void dispatchSelectedOption(int selectedOption) {
+        LoginUser currentLoginUser = loginService.getCurrentUserLogin();
+        String userRole = currentLoginUser.getRole();
+        if (userRole.equalsIgnoreCase("Admin")) {
+            switch(selectedOption) {
+                case 1:
+                    this.createNewUser();
+                    break;
+
+                case 2:
+                    this.displayUsers();
+                    break;
+
+                default:
+                   IO.println("Feature is not implemented yet.");
+                   break;
+            }
+
+        } else {
+            IO.println("Feature is not implemented yet.");
+        }
+    }
+
+    private void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }
