@@ -52,7 +52,7 @@ public class UserView {
             String[] roles = new String[] {"admin", "manager", "cashier" };
             var inputRole = IO.readln("Enter role (1: Admin, 2: Store Manager, 3: Cashier): ");
             int roleIndex = Integer.parseInt(inputRole) - 1;
-            if (roleIndex < 0 || roleIndex > 3) {
+            if (roleIndex < 0 || roleIndex >= 3) {
                 IO.println("Invalid user role. Please try again.");
                 continue;
             }

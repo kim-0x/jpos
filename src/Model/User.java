@@ -5,7 +5,6 @@ import java.util.UUID;
 public abstract class User extends BaseUser {
     private String password;
     private UUID id;
-    private String role;
 
     public User(String username, String role) {
         super(username, role);
