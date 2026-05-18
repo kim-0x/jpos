@@ -4,22 +4,20 @@ import Model.LoginUser;
 import Model.User;
 import Service.LoginService;
 import Service.UserService;
-import Utils.WelcomeMessage;
-import View.AppMenu;
+import View.UserFeature;
 
 import java.util.Arrays;
 
-public class UserView {
+public class UserFeatureView implements UserFeature {
     private final LoginService loginService;
     private final UserService userService;
-    private final AppMenu appMenu;
 
-    public UserView(LoginService loginService, UserService userService, AppMenu appMenu) {
+    public UserFeatureView(LoginService loginService, UserService userService) {
         this.loginService = loginService;
         this.userService = userService;
-        this.appMenu = appMenu;
     }
 
+    @Override
     public void loginForm() {
         while (true) {
             var username = IO.readln("Enter username:");
@@ -39,15 +37,38 @@ public class UserView {
         }
     }
 
-    /**
-     * INTENT: Interactively collect the data required to register a new user account.
-     * PRECONDITION: the program is running in a terminal with an available console, and the operator can
-     * provide a username, matching password entries, and a valid role selection.
-     * RETURNS: nothing.
-     * POSTCONDITION: a new user is created when all entered data is valid; otherwise the method keeps
-     * prompting until creation succeeds or exits early when no console is available.
-     */
-    public void createNewUser() {
+    @Override
+    public void logoutSession() {
+        IO.println("Logout...");
+        loginService.signOut();
+        this.clear();
+    }
+
+    @Override
+    public void selectFeatureOption(int selectedOption) {
+        LoginUser currentLoginUser = loginService.getCurrentUserLogin();
+        String userRole = currentLoginUser.getRole();
+        if (userRole.equalsIgnoreCase("Admin")) {
+            switch(selectedOption) {
+                case 1:
+                    this.createNewUser();
+                    break;
+
+                case 2:
+                    this.displayUsers();
+                    break;
+
+                default:
+                    IO.println("Feature is not implemented yet.");
+                    break;
+            }
+
+        } else {
+            IO.println("Feature is not implemented yet.");
+        }
+    }
+
+    private void createNewUser() {
         while (true) {
             var username = IO.readln("Enter username:");
             var console = System.console();
@@ -80,7 +101,7 @@ public class UserView {
         }
     }
 
-    public void displayUsers() {
+    private void displayUsers() {
         IO.println("User Accounts:");
         LoginUser currentLoginUser = loginService.getCurrentUserLogin();
         User[] allUsers = userService.getUsers(currentLoginUser.getRole());
@@ -89,61 +110,6 @@ public class UserView {
         System.out.printf("%s%n", "-".repeat(70));
         for (User user : allUsers) {
             System.out.printf("%-35s %20s %10s%n", user.getId(), user.getUsername(), user.getRole());
-        }
-    }
-
-    public void createSession() {
-        this.loginForm();
-        int option = -1;
-        while (true) {
-            int selectedOption = option;
-            if (option == -1) {
-                selectedOption = appMenu.selectAppMenu();
-            }
-
-            if (selectedOption != -1) {
-                this.dispatchSelectedOption(selectedOption);
-            }
-
-            var choice = IO.readln("Select an option to start or type 'quit', 'logout' to exit main menu: ");
-            if (choice.equals("logout")) {
-                IO.println("Logout...");
-                loginService.signOut();
-                this.clear();
-                WelcomeMessage.displayWelcomeMessage();
-                this.loginForm();
-                option = -1;
-                continue;
-            }
-
-            if (choice.equalsIgnoreCase("quit")) {
-                return;
-            }
-
-            option = Integer.parseInt(choice);
-        }
-    }
-
-    private void dispatchSelectedOption(int selectedOption) {
-        LoginUser currentLoginUser = loginService.getCurrentUserLogin();
-        String userRole = currentLoginUser.getRole();
-        if (userRole.equalsIgnoreCase("Admin")) {
-            switch(selectedOption) {
-                case 1:
-                    this.createNewUser();
-                    break;
-
-                case 2:
-                    this.displayUsers();
-                    break;
-
-                default:
-                   IO.println("Feature is not implemented yet.");
-                   break;
-            }
-
-        } else {
-            IO.println("Feature is not implemented yet.");
         }
     }
 
