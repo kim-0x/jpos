@@ -35,6 +35,14 @@ public class UserView {
         }
     }
 
+    /**
+     * INTENT: Interactively collect the data required to register a new user account.
+     * PRECONDITION: the program is running in a terminal with an available console, and the operator can
+     * provide a username, matching password entries, and a valid role selection.
+     * RETURNS: nothing.
+     * POSTCONDITION: a new user is created when all entered data is valid; otherwise the method keeps
+     * prompting until creation succeeds or exits early when no console is available.
+     */
     public void createNewUser() {
         while (true) {
             var username = IO.readln("Enter username:");

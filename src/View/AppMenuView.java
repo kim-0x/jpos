@@ -12,6 +12,14 @@ public class AppMenuView {
         this.displayWelcomeMessage();
     }
 
+    /**
+     * INTENT: Display the application menu available to the logged-in user and collect the next action.
+     * PRECONDITION: a user is logged in, the login service can provide that user, and the user's role can
+     * be resolved into accessible features.
+     * RETURNS: the selected menu option number, or -1 when the user quits or access cannot be resolved.
+     * POSTCONDITION: the menu is shown and a valid selection is returned once entered; otherwise the
+     * method keeps prompting until the user quits.
+     */
     public int selectAppMenu() {
         var currentLoginUser = loginService.getCurrentUserLogin();
         User user = UserBuilder.createUser(currentLoginUser.getUsername(), "", currentLoginUser.getRole());
