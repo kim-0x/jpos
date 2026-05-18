@@ -1,10 +1,11 @@
-package View;
+package View.Implementation;
 
 import Model.LoginUser;
 import Model.User;
 import Service.LoginService;
 import Service.UserService;
 import Utils.WelcomeMessage;
+import View.AppMenu;
 
 import java.util.Arrays;
 
@@ -100,7 +101,9 @@ public class UserView {
                 selectedOption = appMenu.selectAppMenu();
             }
 
-            this.dispatchSelectedOption(selectedOption);
+            if (selectedOption != -1) {
+                this.dispatchSelectedOption(selectedOption);
+            }
 
             var choice = IO.readln("Select an option to start or type 'quit', 'logout' to exit main menu: ");
             if (choice.equals("logout")) {

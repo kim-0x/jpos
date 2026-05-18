@@ -1,8 +1,9 @@
-package View;
+package View.Implementation;
 
 import Model.*;
 import Service.LoginService;
 import Utils.UserBuilder;
+import View.AppMenu;
 
 public class AppMenuView implements AppMenu {
     private final LoginService loginService;

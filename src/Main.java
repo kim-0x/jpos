@@ -6,8 +6,8 @@ import Service.LoginService;
 import Service.UserService;
 import Utils.WelcomeMessage;
 import View.AppMenu;
-import View.AppMenuView;
-import View.UserView;
+import View.Implementation.AppMenuView;
+import View.Implementation.UserView;
 
 void main() {
     UserRepository userRepository = new MockUserRepository();
