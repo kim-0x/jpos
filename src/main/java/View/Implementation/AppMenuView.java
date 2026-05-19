@@ -1,7 +1,11 @@
 package View.Implementation;
 
-import Model.*;
+import Model.AdminUser;
+import Model.CashierUser;
+import Model.ManagerUser;
+import Model.User;
 import Service.LoginService;
+import Utils.IO;
 import Utils.UserBuilder;
 import View.AppMenu;
 
@@ -40,7 +44,6 @@ public class AppMenuView implements AppMenu {
                 return -1;
             }
 
-            // parseInt will throw exception if input is not a number. Assume user input the correct number for now.
             int option = Integer.parseInt(choice);
             if (option > 0 && option < accessFeatures.length + 1) {
                 IO.println("Select a valid option: " + choice);
@@ -55,11 +58,11 @@ public class AppMenuView implements AppMenu {
 
     private String[] getAccessFeatures(User user) {
         if (user instanceof AdminUser) {
-            return ((AdminUser)user).getAccessFeatures();
+            return ((AdminUser) user).getAccessFeatures();
         } else if (user instanceof ManagerUser) {
-            return ((ManagerUser)user).getAccessFeatures();
-        } else if  (user instanceof CashierUser) {
-            return ((CashierUser)user).getAccessFeatures();
+            return ((ManagerUser) user).getAccessFeatures();
+        } else if (user instanceof CashierUser) {
+            return ((CashierUser) user).getAccessFeatures();
         }
         return new String[0];
     }
@@ -69,7 +72,7 @@ public class AppMenuView implements AppMenu {
         System.out.printf("%-10s %12s %18s%n", "|", "APP MENU", "|");
         System.out.printf("%s%n", "-".repeat(42));
         for (int i = 0; i < accessFeatures.length; i++) {
-            System.out.printf("%-5s %-30s %5s%n", String.join("", "| " + (i + 1) + "."), accessFeatures[i], "|" );
+            System.out.printf("%-5s %-30s %5s%n", String.join("", "| " + (i + 1) + "."), accessFeatures[i], "|");
         }
         System.out.printf("%s%n", "-".repeat(42));
     }

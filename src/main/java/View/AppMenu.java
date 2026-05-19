@@ -8,5 +8,5 @@ public interface AppMenu {
      * RETURNS: the selected menu option number, or -1 when the user quits or access cannot be resolved.
      * POSTCONDITION: no application state is modified beyond any output needed to show the menu.
      */
-    abstract int selectAppMenu();
+    int selectAppMenu();
 }

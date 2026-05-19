@@ -10,7 +10,7 @@ public interface LoginService {
      * POSTCONDITION: the current logged-in user is stored when authentication succeeds; otherwise the
      * login state is left unchanged.
      */
-    abstract boolean signIn(String username, String password);
-    abstract LoginUser getCurrentUserLogin();
-    abstract void signOut();
+    boolean signIn(String username, String password);
+    LoginUser getCurrentUserLogin();
+    void signOut();
 }

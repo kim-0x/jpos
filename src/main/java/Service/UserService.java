@@ -9,7 +9,7 @@ public interface UserService {
      * RETURNS: true when the user is accepted and persisted; otherwise false.
      * POSTCONDITION: a new user is added to the repository on success; otherwise no user is created.
      */
-    abstract boolean addUser(String username, String password, String role);
+    boolean addUser(String username, String password, String role);
 
     /**
      * INTENT: Retrieve the list of user accounts visible to the current caller.
@@ -18,5 +18,5 @@ public interface UserService {
      * user accounts.
      * POSTCONDITION: no repository data is modified.
      */
-    abstract User[] getUsers(String role);
+    User[] getUsers(String role);
 }

@@ -3,6 +3,7 @@ package Service.Implementation;
 import Model.User;
 import Repository.UserRepository;
 import Service.UserService;
+import Utils.IO;
 
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -24,7 +25,6 @@ public class UserServiceImpl implements UserService {
     public User[] getUsers(String role) {
         boolean isAdminRole = role.equals("Admin");
         if (!isAdminRole) {
-            // Should throw un-authorization exception here
             IO.println("Un-authorized access");
             return null;
         }

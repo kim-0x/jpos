@@ -2,6 +2,7 @@ package Repository.Implementation;
 
 import Model.*;
 import Repository.UserRepository;
+import Utils.IO;
 import Utils.UserBuilder;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class MockUserRepository implements UserRepository {
 
     @Override
     public boolean addUser(String username, String password, String role) {
-        User user =  UserBuilder.createUser(username, password, role);
+        User user = UserBuilder.createUser(username, password, role);
         if (user == null) {
             IO.println("ERROR: Wrong role!");
             return false;
@@ -41,7 +42,7 @@ public class MockUserRepository implements UserRepository {
     public boolean validUser(String username, String password) {
         for (User user : users) {
             if (user.getUsername().equals(username)
-                    &&  user.getPassword().equals(password)) {
+                    && user.getPassword().equals(password)) {
                 return true;
             }
         }

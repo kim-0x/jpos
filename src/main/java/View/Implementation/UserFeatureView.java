@@ -4,6 +4,7 @@ import Model.LoginUser;
 import Model.User;
 import Service.LoginService;
 import Service.UserService;
+import Utils.IO;
 import View.UserFeature;
 
 import java.util.Arrays;
@@ -49,15 +50,13 @@ public class UserFeatureView implements UserFeature {
         LoginUser currentLoginUser = loginService.getCurrentUserLogin();
         String userRole = currentLoginUser.getRole();
         if (userRole.equalsIgnoreCase("Admin")) {
-            switch(selectedOption) {
+            switch (selectedOption) {
                 case 1:
                     this.createNewUser();
                     break;
-
                 case 2:
                     this.displayUsers();
                     break;
-
                 default:
                     IO.println("Feature is not implemented yet.");
                     break;
@@ -82,7 +81,7 @@ public class UserFeatureView implements UserFeature {
                 IO.println("Invalid password. Please try again.");
                 continue;
             }
-            String[] roles = new String[] {"admin", "manager", "cashier" };
+            String[] roles = new String[] {"admin", "manager", "cashier"};
             var inputRole = IO.readln("Enter role (1: Admin, 2: Store Manager, 3: Cashier): ");
             int roleIndex = Integer.parseInt(inputRole) - 1;
             if (roleIndex < 0 || roleIndex >= 3) {
