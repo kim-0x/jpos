@@ -16,7 +16,7 @@ mvn test
 ## Run a single test class
 
 ```sh
-mvn -Dtest=Service.Implementation.LoginServiceImplTest test
+mvn -Dtest=service.implementation.LoginServiceImplTest test
 ```
 
 ## Remove legacy pre-Maven src files

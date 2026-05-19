@@ -1,23 +1,23 @@
-import Repository.Implementation.MockUserRepository;
-import Repository.UserRepository;
-import Service.Implementation.LoginServiceImpl;
-import Service.Implementation.UserServiceImpl;
-import Service.LoginService;
-import Service.UserService;
-import Utils.WelcomeMessage;
-import View.AppMenu;
-import View.Implementation.AppMenuView;
-import View.Implementation.AppView;
-import View.Implementation.UserFeatureView;
-import View.UserFeature;
+import com.jpos.user.UserFacade;
+import com.jpos.user.repository.implementation.MockUserRepository;
+import com.jpos.user.repository.UserRepository;
+import com.jpos.user.service.implementation.LoginServiceImpl;
+import com.jpos.user.service.implementation.UserServiceImpl;
+import com.jpos.user.service.LoginService;
+import com.jpos.user.service.UserService;
+import utils.WelcomeMessage;
+import view.AppMenu;
+import view.implementation.AppMenuView;
+import view.implementation.AppView;
+import view.implementation.UserFeatureView;
+import view.UserFeature;
 
 public class Main {
     public static void main(String[] args) {
         UserRepository userRepository = new MockUserRepository();
-        LoginService loginService = new LoginServiceImpl(userRepository);
-        UserService userService = new UserServiceImpl(userRepository);
-        AppMenu appMenuView = new AppMenuView(loginService);
-        UserFeature userFeatureView = new UserFeatureView(loginService, userService);
+        UserFacade userFacade = new UserFacade(userRepository);
+        AppMenu appMenuView = new AppMenuView(userFacade);
+        UserFeature userFeatureView = new UserFeatureView(userFacade);
         AppView appView = new AppView(userFeatureView, appMenuView);
         WelcomeMessage.displayWelcomeMessage();
         appView.createSession();
