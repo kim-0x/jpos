@@ -39,8 +39,8 @@ public class Inventory {
         return totalStockItem;
     }
 
-    public double getLatestStockPrice() {
-        StockItem[] stockItems = getStockItem(UUID.randomUUID());
+    public double getLatestStockPrice(UUID productId) {
+        StockItem[] stockItems = getStockItem(productId);
         if (stockItems == null) {
             return 0;
         }
@@ -60,7 +60,7 @@ public class Inventory {
         StockItem latestStockItem = stockIn.get(0);
         for (StockItem stockItemIn : stockIn) {
             if (stockItemIn.getCreatedAt().after(latestStockItem.getCreatedAt())) {
-                latestStockItem =  stockItemIn;
+                latestStockItem = stockItemIn;
             }
         }
         return latestStockItem.getCost();
