@@ -5,7 +5,6 @@ import com.jos.inventory.model.ProductQuery;
 import com.jos.inventory.repository.ProductRepository;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.UUID;
 
 public class MockProductRepository implements ProductRepository {
@@ -13,18 +12,8 @@ public class MockProductRepository implements ProductRepository {
 
     @Override
     public Product getProductBy(ProductQuery productQuery) {
-        if (productQuery == null) {
-            return null;
-        }
-
-        for (Product product : products) {
-            if ((productQuery.getProductId() != null && Objects.equals(product.getId(), productQuery.getProductId()))
-                    || (productQuery.getBarcode() != null && Objects.equals(product.getBarcode(), productQuery.getBarcode()))) {
-                return product;
-            }
-        }
-
-        return null;
+        int existingProductIndex = findExistingProductIndex(toProduct(productQuery));
+        return existingProductIndex >= 0 ? products.get(existingProductIndex) : null;
     }
 
     @Override
@@ -56,14 +45,27 @@ public class MockProductRepository implements ProductRepository {
     }
 
     private int findExistingProductIndex(Product product) {
+        if (product == null) {
+            return -1;
+        }
+
         for (int i = 0; i < products.size(); i++) {
-            Product existingProduct = products.get(i);
-            if ((product.getId() != null && Objects.equals(existingProduct.getId(), product.getId()))
-                    || (product.getBarcode() != null && Objects.equals(existingProduct.getBarcode(), product.getBarcode()))) {
+            if (products.get(i).compareTo(product) == 0) {
                 return i;
             }
         }
 
         return -1;
+    }
+
+    private Product toProduct(ProductQuery productQuery) {
+        if (productQuery == null) {
+            return null;
+        }
+
+        Product product = new Product();
+        product.setId(productQuery.getProductId());
+        product.setBarcode(productQuery.getBarcode());
+        return product;
     }
 }

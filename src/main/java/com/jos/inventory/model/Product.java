@@ -2,7 +2,7 @@ package com.jos.inventory.model;
 
 import java.util.UUID;
 
-public class Product {
+public class Product implements Comparable<Product> {
     private UUID id;
     private String barcode;
     private String name;
@@ -38,5 +38,21 @@ public class Product {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @Override
+    public int compareTo(Product otherProduct) {
+        if (otherProduct == null) {
+            return 1;
+        }
+
+        boolean hasMatchingId = this.id != null
+                && otherProduct.getId() != null
+                && this.id.equals(otherProduct.getId());
+        boolean hasMatchingBarcode = this.barcode != null
+                && otherProduct.getBarcode() != null
+                && this.barcode.equals(otherProduct.getBarcode());
+
+        return hasMatchingId || hasMatchingBarcode ? 0 : 1;
     }
 }
