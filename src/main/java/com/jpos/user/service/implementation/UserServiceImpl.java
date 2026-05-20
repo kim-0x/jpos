@@ -5,6 +5,10 @@ import com.jpos.user.repository.UserRepository;
 import com.jpos.user.service.UserService;
 import utils.IO;
 
+import java.io.InvalidObjectException;
+import java.nio.file.AccessDeniedException;
+import java.security.InvalidKeyException;
+
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -13,20 +17,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean addUser(String username, String password, String role) {
+    public boolean addUser(String username, String password, String newUserRole, String currentUserRole) throws InvalidKeyException,
+            InstantiationException,
+            UnsupportedOperationException,
+            AccessDeniedException {
         if (userRepository.isNameTaken(username)) {
-            return false;
+            throw new InvalidKeyException(String.format("Username %s was taken.", username));
         }
 
-        return userRepository.addUser(username, password, role);
+        boolean isAdminRole = currentUserRole.equals("Admin");
+        if (!isAdminRole) {
+            throw new AccessDeniedException(String.format("Role %s is unauthorized access this feature.", currentUserRole));
+        }
+        return userRepository.addUser(username, password, newUserRole);
     }
 
     @Override
-    public User[] getUsers(String role) {
+    public User[] getUsers(String role) throws AccessDeniedException {
         boolean isAdminRole = role.equals("Admin");
         if (!isAdminRole) {
-            IO.println("Un-authorized access");
-            return null;
+            throw new AccessDeniedException(String.format("Role %s is unauthorized access this feature.", role));
         }
         return userRepository.getUsers();
     }

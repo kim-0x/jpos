@@ -1,13 +1,7 @@
 package view.implementation;
 
 import com.jpos.user.UserFacade;
-import com.jpos.user.model.AdminUser;
-import com.jpos.user.model.CashierUser;
-import com.jpos.user.model.ManagerUser;
-import com.jpos.user.model.User;
-import com.jpos.user.service.LoginService;
 import utils.IO;
-import com.jpos.user.utils.UserBuilder;
 import view.AppMenu;
 
 public class AppMenuView implements AppMenu {
@@ -27,45 +21,33 @@ public class AppMenuView implements AppMenu {
      */
     @Override
     public int selectAppMenu() {
-        var currentLoginUser = userFacade.getCurrentUserLogin();
-        this.displayCurrentUserGreeting(currentLoginUser.getUsername());
-        User user = UserBuilder.createUser(currentLoginUser.getUsername(), "", currentLoginUser.getRole());
-        if (user == null) {
-            IO.println("Invalid user role. Access denied.");
+        try {
+            var currentLoginUser = userFacade.getCurrentUserLogin();
+            this.displayCurrentUserGreeting(currentLoginUser.getUsername());
+            String[] accessFeatures = userFacade.getAccessFeatures();
+            printAppMenu(accessFeatures);
+
+            while (true) {
+                var choice = IO.readln("Select an option to start or type 'quit' to exit: ");
+
+                if (choice.equalsIgnoreCase("quit")) {
+                    return -1;
+                }
+
+                int option = Integer.parseInt(choice);
+                boolean isValidKey = userFacade.validAccessFeatureKey(option);
+                if (isValidKey) {
+                    return option;
+                }
+            }
+        } catch (IndexOutOfBoundsException | InstantiationException e) {
+            IO.println(e.getMessage());
             return -1;
-        }
-
-        String[] accessFeatures = getAccessFeatures(user);
-        printAppMenu(accessFeatures);
-
-        while (true) {
-            var choice = IO.readln("Select an option to start or type 'quit' to exit: ");
-
-            if (choice.equalsIgnoreCase("quit")) {
-                return -1;
-            }
-
-            int option = Integer.parseInt(choice);
-            if (option > 0 && option < accessFeatures.length + 1) {
-                IO.println("Select a valid option: " + choice);
-                return option;
-            }
         }
     }
 
     private void displayCurrentUserGreeting(String username) {
         IO.println("Hello, " + username);
-    }
-
-    private String[] getAccessFeatures(User user) {
-        if (user instanceof AdminUser) {
-            return ((AdminUser) user).getAccessFeatures();
-        } else if (user instanceof ManagerUser) {
-            return ((ManagerUser) user).getAccessFeatures();
-        } else if (user instanceof CashierUser) {
-            return ((CashierUser) user).getAccessFeatures();
-        }
-        return new String[0];
     }
 
     private void printAppMenu(String[] accessFeatures) {

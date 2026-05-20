@@ -2,6 +2,10 @@ package com.jpos.user.service;
 
 import com.jpos.user.model.User;
 
+import java.io.InvalidObjectException;
+import java.nio.file.AccessDeniedException;
+import java.security.InvalidKeyException;
+
 public interface UserService {
     /**
      * INTENT: Create a new user account for the requested role.
@@ -9,7 +13,8 @@ public interface UserService {
      * RETURNS: true when the user is accepted and persisted; otherwise false.
      * POSTCONDITION: a new user is added to the repository on success; otherwise no user is created.
      */
-    boolean addUser(String username, String password, String role);
+    boolean addUser(String username, String password, String newUserRole, String currentUserRole)
+            throws InvalidKeyException, InstantiationException, AccessDeniedException;
 
     /**
      * INTENT: Retrieve the list of user accounts visible to the current caller.
@@ -18,5 +23,5 @@ public interface UserService {
      * user accounts.
      * POSTCONDITION: no repository data is modified.
      */
-    User[] getUsers(String role);
+    User[] getUsers(String role) throws AccessDeniedException;
 }

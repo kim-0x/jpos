@@ -18,6 +18,7 @@ public class LoginServiceImpl implements LoginService {
             currentUserLogin = this.userRepository.getUserLogin(username);
             return true;
         }
+        currentUserLogin = null;
         return false;
     }
 
