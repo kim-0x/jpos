@@ -3,6 +3,7 @@ package view.implementation;
 import utils.IO;
 import utils.WelcomeMessage;
 import view.AppMenu;
+import view.InventoryFeature;
 import view.ProductFeature;
 import view.UserFeature;
 
@@ -11,12 +12,14 @@ public class AppView {
 
     private final UserFeature userFeature;
     private final ProductFeature productFeature;
+    private final InventoryFeature inventoryFeature;
 
-    public AppView(AppMenu appMenu, UserFeature userFeature, ProductFeature productFeature) {
+    public AppView(AppMenu appMenu, UserFeature userFeature, ProductFeature productFeature, InventoryFeature inventoryFeature) {
         this.appMenu = appMenu;
 
         this.userFeature = userFeature;
         this.productFeature = productFeature;
+        this.inventoryFeature = inventoryFeature;
     }
 
     public void createSession() {
@@ -65,6 +68,12 @@ public class AppView {
                 case 4:
                     productFeature.displayProducts();
                     break;
+                case 5:
+                    inventoryFeature.stockEntry();
+                    break;
+                case 8:
+                    inventoryFeature.displayStockReport();
+                    break;
                 default:
                     IO.println("Feature is not implemented yet.");
                     break;
@@ -76,6 +85,12 @@ public class AppView {
                     break;
                 case 2:
                     productFeature.displayProducts();
+                    break;
+                case 3:
+                    inventoryFeature.stockEntry();
+                    break;
+                case 4:
+                    inventoryFeature.displayStockReport();
                     break;
                 default:
                     IO.println("Feature is not implemented yet.");

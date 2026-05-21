@@ -3,6 +3,7 @@ package com.jos.inventory.service.implementation;
 import com.jos.inventory.model.Inventory;
 import com.jos.inventory.model.Product;
 import com.jos.inventory.model.StockItem;
+import com.jos.inventory.model.StockRecord;
 import com.jos.inventory.repository.implementation.MockInventoryRepository;
 import com.jos.inventory.repository.implementation.MockProductRepository;
 import org.junit.After;
@@ -40,7 +41,7 @@ public class InventoryServiceImplTest {
         productRepository.saveProduct(createProduct("barcode-1", "Milk", "dairy"));
         Date beforeEntry = new Date();
 
-        inventoryService.entryStock("barcode-1", "Milk", "dairy", 4.5, 5);
+        inventoryService.entryStock("barcode-1", 4.5, 5);
 
         Date afterEntry = new Date();
         StockItem[] stockItems = inventoryRepository.getStockItems();
@@ -57,7 +58,32 @@ public class InventoryServiceImplTest {
     @Test
     public void shouldThrowWhenProductDoesNotExist() {
         assertThrows(IllegalArgumentException.class,
-                () -> inventoryService.entryStock("missing-barcode", "Milk", "dairy", 4.5, 5));
+                () -> inventoryService.entryStock("missing-barcode", 4.5, 5));
+    }
+
+    @Test
+    public void shouldReturnStockReportForMultipleEntriesOfSameProduct() throws Exception {
+        productRepository.saveProduct(createProduct("barcode-1", "Milk", "dairy"));
+        productRepository.saveProduct(createProduct("barcode-2", "Coffee", "beverage"));
+
+        inventoryService.entryStock("barcode-1", 1.5, 10);
+        Thread.sleep(2);
+        inventoryService.entryStock("barcode-1", 1.75, 20);
+        inventoryService.entryStock("barcode-2", 5.5, 5);
+
+        StockRecord[] stockReport = inventoryService.getStockReport();
+
+        assertEquals(2, stockReport.length);
+
+        StockRecord firstProductStock = getStockRecordByBarcode(stockReport, "barcode-1");
+        assertNotNull(firstProductStock);
+        assertEquals(1.75, firstProductStock.getCost(), 0.0);
+        assertEquals(30.0, firstProductStock.getNumberInStock(), 0.0);
+
+        StockRecord secondProductStock = getStockRecordByBarcode(stockReport, "barcode-2");
+        assertNotNull(secondProductStock);
+        assertEquals(5.5, secondProductStock.getCost(), 0.0);
+        assertEquals(5.0, secondProductStock.getNumberInStock(), 0.0);
     }
 
     private Product createProduct(String barcode, String name, String category) {
@@ -66,6 +92,15 @@ public class InventoryServiceImplTest {
         product.setName(name);
         product.setCategory(category);
         return product;
+    }
+
+    private StockRecord getStockRecordByBarcode(StockRecord[] stockRecords, String barcode) {
+        for (StockRecord stockRecord : stockRecords) {
+            if (stockRecord.getProduct().getBarcode().equals(barcode)) {
+                return stockRecord;
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")

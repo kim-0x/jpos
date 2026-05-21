@@ -19,14 +19,14 @@ public class Inventory {
         this.stockItems.add(item);
     }
 
-    public StockItem[] getStockItem(UUID itemId) {
+    public StockItem[] getStockItem(UUID productId) {
         if  (this.stockItems.isEmpty()) {
             return null;
         }
 
         ArrayList<StockItem> results = new ArrayList<>();
         for (StockItem stockItem : this.stockItems) {
-            if (stockItem.getId().equals(itemId)) {
+            if (stockItem.getProductId() != null && stockItem.getProductId().equals(productId)) {
                 results.add(stockItem);
             }
         }

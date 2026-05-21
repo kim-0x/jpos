@@ -1,7 +1,7 @@
 package com.jos.inventory;
 
 import com.jos.inventory.model.Product;
-import com.jos.inventory.model.ProductInventoryRecord;
+import com.jos.inventory.model.StockRecord;
 import com.jos.inventory.repository.InventoryRepository;
 import com.jos.inventory.repository.ProductRepository;
 import com.jos.inventory.service.InventoryService;
@@ -30,11 +30,11 @@ public class InventoryFacade {
         return productService.getCategories();
     }
 
-    public ProductInventoryRecord[] getProductsWithLatestCost() {
-        return inventoryService.getProductsWithLatestCost();
+    public StockRecord[] getStockReport() {
+        return inventoryService.getStockReport();
     }
 
-    public void stockEntry(String barcode, String name, String category, double cost, float numberInStock) {
-        inventoryService.entryStock(barcode, name, category, cost, numberInStock);
+    public void stockEntry(String barcode, double cost, float numberInStock) {
+        inventoryService.entryStock(barcode, cost, numberInStock);
     }
 }

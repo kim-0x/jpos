@@ -8,11 +8,9 @@ import com.jpos.user.repository.implementation.MockUserRepository;
 import com.jpos.user.repository.UserRepository;
 import utils.WelcomeMessage;
 import view.AppMenu;
+import view.InventoryFeature;
 import view.ProductFeature;
-import view.implementation.AppMenuView;
-import view.implementation.AppView;
-import view.implementation.ProductFeatureView;
-import view.implementation.UserFeatureView;
+import view.implementation.*;
 import view.UserFeature;
 
 public class Main {
@@ -26,8 +24,9 @@ public class Main {
         ProductRepository productRepository = new MockProductRepository();
         InventoryFacade inventoryFacade = new InventoryFacade(inventoryRepository, productRepository);
         ProductFeature productFeatureView = new ProductFeatureView(inventoryFacade);
+        InventoryFeature inventoryFeatureView = new InventoryFeatureView(inventoryFacade);
 
-        AppView appView = new AppView(appMenuView, userFeatureView, productFeatureView);
+        AppView appView = new AppView(appMenuView, userFeatureView, productFeatureView, inventoryFeatureView);
         WelcomeMessage.displayWelcomeMessage();
         appView.createSession();
     }
