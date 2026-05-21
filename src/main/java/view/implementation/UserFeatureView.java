@@ -3,8 +3,6 @@ package view.implementation;
 import com.jpos.user.UserFacade;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
-import com.jpos.user.service.LoginService;
-import com.jpos.user.service.UserService;
 import utils.IO;
 import view.UserFeature;
 
@@ -47,28 +45,7 @@ public class UserFeatureView implements UserFeature {
     }
 
     @Override
-    public void selectFeatureOption(int selectedOption) {
-        LoginUser currentLoginUser = userFacade.getCurrentUserLogin();
-        String userRole = currentLoginUser.getRole();
-        if (userRole.equalsIgnoreCase("Admin")) {
-            switch (selectedOption) {
-                case 1:
-                    this.createNewUser();
-                    break;
-                case 2:
-                    this.displayUsers();
-                    break;
-                default:
-                    IO.println("Feature is not implemented yet.");
-                    break;
-            }
-
-        } else {
-            IO.println("Feature is not implemented yet.");
-        }
-    }
-
-    private void createNewUser() {
+    public void createNewUser() {
         try {
             while (true) {
                 var username = IO.readln("Enter username:");
@@ -101,7 +78,8 @@ public class UserFeatureView implements UserFeature {
         }
     }
 
-    private void displayUsers() {
+    @Override
+    public void displayUsers() {
         IO.println("User Accounts:");
         try {
             LoginUser currentLoginUser = userFacade.getCurrentUserLogin();
@@ -115,6 +93,12 @@ public class UserFeatureView implements UserFeature {
         } catch (AccessDeniedException e) {
            IO.println(e.getMessage());
         }
+    }
+
+    @Override
+    public String getCurrentUserRole() {
+        LoginUser currentLoginUser = userFacade.getCurrentUserLogin();
+        return currentLoginUser.getRole();
     }
 
     private void clear() {

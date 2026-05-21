@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface ProductService {
     abstract void saveProduct(String barcode, String name, String category);
     abstract Product[] getProducts();
+    abstract String[] getCategories();
 }

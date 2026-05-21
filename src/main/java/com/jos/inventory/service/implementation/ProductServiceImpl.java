@@ -34,4 +34,9 @@ public class ProductServiceImpl implements ProductService {
     public Product[] getProducts() {
         return this.productRepository.getProducts();
     }
+
+    @Override
+    public String[] getCategories() {
+        return categories;
+    }
 }
