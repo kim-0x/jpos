@@ -5,6 +5,15 @@ import java.util.UUID;
 
 public class Inventory {
     private final ArrayList<StockItem> stockItems = new ArrayList<>();
+    private float lowStockLevel = 3.0f;
+
+    public float getLowStockLevel() {
+        return lowStockLevel;
+    }
+
+    public void setLowStockLevel(float lowStockLevel) {
+        this.lowStockLevel = lowStockLevel;
+    }
 
     public void addStockItem(StockItem item) {
         this.stockItems.add(item);
@@ -25,6 +34,10 @@ public class Inventory {
         return results.toArray(new StockItem[0]);
     }
 
+    public StockItem[] getStockItems() {
+        return stockItems.toArray(new StockItem[0]);
+    }
+
     public float getStockLevelForProduct(UUID productId) {
         StockItem[] stockItems = getStockItem(productId);
         if (stockItems == null) {
@@ -37,6 +50,15 @@ public class Inventory {
         }
 
         return totalStockItem;
+    }
+
+    public boolean isLowStockLevel(StockItem stockItem) {
+        if (stockItem == null || stockItem.getProductId() == null) {
+            return false;
+        }
+
+        float remainingStockLevel = getStockLevelForProduct(stockItem.getProductId()) - stockItem.getNumberInStock();
+        return remainingStockLevel <= this.lowStockLevel;
     }
 
     public double getLatestStockPrice(UUID productId) {
