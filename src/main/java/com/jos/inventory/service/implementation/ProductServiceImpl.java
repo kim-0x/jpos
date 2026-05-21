@@ -7,11 +7,11 @@ import com.jos.inventory.service.ProductService;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 
-public class MockProductService implements ProductService {
+public class ProductServiceImpl implements ProductService {
     private final String[] categories = new String[] {"food", "beverage", "household", "fruit", "dairy"};
     private final ProductRepository productRepository;
 
-    public MockProductService(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 

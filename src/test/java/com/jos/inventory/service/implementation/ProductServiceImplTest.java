@@ -14,15 +14,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-public class MockProductServiceTest {
-    private MockProductService productService;
+public class ProductServiceImplTest {
+    private ProductServiceImpl productService;
     private MockProductRepository productRepository;
 
     @Before
     public void setUp() throws Exception {
         resetProducts();
         productRepository = new MockProductRepository();
-        productService = new MockProductService(productRepository);
+        productService = new ProductServiceImpl(productRepository);
     }
 
     @After
