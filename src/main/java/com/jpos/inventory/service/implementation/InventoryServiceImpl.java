@@ -1,5 +1,6 @@
 package com.jpos.inventory.service.implementation;
 
+import com.jpos.inventory.exception.ProductNotFoundException;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.StockRecord;
 import com.jpos.inventory.model.ProductQuery;
@@ -25,7 +26,7 @@ public class InventoryServiceImpl implements InventoryService {
     public void entryStock(String barcode, double cost, float numberInStock) {
         Product product = productRepository.getProductBy(new ProductQuery(null, barcode));
         if (product == null) {
-            throw new IllegalArgumentException(String.format("Product %s not found.", barcode));
+            throw new ProductNotFoundException(barcode);
         }
 
         StockItem stockItem = new StockItem();

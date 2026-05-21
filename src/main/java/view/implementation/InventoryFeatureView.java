@@ -1,6 +1,7 @@
 package view.implementation;
 
 import com.jpos.inventory.InventoryFacade;
+import com.jpos.inventory.exception.ProductNotFoundException;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.StockRecord;
 import view.InventoryFeature;
@@ -29,7 +30,9 @@ public class InventoryFeatureView implements InventoryFeature {
                 if (answer.equalsIgnoreCase("n")) {
                     break;
                 }
-            } catch(Exception e) {
+            } catch(NumberFormatException e) {
+                IO.println(String.format("Invalid number format %s", e.getMessage()));
+            } catch(ProductNotFoundException e) {
                 IO.println(e.getMessage());
             }
         }

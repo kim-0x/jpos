@@ -1,5 +1,6 @@
 package com.jpos.inventory.service.implementation;
 
+import com.jpos.inventory.exception.ProductNotFoundException;
 import com.jpos.inventory.model.Inventory;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.StockItem;
@@ -57,7 +58,7 @@ public class InventoryServiceImplTest {
 
     @Test
     public void shouldThrowWhenProductDoesNotExist() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ProductNotFoundException.class,
                 () -> inventoryService.entryStock("missing-barcode", 4.5, 5));
     }
 

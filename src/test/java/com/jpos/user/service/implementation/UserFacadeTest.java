@@ -1,6 +1,9 @@
 package com.jpos.user.service.implementation;
 
 import com.jpos.user.UserFacade;
+import com.jpos.user.exception.AdminAlreadyExistsException;
+import com.jpos.user.exception.UnauthorizedUserActionException;
+import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.AdminUser;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
@@ -10,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -77,10 +79,26 @@ public class UserFacadeTest {
     }
 
     @Test
+    public void shouldThrowWhenUsernameAlreadyExists() throws Exception {
+        userFacade.signIn("admin", "admin");
+
+        assertThrows(UsernameAlreadyExistsException.class,
+                () -> userFacade.createNewUser("admin", "password", "cashier"));
+    }
+
+    @Test
+    public void shouldThrowWhenCreatingSecondAdmin() throws Exception {
+        userFacade.signIn("admin", "admin");
+
+        assertThrows(AdminAlreadyExistsException.class,
+                () -> userFacade.createNewUser("otherAdmin", "password", "admin"));
+    }
+
+    @Test
     public void shouldThrowAccessDeniedWhenCashierGetsUsers() throws Exception {
         signInAsCashier();
 
-        assertThrows(AccessDeniedException.class,
+        assertThrows(UnauthorizedUserActionException.class,
                 () -> userFacade.getUsers(userFacade.getCurrentUserLogin().getRole()));
     }
 
@@ -88,7 +106,7 @@ public class UserFacadeTest {
     public void shouldThrowAccessDeniedWhenCashierCreatesUser() throws Exception {
         signInAsCashier();
 
-        assertThrows(AccessDeniedException.class,
+        assertThrows(UnauthorizedUserActionException.class,
                 () -> userFacade.createNewUser("testUser", "password", "cashier"));
     }
 

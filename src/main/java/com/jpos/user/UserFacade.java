@@ -1,5 +1,6 @@
 package com.jpos.user;
 
+import com.jpos.user.exception.UnauthorizedUserActionException;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
@@ -8,9 +9,6 @@ import com.jpos.user.service.UserService;
 import com.jpos.user.service.implementation.LoginServiceImpl;
 import com.jpos.user.service.implementation.UserServiceImpl;
 import com.jpos.user.utils.UserBuilder;
-
-import java.nio.file.AccessDeniedException;
-import java.security.InvalidKeyException;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 
@@ -24,7 +22,7 @@ public class UserFacade {
         userService = new UserServiceImpl(userRepository);
     }
 
-    public User[] getUsers(String role) throws AccessDeniedException {
+    public User[] getUsers(String role) {
         return userService.getUsers(role);
     }
 
@@ -33,16 +31,14 @@ public class UserFacade {
     }
 
     public void createNewUser(String username, String password, String role) throws InvalidParameterException,
-            InvalidKeyException,
-            InstantiationException,
-            AccessDeniedException {
+            InstantiationException {
         if (!Arrays.asList(roles).contains(role.toLowerCase())) {
            throw new InvalidParameterException(String.format("Invalid role %s", role));
         }
 
         LoginUser currentUser = loginService.getCurrentUserLogin();
         if (currentUser == null) {
-            throw new AccessDeniedException("User is unauthorized access this feature.");
+            throw new UnauthorizedUserActionException("User is unauthorized access this feature.");
         }
 
         userService.addUser(username, password, role, currentUser.getRole());

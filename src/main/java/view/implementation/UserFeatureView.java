@@ -1,13 +1,14 @@
 package view.implementation;
 
 import com.jpos.user.UserFacade;
+import com.jpos.user.exception.AdminAlreadyExistsException;
+import com.jpos.user.exception.UnauthorizedUserActionException;
+import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
 import utils.IO;
 import view.UserFeature;
 
-import java.nio.file.AccessDeniedException;
-import java.security.InvalidKeyException;
 import java.util.Arrays;
 
 public class UserFeatureView implements UserFeature {
@@ -73,7 +74,10 @@ public class UserFeatureView implements UserFeature {
                 IO.println("User created successfully.");
                 break;
             }
-        } catch (InvalidKeyException | InstantiationException | UnsupportedOperationException | AccessDeniedException e) {
+        } catch (UsernameAlreadyExistsException
+                 | AdminAlreadyExistsException
+                 | InstantiationException
+                 | UnauthorizedUserActionException e) {
             IO.println(e.getMessage());
         }
     }
@@ -90,7 +94,7 @@ public class UserFeatureView implements UserFeature {
             for (User user : allUsers) {
                 System.out.printf("%-35s %20s %10s%n", user.getId(), user.getUsername(), user.getRole());
             }
-        } catch (AccessDeniedException e) {
+        } catch (UnauthorizedUserActionException e) {
            IO.println(e.getMessage());
         }
     }

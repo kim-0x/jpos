@@ -1,5 +1,6 @@
 package com.jpos.user.repository.implementation;
 
+import com.jpos.user.exception.AdminAlreadyExistsException;
 import com.jpos.user.model.AdminUser;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
@@ -31,14 +32,14 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public boolean addUser(String username, String password, String role)
-            throws UnsupportedOperationException, InstantiationException {
+            throws InstantiationException {
         User user = UserBuilder.createUser(username, password, role);
         if (user == null) {
             throw new InstantiationException("Unable to create user object");
         }
 
         if (user instanceof AdminUser) {
-            throw new UnsupportedOperationException("Multiple Admin users do not supported yet.");
+            throw new AdminAlreadyExistsException();
         }
 
         users.add(user);
