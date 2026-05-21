@@ -1,11 +1,11 @@
-import com.jos.inventory.InventoryFacade;
-import com.jos.inventory.repository.InventoryRepository;
-import com.jos.inventory.repository.ProductRepository;
-import com.jos.inventory.repository.implementation.MockInventoryRepository;
-import com.jos.inventory.repository.implementation.MockProductRepository;
+import com.jpos.inventory.InventoryFacade;
+import com.jpos.inventory.repository.InventoryRepository;
+import com.jpos.inventory.repository.ProductRepository;
+import com.jpos.inventory.repository.implementation.FileInventoryRepository;
+import com.jpos.inventory.repository.implementation.FileProductRepository;
 import com.jpos.user.UserFacade;
-import com.jpos.user.repository.implementation.MockUserRepository;
 import com.jpos.user.repository.UserRepository;
+import com.jpos.user.repository.implementation.FileUserRepository;
 import utils.WelcomeMessage;
 import view.AppMenu;
 import view.InventoryFeature;
@@ -15,13 +15,13 @@ import view.UserFeature;
 
 public class Main {
     public static void main(String[] args) {
-        UserRepository userRepository = new MockUserRepository();
+        UserRepository userRepository = new FileUserRepository();
         UserFacade userFacade = new UserFacade(userRepository);
         AppMenu appMenuView = new AppMenuView(userFacade);
         UserFeature userFeatureView = new UserFeatureView(userFacade);
 
-        InventoryRepository inventoryRepository = new MockInventoryRepository();
-        ProductRepository productRepository = new MockProductRepository();
+        InventoryRepository inventoryRepository = new FileInventoryRepository();
+        ProductRepository productRepository = new FileProductRepository();
         InventoryFacade inventoryFacade = new InventoryFacade(inventoryRepository, productRepository);
         ProductFeature productFeatureView = new ProductFeatureView(inventoryFacade);
         InventoryFeature inventoryFeatureView = new InventoryFeatureView(inventoryFacade);

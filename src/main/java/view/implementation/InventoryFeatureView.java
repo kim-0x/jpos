@@ -1,8 +1,8 @@
 package view.implementation;
 
-import com.jos.inventory.InventoryFacade;
-import com.jos.inventory.model.Product;
-import com.jos.inventory.model.StockRecord;
+import com.jpos.inventory.InventoryFacade;
+import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.StockRecord;
 import view.InventoryFeature;
 import utils.IO;
 

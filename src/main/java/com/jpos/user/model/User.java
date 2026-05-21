@@ -24,7 +24,7 @@ public abstract class User extends BaseUser {
         return id;
     }
 
-    protected void setId(UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 }

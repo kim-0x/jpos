@@ -44,6 +44,7 @@ mvn -version
 ```text
 src/main/java   Application source code
 src/test/java   JUnit test source code
+data            CSV application data
 pom.xml         Maven build configuration
 ```
 
@@ -69,11 +70,19 @@ mvn compile
 java -cp target/classes Main
 ```
 
-For the current mock setup, the default admin login is:
+For the current CSV-backed setup, the default admin login is:
 
 ```sh
 username: admin
 password: admin
+```
+
+The application now reads its initial users, products, and inventory data from:
+
+```text
+data/user.csv
+data/product.csv
+data/inventory.csv
 ```
 
 ## Test setup
