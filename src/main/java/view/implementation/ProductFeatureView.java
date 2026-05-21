@@ -1,6 +1,7 @@
 package view.implementation;
 
 import com.jos.inventory.InventoryFacade;
+import com.jos.inventory.model.Product;
 import utils.IO;
 import view.ProductFeature;
 
@@ -13,8 +14,8 @@ public class ProductFeatureView implements ProductFeature {
 
     @Override
     public void createNewProduct() {
-        try {
-            while(true) {
+        while (true) {
+            try {
                 var barcode = IO.readln("Enter barcode: ");
                 var productName = IO.readln("Enter product name: ");
                 var category = selectCategory();
@@ -24,29 +25,60 @@ public class ProductFeatureView implements ProductFeature {
                     break;
                 }
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+            catch(NumberFormatException e) {
+                var continuing = IO.readln(String.format("%s. Do you want to continue? (y/n): ", e.getMessage()));
+                if (continuing.equalsIgnoreCase("n")) {
+                    break;
+                }
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void displayProducts() {
+        IO.println("Product Catalog:");
+        try {
+            System.out.printf("%s%n", "*".repeat(110));
+            System.out.printf("%-35s %-20s %-30s %-20s%n", "ID", "Barcode", "Name", "Category");
+            System.out.printf("%s%n", "*".repeat(110));
+            Product[] products = inventoryFacade.getProducts();
+            if (products == null || products.length == 0) {
+                System.out.println("No product has been displayed.");
+                return;
+            }
+
+            for (Product product:  products) {
+                System.out.printf("%-35s %-20s %-30s %-20s%n", product.getId(), product.getBarcode(), product.getName(), product.getCategory());
+            }
+        }catch(Exception e) {
+            IO.println(e.getMessage());
         }
     }
 
     private String selectCategory() {
-        StringBuilder builder = new StringBuilder();
-        String[] categorySelectionList = inventoryFacade.getCategories();
-        while (true) {
-            int selectIndex = 1;
+        try {
+            String[] categorySelectionList = inventoryFacade.getCategories();
+            while (true) {
+                int selectIndex = 1;
+                StringBuilder builder = new StringBuilder();
+                for (String category : categorySelectionList) {
+                    builder.append(String.format("%d - %s\n", selectIndex, category));
+                    selectIndex++;
+                }
+                var userSelectOption = IO.readln(String.format("Select product category \n%s: ", builder));
+                int optionIndex = Integer.parseInt(userSelectOption) - 1;
+                if (optionIndex < 0 || optionIndex >= categorySelectionList.length) {
+                    IO.println("Select a valid category. Please enter number in the range.");
+                    continue;
+                }
 
-            for(String category: categorySelectionList) {
-                builder.append(String.format("%d - %s\n", selectIndex, category));
-                selectIndex++;
+                return categorySelectionList[optionIndex];
             }
-            var userSelectOption = IO.readln(String.format("Select product category \n%s: ",  builder));
-            int optionIndex = Integer.parseInt(userSelectOption) - 1;
-            if (optionIndex < 0 || optionIndex >= categorySelectionList.length) {
-                IO.println("Select a valid category. Please number in the range.");
-                continue;
-            }
-
-            return categorySelectionList[optionIndex];
+        } catch (NumberFormatException e) {
+            throw new NumberFormatException(String.format("%s is invalid category selection", e.getMessage()));
         }
     }
 }

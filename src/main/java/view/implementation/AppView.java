@@ -62,6 +62,9 @@ public class AppView {
                 case 3:
                     productFeature.createNewProduct();
                     break;
+                case 4:
+                    productFeature.displayProducts();
+                    break;
                 default:
                     IO.println("Feature is not implemented yet.");
                     break;
@@ -70,6 +73,9 @@ public class AppView {
             switch (selectedOption) {
                 case 1:
                     productFeature.createNewProduct();
+                    break;
+                case 2:
+                    productFeature.displayProducts();
                     break;
                 default:
                     IO.println("Feature is not implemented yet.");
