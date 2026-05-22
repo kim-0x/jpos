@@ -42,7 +42,7 @@ public class ProductFeatureView implements ProductFeature {
         IO.println("Product Catalog:");
         try {
             System.out.printf("%s%n", "*".repeat(110));
-            System.out.printf("%-35s %-20s %-30s %-20s%n", "ID", "Barcode", "Name", "Category");
+            System.out.printf("%-45s %-20s %-30s %-20s%n", "ID", "Barcode", "Name", "Category");
             System.out.printf("%s%n", "*".repeat(110));
             Product[] products = inventoryFacade.getProducts();
             if (products == null || products.length == 0) {
@@ -51,7 +51,11 @@ public class ProductFeatureView implements ProductFeature {
             }
 
             for (Product product:  products) {
-                System.out.printf("%-35s %-20s %-30s %-20s%n", product.getId(), product.getBarcode(), product.getName(), product.getCategory());
+                String productName = product.getName();
+                String formatProductName = (productName.length() > 25)
+                        ? String.format("%s...",productName.substring(0, 25))
+                        : productName;
+                System.out.printf("%-45s %-20s %-30s %-20s%n", product.getId(), product.getBarcode(), formatProductName, product.getCategory());
             }
         }catch(Exception e) {
             IO.println(e.getMessage());

@@ -56,9 +56,14 @@ public class InventoryFeatureView implements InventoryFeature {
                 double cost = record.getCost();
                 DecimalFormat df = new DecimalFormat("$###,###.00");
                 String costFormatted = df.format(cost);
+                String productName = product.getName();
+                String formatProductName = (productName.length() > 25)
+                        ? String.format("%s...",productName.substring(0, 25))
+                        : productName;
 
-                System.out.printf("%-20s %-30s %-20s %20s %20s%n", product.getBarcode(),
-                        product.getName(),
+                System.out.printf("%-20s %-30s %-20s %20s %20s%n",
+                        product.getBarcode(),
+                        formatProductName,
                         product.getCategory(),
                         record.getNumberInStock(),
                         costFormatted);

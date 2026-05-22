@@ -26,13 +26,20 @@ public final class CsvRepositorySupport {
                 .normalize();
     }
 
+    /**
+     * INTENT: Read non-blank CSV records from a data file and convert them into row arrays.
+     * PRECONDITION: filePath points to an existing regular file, dataLabel identifies that file in error
+     * messages, and the file content follows the CSV format expected by this utility.
+     * RETURNS: a list of parsed row arrays in the same order as the non-blank lines in the file.
+     * POSTCONDITION: the file content is read and represented in memory without modifying the source file.
+     */
     public static List<String[]> readRows(Path filePath, String dataLabel) {
         ensureFileExists(filePath, dataLabel);
 
         try {
             List<String[]> rows = new ArrayList<>();
             for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
-                if (line == null || line.isBlank()) {
+                if (line.isBlank()) {
                     continue;
                 }
                 rows.add(parseCsvLine(line));
@@ -44,6 +51,13 @@ public final class CsvRepositorySupport {
         }
     }
 
+    /**
+     * INTENT: Persist a collection of row arrays to a data file as CSV records.
+     * PRECONDITION: filePath points to an existing regular file, dataLabel identifies that file in error
+     * messages, and rows contains the values to serialize.
+     * RETURNS: no value.
+     * POSTCONDITION: the target file content is replaced with the CSV representation of the supplied rows.
+     */
     public static void writeRows(Path filePath, String dataLabel, List<String[]> rows) {
         ensureFileExists(filePath, dataLabel);
 
@@ -82,6 +96,14 @@ public final class CsvRepositorySupport {
         return TIMESTAMP_FORMATTER.format(localDateTime);
     }
 
+    /**
+     * INTENT: Locate the repository root directory that contains the project descriptor and data folder.
+     * PRECONDITION: startPath identifies a directory within or near the project tree that can be walked
+     * upward through its parent paths.
+     * RETURNS: the nearest ancestor path containing both pom.xml and the data directory, or startPath
+     * when no matching project root is found.
+     * POSTCONDITION: no filesystem content is modified while determining the project root path.
+     */
     private static Path findProjectRoot(Path startPath) {
         for (Path currentPath = startPath; currentPath != null; currentPath = currentPath.getParent()) {
             if (Files.isRegularFile(currentPath.resolve("pom.xml"))
@@ -99,6 +121,13 @@ public final class CsvRepositorySupport {
         }
     }
 
+    /**
+     * INTENT: Parse one CSV record into its individual field values.
+     * PRECONDITION: line is a single CSV row encoded with commas as separators and doubled quotes for
+     * escaped quote characters.
+     * RETURNS: an array containing the parsed field values in their original order.
+     * POSTCONDITION: the CSV row is decoded into field values without modifying external state.
+     */
     private static String[] parseCsvLine(String line) {
         ArrayList<String> values = new ArrayList<>();
         StringBuilder currentValue = new StringBuilder();
@@ -133,6 +162,13 @@ public final class CsvRepositorySupport {
         return values.toArray(new String[0]);
     }
 
+    /**
+     * INTENT: Convert one row of field values into a CSV record string.
+     * PRECONDITION: row contains the field values to serialize, and any embedded quotes must be emitted
+     * using standard CSV escaping rules.
+     * RETURNS: a CSV line with commas separating values and quotes added where required.
+     * POSTCONDITION: the input row is represented as a CSV-formatted string without changing external state.
+     */
     private static String toCsvLine(String[] row) {
         StringBuilder builder = new StringBuilder();
         for (int index = 0; index < row.length; index++) {
