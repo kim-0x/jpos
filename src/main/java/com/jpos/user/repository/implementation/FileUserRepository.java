@@ -6,19 +6,18 @@ import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.utils.UserBuilder;
+import utils.AbstractCsvRepository;
 import utils.CsvRepositorySupport;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class FileUserRepository implements UserRepository {
+public class FileUserRepository extends AbstractCsvRepository<User> implements UserRepository {
     private static final String DATA_LABEL = "User data";
     private static final String[] HEADER = new String[] {"id", "name", "password", "role"};
 
-    private final Path filePath;
     private final ArrayList<User> users = new ArrayList<>();
 
     public FileUserRepository() {
@@ -26,7 +25,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     public FileUserRepository(Path filePath) {
-        this.filePath = filePath;
+        super(filePath);
         loadUsers();
     }
 
@@ -85,42 +84,49 @@ public class FileUserRepository implements UserRepository {
 
     private void loadUsers() {
         users.clear();
-
-        List<String[]> rows = CsvRepositorySupport.readRows(filePath, DATA_LABEL);
-        for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++) {
-            String[] row = rows.get(rowIndex);
-            if (row.length != 4) {
-                throw new IllegalStateException(String.format("Invalid user row at line %d.", rowIndex + 1));
-            }
-
-            try {
-                User user = UserBuilder.createUser(row[1], row[2], row[3]);
-                if (user == null) {
-                    throw new IllegalArgumentException(String.format("Invalid role '%s'.", row[3]));
-                }
-
-                user.setId(UUID.fromString(row[0].trim()));
-                users.add(user);
-            } catch (RuntimeException exception) {
-                throw new IllegalStateException(String.format("Invalid user row at line %d.", rowIndex + 1),
-                        exception);
-            }
-        }
+        users.addAll(loadFromCsv());
     }
 
     private void persistUsers() {
-        ArrayList<String[]> rows = new ArrayList<>();
-        rows.add(HEADER);
+        persistToCsv(users);
+    }
 
-        for (User user : users) {
-            rows.add(new String[] {
-                    user.getId().toString(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getRole().toLowerCase(Locale.ROOT)
-            });
+    @Override
+    protected String getDataLabel() {
+        return DATA_LABEL;
+    }
+
+    @Override
+    protected String[] getHeaderRow() {
+        return HEADER;
+    }
+
+    @Override
+    protected User toEntity(String[] row, int lineNumber) {
+        if (row.length != 4) {
+            throw new IllegalStateException(String.format("Invalid user row at line %d.", lineNumber));
         }
 
-        CsvRepositorySupport.writeRows(filePath, DATA_LABEL, rows);
+        try {
+            User user = UserBuilder.createUser(row[1], row[2], row[3]);
+            if (user == null) {
+                throw new IllegalArgumentException(String.format("Invalid role '%s'.", row[3]));
+            }
+
+            user.setId(UUID.fromString(row[0].trim()));
+            return user;
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException(String.format("Invalid user row at line %d.", lineNumber), exception);
+        }
+    }
+
+    @Override
+    protected String[] toRow(User user) {
+        return new String[] {
+                user.getId().toString(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getRole().toLowerCase(Locale.ROOT)
+        };
     }
 }
