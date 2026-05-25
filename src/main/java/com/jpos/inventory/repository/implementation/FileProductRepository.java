@@ -3,18 +3,17 @@ package com.jpos.inventory.repository.implementation;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.repository.ProductRepository;
+import utils.AbstractCsvRepository;
 import utils.CsvRepositorySupport;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-public class FileProductRepository implements ProductRepository {
+public class FileProductRepository extends AbstractCsvRepository<Product> implements ProductRepository {
     private static final String DATA_LABEL = "Product data";
     private static final String[] HEADER = new String[] {"id", "barcode", "name", "category"};
 
-    private final Path filePath;
     private final ArrayList<Product> products = new ArrayList<>();
 
     public FileProductRepository() {
@@ -22,7 +21,7 @@ public class FileProductRepository implements ProductRepository {
     }
 
     public FileProductRepository(Path filePath) {
-        this.filePath = filePath;
+        super(filePath, DATA_LABEL, HEADER);
         loadProducts();
     }
 
@@ -64,43 +63,11 @@ public class FileProductRepository implements ProductRepository {
 
     private void loadProducts() {
         products.clear();
-
-        List<String[]> rows = CsvRepositorySupport.readRows(filePath, DATA_LABEL);
-        for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++) {
-            String[] row = rows.get(rowIndex);
-            if (row.length != 4) {
-                throw new IllegalStateException(String.format("Invalid product row at line %d.", rowIndex + 1));
-            }
-
-            try {
-                UUID productId = UUID.fromString(row[0].trim());
-                Product product = new Product();
-                product.setId(productId);
-                product.setBarcode(row[1].trim());
-                product.setName(row[2]);
-                product.setCategory(row[3].trim());
-                products.add(product);
-            } catch (IllegalArgumentException exception) {
-                throw new IllegalStateException(String.format("Invalid product id at line %d.", rowIndex + 1),
-                        exception);
-            }
-        }
+        products.addAll(loadAll());
     }
 
     private void persistProducts() {
-        ArrayList<String[]> rows = new ArrayList<>();
-        rows.add(HEADER);
-
-        for (Product product : products) {
-            rows.add(new String[] {
-                    product.getId().toString(),
-                    product.getBarcode(),
-                    product.getName(),
-                    product.getCategory()
-            });
-        }
-
-        CsvRepositorySupport.writeRows(filePath, DATA_LABEL, rows);
+        persistAll(products);
     }
 
     private void validateUniqueProduct(Product product, int excludedIndex) {
@@ -138,5 +105,30 @@ public class FileProductRepository implements ProductRepository {
         product.setId(productQuery.getProductId());
         product.setBarcode(productQuery.getBarcode());
         return product;
+    }
+
+    @Override
+    protected Product mapRowToEntity(String[] row, int lineNumber) {
+        Product product = new Product();
+        product.setId(UUID.fromString(row[0].trim()));
+        product.setBarcode(row[1].trim());
+        product.setName(row[2]);
+        product.setCategory(row[3].trim());
+        return product;
+    }
+
+    @Override
+    protected String[] mapEntityToRow(Product entity) {
+        return new String[] {
+                entity.getId().toString(),
+                entity.getBarcode(),
+                entity.getName(),
+                entity.getCategory()
+        };
+    }
+
+    @Override
+    protected int expectedColumnCount() {
+        return 4;
     }
 }

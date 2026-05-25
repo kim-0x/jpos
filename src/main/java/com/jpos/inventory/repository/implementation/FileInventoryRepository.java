@@ -4,19 +4,18 @@ import com.jpos.inventory.model.Inventory;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.model.StockItem;
 import com.jpos.inventory.repository.InventoryRepository;
+import utils.AbstractCsvRepository;
 import utils.CsvRepositorySupport;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
-public class FileInventoryRepository implements InventoryRepository {
+public class FileInventoryRepository extends AbstractCsvRepository<StockItem> implements InventoryRepository {
     private static final String DATA_LABEL = "Inventory data";
     private static final String[] HEADER = new String[] {"id", "numberInStock", "cost", "productId", "createdAt"};
 
-    private final Path filePath;
     private final Inventory inventory = new Inventory();
 
     public FileInventoryRepository() {
@@ -24,7 +23,7 @@ public class FileInventoryRepository implements InventoryRepository {
     }
 
     public FileInventoryRepository(Path filePath) {
-        this.filePath = filePath;
+        super(filePath, DATA_LABEL, HEADER);
         loadStockItems();
     }
 
@@ -82,43 +81,13 @@ public class FileInventoryRepository implements InventoryRepository {
     }
 
     private void loadStockItems() {
-        List<String[]> rows = CsvRepositorySupport.readRows(filePath, DATA_LABEL);
-        for (int rowIndex = 1; rowIndex < rows.size(); rowIndex++) {
-            String[] row = rows.get(rowIndex);
-            if (row.length != 5) {
-                throw new IllegalStateException(String.format("Invalid inventory row at line %d.", rowIndex + 1));
-            }
-
-            try {
-                StockItem stockItem = new StockItem();
-                stockItem.setId(UUID.fromString(row[0].trim()));
-                stockItem.setNumberInStock(Float.parseFloat(row[1]));
-                stockItem.setCost(Double.parseDouble(row[2]));
-                stockItem.setProductId(UUID.fromString(row[3].trim()));
-                stockItem.setCreatedAt(CsvRepositorySupport.parseTimestamp(row[4]));
-                inventory.addStockItem(stockItem);
-            } catch (RuntimeException exception) {
-                throw new IllegalStateException(String.format("Invalid inventory row at line %d.", rowIndex + 1),
-                        exception);
-            }
+        for (StockItem stockItem : loadAll()) {
+            inventory.addStockItem(stockItem);
         }
     }
 
     private void persistStockItems() {
-        ArrayList<String[]> rows = new ArrayList<>();
-        rows.add(HEADER);
-
-        for (StockItem stockItem : inventory.getStockItems()) {
-            rows.add(new String[] {
-                    stockItem.getId().toString(),
-                    String.valueOf(stockItem.getNumberInStock()),
-                    String.valueOf(stockItem.getCost()),
-                    stockItem.getProductId().toString(),
-                    CsvRepositorySupport.formatTimestamp(stockItem.getCreatedAt())
-            });
-        }
-
-        CsvRepositorySupport.writeRows(filePath, DATA_LABEL, rows);
+        persistAll(Arrays.asList(inventory.getStockItems()));
     }
 
     private void validateProductQuery(ProductQuery productQuery) {
@@ -137,5 +106,32 @@ public class FileInventoryRepository implements InventoryRepository {
         if (stockItem.getProductId() == null) {
             throw new IllegalArgumentException("Product id is required.");
         }
+    }
+
+    @Override
+    protected StockItem mapRowToEntity(String[] row, int lineNumber) {
+        StockItem stockItem = new StockItem();
+        stockItem.setId(UUID.fromString(row[0].trim()));
+        stockItem.setNumberInStock(Float.parseFloat(row[1]));
+        stockItem.setCost(Double.parseDouble(row[2]));
+        stockItem.setProductId(UUID.fromString(row[3].trim()));
+        stockItem.setCreatedAt(CsvRepositorySupport.parseTimestamp(row[4]));
+        return stockItem;
+    }
+
+    @Override
+    protected String[] mapEntityToRow(StockItem entity) {
+        return new String[] {
+                entity.getId().toString(),
+                String.valueOf(entity.getNumberInStock()),
+                String.valueOf(entity.getCost()),
+                entity.getProductId().toString(),
+                CsvRepositorySupport.formatTimestamp(entity.getCreatedAt())
+        };
+    }
+
+    @Override
+    protected int expectedColumnCount() {
+        return 5;
     }
 }
