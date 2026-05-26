@@ -50,4 +50,22 @@ public class InventoryServiceImpl implements InventoryService {
         }
         return stockRecords.toArray(new StockRecord[0]);
     }
+
+    @Override
+    public double getProductCostById(UUID productId) {
+        Product product = null;
+        for (Product p : productRepository.getProducts()) {
+            if (p.getId().equals(productId)) {
+                product = p;
+                break;
+            }
+        }
+
+        if (product == null) {
+            throw new ProductNotFoundException(String.valueOf(productId));
+        }
+
+        ProductQuery productQuery = new ProductQuery(product.getId(), product.getBarcode());
+        return inventoryRepository.getProductCost(productQuery);
+    }
 }
