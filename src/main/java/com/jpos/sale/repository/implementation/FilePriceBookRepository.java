@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> implements PriceBookRepository {
     private static final String DATA_LABEL = "Price book data";
-    private static final String[] HEADER = new String[] {"productId", "cost", "margin", "salePrice", "lastModified"};
+    private static final String[] HEADER = new String[] {"productId", "cost", "margin", "salePrice", "effectiveAt"};
 
     private final ArrayList<PriceBook> priceBooks = new ArrayList<>();
 
@@ -49,8 +49,7 @@ public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> im
             if (!productId.equals(priceBook.getProductId())) {
                 continue;
             }
-            if (latest == null || (priceBook.getLastModified() != null
-                    && priceBook.getLastModified().after(latest.getLastModified()))) {
+            if (latest == null || priceBook.getEffectiveAt().after(latest.getEffectiveAt())) {
                 latest = priceBook;
             }
         }
@@ -74,13 +73,13 @@ public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> im
         }
 
         try {
-            PriceBook priceBook = new PriceBook();
-            priceBook.setProductId(UUID.fromString(row[0].trim()));
-            priceBook.setCost(Double.parseDouble(row[1]));
-            priceBook.setMargin(Float.parseFloat(row[2]));
-            priceBook.setSalePrice(Double.parseDouble(row[3]));
-            priceBook.setLastModified(CsvRepositorySupport.parseTimestamp(row[4]));
-            return priceBook;
+            return new PriceBook(
+                    UUID.fromString(row[0].trim()),
+                    Double.parseDouble(row[1]),
+                    Float.parseFloat(row[2]),
+                    Double.parseDouble(row[3]),
+                    CsvRepositorySupport.parseTimestamp(row[4])
+            );
         } catch (RuntimeException exception) {
             throw new IllegalStateException(String.format("Invalid price book row at line %d.", lineNumber),
                     exception);
@@ -94,7 +93,7 @@ public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> im
                 String.valueOf(priceBook.getCost()),
                 String.valueOf(priceBook.getMargin()),
                 String.valueOf(priceBook.getSalePrice()),
-                CsvRepositorySupport.formatTimestamp(priceBook.getLastModified())
+                CsvRepositorySupport.formatTimestamp(priceBook.getEffectiveAt())
         };
     }
 }

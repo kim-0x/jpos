@@ -76,11 +76,11 @@ public class FilePriceBookRepositoryTest {
     }
 
     // ---------------------------------------------------------------------------
-    // Test 3: getById() returns the record with the latest lastModified date
+    // Test 3: getById() returns the record with the latest effectiveAt date
     // ---------------------------------------------------------------------------
 
     @Test
-    public void shouldReturnLatestPriceByLastModifiedDateWhenProductIdIsDuplicated() throws Exception {
+    public void shouldReturnLatestPriceByEffectiveAtDateWhenProductIdIsDuplicated() throws Exception {
         File priceBookFile = createEmptyPriceBookFile("pricebook.csv");
         FilePriceBookRepository repository = new FilePriceBookRepository(priceBookFile.toPath());
 
@@ -97,7 +97,7 @@ public class FilePriceBookRepositoryTest {
         assertNotNull(latest);
         assertEquals(15.0, latest.getCost(), 0.0);
         assertEquals(18.75, latest.getSalePrice(), 0.0);
-        assertEquals(newerDate.getTime(), latest.getLastModified().getTime());
+        assertEquals(newerDate.getTime(), latest.getEffectiveAt().getTime());
     }
 
     // ---------------------------------------------------------------------------
@@ -105,14 +105,8 @@ public class FilePriceBookRepositoryTest {
     // ---------------------------------------------------------------------------
 
     private PriceBook buildPriceBook(UUID productId, double cost, float margin,
-                                     double salePrice, Date lastModified) {
-        PriceBook pb = new PriceBook();
-        pb.setProductId(productId);
-        pb.setCost(cost);
-        pb.setMargin(margin);
-        pb.setSalePrice(salePrice);
-        pb.setLastModified(lastModified);
-        return pb;
+                                     double salePrice, Date effectiveAt) {
+        return new PriceBook(productId, cost, margin, salePrice, effectiveAt);
     }
 
     /**
@@ -129,7 +123,7 @@ public class FilePriceBookRepositoryTest {
 
     private File createEmptyPriceBookFile(String fileName) throws Exception {
         File file = temporaryFolder.newFile(fileName);
-        Files.writeString(file.toPath(), "productId,cost,margin,salePrice,lastModified\n",
+        Files.writeString(file.toPath(), "productId,cost,margin,salePrice,effectiveAt\n",
                 StandardCharsets.UTF_8);
         return file;
     }

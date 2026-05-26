@@ -4,49 +4,52 @@ import java.util.Date;
 import java.util.UUID;
 
 public class PriceBook {
-    private UUID productId;
-    private double cost;
-    private float margin;
-    private double salePrice;
-    private Date lastModified;
+    private final UUID productId;
+    private final double cost;
+    private final float margin;
+    private final double salePrice;
+    private final Date effectiveAt;
+
+    public PriceBook(UUID productId, double cost, float margin, double salePrice) {
+        this(productId, cost, margin, salePrice, null);
+    }
+
+    public PriceBook(UUID productId, double cost, float margin, double salePrice, Date effectiveAt) {
+        if (productId == null) {
+            throw new IllegalArgumentException("Product id is required.");
+        }
+        if (cost <= 0) {
+            throw new IllegalArgumentException("Cost must be a positive number.");
+        }
+        if (salePrice <= 0) {
+            throw new IllegalArgumentException("Sale price must be a positive number.");
+        }
+
+        this.productId = productId;
+        this.cost = cost;
+        this.margin = margin;
+        this.salePrice = salePrice;
+        Date timestamp = (effectiveAt == null) ? new Date() : effectiveAt;
+        this.effectiveAt = new Date(timestamp.getTime());
+    }
 
     public UUID getProductId() {
         return productId;
-    }
-
-    public void setProductId(UUID productId) {
-        this.productId = productId;
     }
 
     public double getCost() {
         return cost;
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
-
     public float getMargin() {
         return margin;
-    }
-
-    public void setMargin(float margin) {
-        this.margin = margin;
     }
 
     public double getSalePrice() {
         return salePrice;
     }
 
-    public void setSalePrice(double salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
+    public Date getEffectiveAt() {
+        return new Date(effectiveAt.getTime());
     }
 }
