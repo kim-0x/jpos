@@ -1,13 +1,18 @@
 package view.implementation;
 
+import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.SaleFacade;
+import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.model.SaleItemData;
-import com.jpos.sale.model.SaleTransaction;
 import utils.IO;
 import view.SaleFeature;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class SaleFeatureView implements SaleFeature {
     private final SaleFacade saleFacade;
@@ -71,12 +76,32 @@ public class SaleFeatureView implements SaleFeature {
 
     @Override
     public void processSaleTransaction() {
-        //String receiptNumber, SaleItemData[] items
-    }
+        while (true) {
+            String receiptNumber = generateReceiptNumber();
+            ArrayList<SaleItemData> records = new ArrayList<>();
+            while (true) {
+                try {
+                    var barcode = utils.IO.readln("Enter barcode: ");
+                    records.add(new SaleItemData(barcode, 1));
 
-    @Override
-    public SaleTransaction getSaleTransaction(String receiptNumber) {
-        return null;
+                    var answer = utils.IO.readln("Do you want to complete transaction? (y/n): ");
+                    if (answer.equalsIgnoreCase("y")) {
+                        var transactionId = saleFacade.processSaleTransaction(receiptNumber,
+                                records.toArray(new SaleItemData[0]));
+                        IO.println(String.format("Transaction completed: %s", transactionId));
+                        displayTransaction(transactionId);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
+            var answer = utils.IO.readln("Next customer? (y/n): ");
+            if (answer.equalsIgnoreCase("n")) {
+                break;
+            }
+        }
     }
 
     private float enterMargin() {
@@ -90,5 +115,30 @@ public class SaleFeatureView implements SaleFeature {
             }
             return margin;
         }
+    }
+
+    private String generateReceiptNumber() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmssSSS");
+        return String.format("REC-%s", dtf.format(now));
+    }
+
+    private void displayTransaction(UUID transactionId) {
+        var saleTransaction = saleFacade.getTransactionById(transactionId);
+        IO.println(String.format("Receipt Number: %s", saleTransaction.getHeader().getReceiptNumber()));
+        System.out.printf("%s%n", "-".repeat(110));
+        System.out.printf("%-45s %-20s %-30s %-20s%n", "ProductName", "Quantity", "Price", "Total");
+        System.out.printf("%s%n", "-".repeat(110));
+        SaleItem[] saleItems = saleTransaction.getSaleItems();
+        for (SaleItem saleItem : saleItems) {
+            System.out.printf("%-45s %-20s %-30s %-20s%n",
+                    saleItem.getProductId(),
+                    saleItem.getQuantity(),
+                    saleItem.getPrice(),
+                    saleItem.getTotalPrice());
+        }
+
+        System.out.printf("%s%n", "-".repeat(110));
+        IO.println(String.format("Grad Total: %-100s%n", saleTransaction.getHeader().getGrandTotal()));
     }
 }

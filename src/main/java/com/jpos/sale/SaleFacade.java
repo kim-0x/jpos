@@ -22,6 +22,7 @@ import java.util.UUID;
 public class SaleFacade {
     private final SaleTransactionService saleTransactionService;
     private final ProductPriceService productPriceService;
+    private final ProductIdentifierProvider productIdentifierProvider;
 
     public SaleFacade(SaleHeaderRepository saleHeaderRepository,
                       SaleItemRepository saleItemRepository,
@@ -31,6 +32,7 @@ public class SaleFacade {
         this.saleTransactionService = new SaleTransactionServiceImpl(saleHeaderRepository, saleItemRepository);
         this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCostProvider,
                 productIdentifierProvider);
+        this.productIdentifierProvider = productIdentifierProvider;
     }
 
     /**
@@ -39,19 +41,23 @@ public class SaleFacade {
      *
      * @param receiptNumber the receipt number for this transaction
      * @param items         array of SaleItemData records containing product information
-     * @return the completed SaleTransaction
+     * @return the transaction ID of the completed SaleTransaction
      */
-    public SaleTransaction processSaleTransaction(String receiptNumber, SaleItemData[] items) {
+    public UUID processSaleTransaction(String receiptNumber, SaleItemData[] items) {
         Objects.requireNonNull(receiptNumber, "receiptNumber must not be null");
         Objects.requireNonNull(items, "items must not be null");
 
         SaleTransaction transaction = saleTransactionService.createTransaction(receiptNumber);
 
         for (SaleItemData item : items) {
+            var productQuery = new ProductQuery(null, item.getBarcode());
+            var productId = productIdentifierProvider.getProductId(productQuery);
+            var priceBook = getCurrentProductPrice(productQuery);
+
             SaleItem saleItem = new SaleItem(
-                    item.getProductId(),
+                    productId,
                     item.getQuantity(),
-                    item.getPrice(),
+                    priceBook.getSalePrice(),
                     transaction.getHeader().getTransactionId()
             );
             saleTransactionService.addItemToTransaction(transaction, saleItem);
@@ -59,7 +65,7 @@ public class SaleFacade {
 
         saleTransactionService.completeTransaction(transaction);
 
-        return transaction;
+        return transaction.getHeader().getTransactionId();
     }
 
     /**

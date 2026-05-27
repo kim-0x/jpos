@@ -25,6 +25,12 @@ public class SaleFacadeTest {
     private MockProductCostProvider costProvider;
     private MockProductIdentifierProvider productIdentifierProvider;
 
+    private void registerPricedProduct(String barcode, UUID productId, double salePrice) {
+        productIdentifierProvider.registerProduct(barcode, productId);
+        costProvider.registerProductCost(productId, salePrice);
+        saleFacade.setProductPrice(new ProductQuery(productId, barcode), 0.0f);
+    }
+
     @Before
     public void setUp() {
         costProvider = new MockProductCostProvider();
@@ -46,13 +52,20 @@ public class SaleFacadeTest {
     public void shouldReturnCompletedTransactionWithCorrectGrandTotal() {
         UUID productId1 = UUID.randomUUID();
         UUID productId2 = UUID.randomUUID();
+        String barcode1 = "barcode-1";
+        String barcode2 = "barcode-2";
+        registerPricedProduct(barcode1, productId1, 10.0);
+        registerPricedProduct(barcode2, productId2, 5.0);
+
         SaleItemData[] items = {
-                new SaleItemData(productId1, 2.0f, 10.0),
-                new SaleItemData(productId2, 1.0f, 5.0)
+                new SaleItemData(barcode1, 2.0f),
+                new SaleItemData(barcode2, 1.0f)
         };
 
-        SaleTransaction result = saleFacade.processSaleTransaction("REC-001", items);
+        UUID transactionId = saleFacade.processSaleTransaction("REC-001", items);
+        SaleTransaction result = saleFacade.getTransactionById(transactionId);
 
+        assertNotNull(transactionId);
         assertNotNull(result);
         assertEquals("REC-001", result.getHeader().getReceiptNumber());
         assertEquals(2, result.getSaleItems().length);
@@ -62,13 +75,19 @@ public class SaleFacadeTest {
     @Test
     public void shouldMergeItemsWithSameProductIdIntoOneEntry() {
         UUID productId = UUID.randomUUID();
+        String barcode = "barcode-3";
+        registerPricedProduct(barcode, productId, 10.0);
+
         SaleItemData[] items = {
-                new SaleItemData(productId, 1.0f, 10.0),
-                new SaleItemData(productId, 3.0f, 10.0)
+                new SaleItemData(barcode, 1.0f),
+                new SaleItemData(barcode, 3.0f)
         };
 
-        SaleTransaction result = saleFacade.processSaleTransaction("REC-002", items);
+        UUID transactionId = saleFacade.processSaleTransaction("REC-002", items);
+        SaleTransaction result = saleFacade.getTransactionById(transactionId);
 
+        assertNotNull(transactionId);
+        assertNotNull(result);
         assertEquals(1, result.getSaleItems().length);
         assertEquals(4.0f, result.getSaleItems()[0].getQuantity(), 0.0001f);
         assertEquals(40.0, result.getHeader().getGrandTotal(), 0.0001);
@@ -76,8 +95,10 @@ public class SaleFacadeTest {
 
     @Test
     public void shouldProcessTransactionWithEmptyItemsAndZeroGrandTotal() {
-        SaleTransaction result = saleFacade.processSaleTransaction("REC-003", new SaleItemData[0]);
+        UUID transactionId = saleFacade.processSaleTransaction("REC-003", new SaleItemData[0]);
+        SaleTransaction result = saleFacade.getTransactionById(transactionId);
 
+        assertNotNull(transactionId);
         assertNotNull(result);
         assertEquals(0, result.getSaleItems().length);
         assertEquals(0.0, result.getHeader().getGrandTotal(), 0.0001);
@@ -102,13 +123,16 @@ public class SaleFacadeTest {
     @Test
     public void shouldRetrieveCompletedTransactionByItsId() {
         UUID productId = UUID.randomUUID();
-        SaleTransaction completed = saleFacade.processSaleTransaction("REC-005",
-                new SaleItemData[]{ new SaleItemData(productId, 1.0f, 20.0) });
+        String barcode = "barcode-4";
+        registerPricedProduct(barcode, productId, 20.0);
 
-        SaleTransaction found = saleFacade.getTransactionById(completed.getHeader().getTransactionId());
+        UUID completedTransactionId = saleFacade.processSaleTransaction("REC-005",
+                new SaleItemData[]{ new SaleItemData(barcode, 1.0f) });
+
+        SaleTransaction found = saleFacade.getTransactionById(completedTransactionId);
 
         assertNotNull(found);
-        assertEquals(completed.getHeader().getReceiptNumber(), found.getHeader().getReceiptNumber());
+        assertEquals("REC-005", found.getHeader().getReceiptNumber());
         assertEquals(20.0, found.getHeader().getGrandTotal(), 0.0001);
     }
 
@@ -125,11 +149,18 @@ public class SaleFacadeTest {
 
     @Test
     public void shouldReturnAllCompletedTransactions() {
+        UUID productId1 = UUID.randomUUID();
+        UUID productId2 = UUID.randomUUID();
+        String barcode1 = "barcode-5";
+        String barcode2 = "barcode-6";
+        registerPricedProduct(barcode1, productId1, 10.0);
+        registerPricedProduct(barcode2, productId2, 5.0);
+
         saleFacade.processSaleTransaction("REC-006", new SaleItemData[]{
-                new SaleItemData(UUID.randomUUID(), 1.0f, 10.0)
+                new SaleItemData(barcode1, 1.0f)
         });
         saleFacade.processSaleTransaction("REC-007", new SaleItemData[]{
-                new SaleItemData(UUID.randomUUID(), 2.0f, 5.0)
+                new SaleItemData(barcode2, 2.0f)
         });
 
         SaleTransaction[] all = saleFacade.getAllTransactions();
