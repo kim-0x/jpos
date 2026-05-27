@@ -1,39 +1,19 @@
 package com.jpos.sale.model;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 
 public class SaleTransaction {
-    private final UUID transactionId;
-    private final String receiptNumber;
-    private double grandTotal;
-    private final Date transactionDate;
+    private final SaleHeader header;
 
     private SaleItem[] saleItems = new SaleItem[0];
 
-    public UUID getTransactionId() {
-        return transactionId;
+    public SaleHeader getHeader() {
+        return header;
     }
 
-    public String getReceiptNumber() {
-        return receiptNumber;
-    }
-
-    public double getGrandTotal() {
-        return grandTotal;
-    }
-
-    public Date getTransactionDate() {
-        return transactionDate;
-    }
-
-    public SaleTransaction(UUID transactionId, String receiptNumber, double grandTotal, Date transactionDate) {
-        this.transactionId = transactionId;
-        this.receiptNumber = receiptNumber;
-        this.grandTotal = grandTotal;
-        this.transactionDate = transactionDate;
+    public SaleTransaction(SaleHeader header) {
+        this.header = Objects.requireNonNull(header, "header must not be null");
     }
 
     public SaleItem[] getSaleItems() {
@@ -51,7 +31,7 @@ public class SaleTransaction {
                         existing.getProductId(),
                         mergedQuantity,
                         existing.getPrice(),
-                        transactionId
+                        header.getTransactionId()
                 );
                 recalculateGrandTotal();
                 return;
@@ -65,8 +45,8 @@ public class SaleTransaction {
     }
 
     private void recalculateGrandTotal() {
-        grandTotal = Arrays.stream(saleItems)
+        header.setGrandTotal(Arrays.stream(saleItems)
                 .mapToDouble(SaleItem::getTotalPrice)
-                .sum();
+                .sum());
     }
 }
