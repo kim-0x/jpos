@@ -1,5 +1,6 @@
 package com.jpos.sale.service.implementation;
 
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.service.ProductCostProvider;
 
@@ -15,9 +16,10 @@ public class MockProductCostProvider implements ProductCostProvider {
     }
 
     @Override
-    public double getProductCost(UUID productId) {
-        if (!costMap.containsKey(productId)) {
-            throw new ProductNotFoundException(productId);
+    public double getProductCost(ProductQuery productQuery) {
+        UUID productId = productQuery == null ? null : productQuery.getProductId();
+        if (productId == null || !costMap.containsKey(productId)) {
+            throw new ProductNotFoundException(String.valueOf(productId));
         }
         return costMap.get(productId);
     }

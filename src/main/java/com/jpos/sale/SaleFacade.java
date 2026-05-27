@@ -1,5 +1,6 @@
 package com.jpos.sale;
 
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.PriceBook;
 import com.jpos.sale.model.SaleItem;
@@ -85,7 +86,7 @@ public class SaleFacade {
      * @throws ProductNotFoundException if the product is not found in inventory
      */
     public void setProductPrice(UUID productId, float margin) throws ProductNotFoundException {
-        productPriceService.setProductPrice(productId, margin);
+        productPriceService.setProductPrice(new ProductQuery(productId, null), margin);
     }
 
     /**

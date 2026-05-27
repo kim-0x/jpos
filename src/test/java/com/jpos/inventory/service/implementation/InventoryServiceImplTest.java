@@ -3,6 +3,7 @@ package com.jpos.inventory.service.implementation;
 import com.jpos.inventory.exception.ProductNotFoundException;
 import com.jpos.inventory.model.Inventory;
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.model.StockItem;
 import com.jpos.inventory.model.StockRecord;
 import com.jpos.inventory.repository.implementation.MockInventoryRepository;
@@ -85,6 +86,34 @@ public class InventoryServiceImplTest {
         assertNotNull(secondProductStock);
         assertEquals(5.5, secondProductStock.getCost(), 0.0);
         assertEquals(5.0, secondProductStock.getNumberInStock(), 0.0);
+    }
+
+    @Test
+    public void shouldGetProductCostByBarcodeQuery() {
+        Product product = createProduct("barcode-1", "Milk", "dairy");
+        productRepository.saveProduct(product);
+        inventoryService.entryStock("barcode-1", 4.5, 5);
+
+        double cost = inventoryService.getProductCostBy(new ProductQuery(null, "barcode-1"));
+
+        assertEquals(4.5, cost, 0.0);
+    }
+
+    @Test
+    public void shouldGetProductCostByProductIdQuery() {
+        Product product = createProduct("barcode-1", "Milk", "dairy");
+        productRepository.saveProduct(product);
+        inventoryService.entryStock("barcode-1", 6.25, 5);
+
+        double cost = inventoryService.getProductCostBy(new ProductQuery(product.getId(), null));
+
+        assertEquals(6.25, cost, 0.0);
+    }
+
+    @Test
+    public void shouldThrowWhenGetProductCostByQueryAndProductDoesNotExist() {
+        assertThrows(ProductNotFoundException.class,
+                () -> inventoryService.getProductCostBy(new ProductQuery(null, "missing-barcode")));
     }
 
     private Product createProduct(String barcode, String name, String category) {

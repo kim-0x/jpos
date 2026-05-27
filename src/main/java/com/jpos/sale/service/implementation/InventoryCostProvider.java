@@ -1,10 +1,9 @@
 package com.jpos.sale.service.implementation;
 
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.service.ProductCostProvider;
 import com.jpos.inventory.service.InventoryService;
-
-import java.util.UUID;
 
 /**
  * Adapter that provides product costs from the inventory module to the sales module.
@@ -18,12 +17,17 @@ public class InventoryCostProvider implements ProductCostProvider {
     }
 
     @Override
-    public double getProductCost(UUID productId) {
+    public double getProductCost(ProductQuery productQuery) {
         try {
-            return inventoryService.getProductCostById(productId);
+            return inventoryService.getProductCostBy(productQuery);
         } catch (com.jpos.inventory.exception.ProductNotFoundException e) {
             // Convert inventory exception to sale module exception
-            throw new ProductNotFoundException(productId);
+            String identifier = productQuery == null
+                    ? "null"
+                    : String.valueOf(productQuery.getProductId() != null
+                    ? productQuery.getProductId()
+                    : productQuery.getBarcode());
+            throw new ProductNotFoundException(identifier);
         }
     }
 }

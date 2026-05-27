@@ -1,19 +1,19 @@
 package com.jpos.sale.service;
 
-import java.util.UUID;
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 
 /**
  * Contract for retrieving product costs from external sources (e.g., inventory module).
- * Implementations are responsible for looking up the current cost of a product by its ID.
+ * Implementations are responsible for looking up the current cost of a product.
  */
 public interface ProductCostProvider {
     /**
      * Get the current cost of a product.
      *
-     * @param productId the unique identifier of the product
+     * @param productQuery query containing product identifiers (id and/or barcode)
      * @return the cost of the product
      * @throws ProductNotFoundException if the product is not found
      */
-    double getProductCost(UUID productId);
+    double getProductCost(ProductQuery productQuery);
 }
