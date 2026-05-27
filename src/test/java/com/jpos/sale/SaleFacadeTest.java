@@ -1,5 +1,6 @@
 package com.jpos.sale;
 
+import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.PriceBook;
 import com.jpos.sale.model.SaleItemData;
@@ -8,6 +9,7 @@ import com.jpos.sale.repository.implementation.MockPriceBookRepository;
 import com.jpos.sale.repository.implementation.MockSaleHeaderRepository;
 import com.jpos.sale.repository.implementation.MockSaleItemRepository;
 import com.jpos.sale.service.implementation.MockProductCostProvider;
+import com.jpos.sale.service.implementation.MockProductIdentifierProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,15 +23,18 @@ import static org.junit.Assert.assertThrows;
 public class SaleFacadeTest {
     private SaleFacade saleFacade;
     private MockProductCostProvider costProvider;
+    private MockProductIdentifierProvider productIdentifierProvider;
 
     @Before
     public void setUp() {
         costProvider = new MockProductCostProvider();
+        productIdentifierProvider = new MockProductIdentifierProvider();
         saleFacade = new SaleFacade(
                 new MockSaleHeaderRepository(),
                 new MockSaleItemRepository(),
                 new MockPriceBookRepository(),
-                costProvider
+                costProvider,
+                productIdentifierProvider
         );
     }
 
@@ -148,9 +153,9 @@ public class SaleFacadeTest {
         UUID productId = UUID.randomUUID();
         costProvider.registerProductCost(productId, 100.0);
 
-        saleFacade.setProductPrice(productId, 0.25f);
+        saleFacade.setProductPrice(new ProductQuery(productId, null), 0.25f);
 
-        PriceBook priceBook = saleFacade.getCurrentProductPrice(productId);
+        PriceBook priceBook = saleFacade.getCurrentProductPrice(new ProductQuery(productId, null));
         assertNotNull(priceBook);
         assertEquals(100.0, priceBook.getCost(), 0.0001);
         assertEquals(0.25f, priceBook.getMargin(), 0.0001f);
@@ -162,12 +167,27 @@ public class SaleFacadeTest {
         UUID unknownProductId = UUID.randomUUID();
 
         assertThrows(ProductNotFoundException.class,
-                () -> saleFacade.setProductPrice(unknownProductId, 0.2f));
+                () -> saleFacade.setProductPrice(new ProductQuery(unknownProductId, null), 0.2f));
+    }
+
+    @Test
+    public void shouldSetAndGetProductPriceByBarcodeQuery() {
+        UUID productId = UUID.randomUUID();
+        String barcode = "barcode-1";
+        productIdentifierProvider.registerProduct(barcode, productId);
+        costProvider.registerProductCost(productId, 80.0);
+
+        saleFacade.setProductPrice(new ProductQuery(null, barcode), 0.50f);
+
+        PriceBook priceBook = saleFacade.getCurrentProductPrice(new ProductQuery(null, barcode));
+        assertNotNull(priceBook);
+        assertEquals(productId, priceBook.getProductId());
+        assertEquals(120.0, priceBook.getSalePrice(), 0.0001);
     }
 
     @Test
     public void shouldReturnNullWhenNoProductPriceIsSet() {
-        PriceBook priceBook = saleFacade.getCurrentProductPrice(UUID.randomUUID());
+        PriceBook priceBook = saleFacade.getCurrentProductPrice(new ProductQuery(UUID.randomUUID(), null));
 
         assertNull(priceBook);
     }
@@ -177,12 +197,12 @@ public class SaleFacadeTest {
         UUID productId = UUID.randomUUID();
         costProvider.registerProductCost(productId, 100.0);
 
-        saleFacade.setProductPrice(productId, 0.10f);
+        saleFacade.setProductPrice(new ProductQuery(productId, null), 0.10f);
         Thread.sleep(10); // ensure a time gap between entries
         costProvider.registerProductCost(productId, 120.0);
-        saleFacade.setProductPrice(productId, 0.20f);
+        saleFacade.setProductPrice(new ProductQuery(productId, null), 0.20f);
 
-        PriceBook latest = saleFacade.getCurrentProductPrice(productId);
+        PriceBook latest = saleFacade.getCurrentProductPrice(new ProductQuery(productId, null));
         assertNotNull(latest);
         assertEquals(120.0, latest.getCost(), 0.0001);
         assertEquals(144.0, latest.getSalePrice(), 0.0001);

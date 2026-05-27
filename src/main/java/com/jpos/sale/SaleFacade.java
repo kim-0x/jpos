@@ -12,6 +12,7 @@ import com.jpos.sale.repository.SaleItemRepository;
 import com.jpos.sale.service.ProductPriceService;
 import com.jpos.sale.service.SaleTransactionService;
 import com.jpos.sale.service.ProductCostProvider;
+import com.jpos.sale.service.ProductIdentifierProvider;
 import com.jpos.sale.service.implementation.ProductPriceServiceImpl;
 import com.jpos.sale.service.implementation.SaleTransactionServiceImpl;
 
@@ -25,9 +26,11 @@ public class SaleFacade {
     public SaleFacade(SaleHeaderRepository saleHeaderRepository,
                       SaleItemRepository saleItemRepository,
                       PriceBookRepository priceBookRepository,
-                      ProductCostProvider productCostProvider) {
+                      ProductCostProvider productCostProvider,
+                      ProductIdentifierProvider productIdentifierProvider) {
         this.saleTransactionService = new SaleTransactionServiceImpl(saleHeaderRepository, saleItemRepository);
-        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCostProvider);
+        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCostProvider,
+                productIdentifierProvider);
     }
 
     /**
@@ -81,21 +84,21 @@ public class SaleFacade {
     /**
      * Set the price for a product with a given margin.
      *
-     * @param productId the product ID
+     * @param productQuery query containing product identifiers (id and/or barcode)
      * @param margin    the profit margin
      * @throws ProductNotFoundException if the product is not found in inventory
      */
-    public void setProductPrice(UUID productId, float margin) throws ProductNotFoundException {
-        productPriceService.setProductPrice(new ProductQuery(productId, null), margin);
+    public void setProductPrice(ProductQuery productQuery, float margin) throws ProductNotFoundException {
+        productPriceService.setProductPrice(productQuery, margin);
     }
 
     /**
      * Get the current price book entry for a product.
      *
-     * @param productId the product ID
+     * @param productQuery query containing product identifiers (id and/or barcode)
      * @return the PriceBook entry for the product or null if not found
      */
-    public PriceBook getCurrentProductPrice(UUID productId) {
-        return productPriceService.getCurrentProductPrice(productId);
+    public PriceBook getCurrentProductPrice(ProductQuery productQuery) {
+        return productPriceService.getCurrentProductPrice(productQuery);
     }
 }
