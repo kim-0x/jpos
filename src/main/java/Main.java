@@ -3,15 +3,25 @@ import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.repository.implementation.FileInventoryRepository;
 import com.jpos.inventory.repository.implementation.FileProductRepository;
+import com.jpos.inventory.service.implementation.InventoryServiceImpl;
+import com.jpos.inventory.service.implementation.ProductServiceImpl;
+import com.jpos.sale.SaleFacade;
+import com.jpos.sale.repository.PriceBookRepository;
+import com.jpos.sale.repository.SaleHeaderRepository;
+import com.jpos.sale.repository.SaleItemRepository;
+import com.jpos.sale.repository.implementation.FilePriceBookRepository;
+import com.jpos.sale.repository.implementation.FileSaleHeaderRepository;
+import com.jpos.sale.repository.implementation.FileSaleItemRepository;
+import com.jpos.sale.service.ProductCostProvider;
+import com.jpos.sale.service.ProductIdentifierProvider;
+import com.jpos.sale.service.implementation.InventoryCostProvider;
+import com.jpos.sale.service.implementation.InventoryProductIdentifierProvider;
 import com.jpos.user.UserFacade;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.repository.implementation.FileUserRepository;
 import utils.WelcomeMessage;
-import view.AppMenu;
-import view.InventoryFeature;
-import view.ProductFeature;
+import view.*;
 import view.implementation.*;
-import view.UserFeature;
 
 public class Main {
     public static void main(String[] args) {
@@ -26,7 +36,27 @@ public class Main {
         ProductFeature productFeatureView = new ProductFeatureView(inventoryFacade);
         InventoryFeature inventoryFeatureView = new InventoryFeatureView(inventoryFacade);
 
-        AppView appView = new AppView(appMenuView, userFeatureView, productFeatureView, inventoryFeatureView);
+        SaleHeaderRepository  saleHeaderRepository = new FileSaleHeaderRepository();
+        SaleItemRepository saleItemRepository = new FileSaleItemRepository();
+        PriceBookRepository priceBookRepository = new FilePriceBookRepository();
+        ProductCostProvider productCostProvider = new InventoryCostProvider(
+                new InventoryServiceImpl(inventoryRepository, productRepository));
+        ProductIdentifierProvider productIdentifierProvider = new InventoryProductIdentifierProvider(productRepository);
+
+        SaleFacade saleFacade = new SaleFacade(
+                saleHeaderRepository,
+                saleItemRepository,
+                priceBookRepository,
+                productCostProvider,
+                productIdentifierProvider);
+        SaleFeature saleFeatureView = new SaleFeatureView(saleFacade);
+
+        AppView appView = new AppView(appMenuView,
+                userFeatureView,
+                productFeatureView,
+                inventoryFeatureView,
+                saleFeatureView);
+
         WelcomeMessage.displayWelcomeMessage();
         appView.createSession();
     }

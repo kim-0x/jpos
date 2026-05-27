@@ -2,10 +2,7 @@ package view.implementation;
 
 import utils.IO;
 import utils.WelcomeMessage;
-import view.AppMenu;
-import view.InventoryFeature;
-import view.ProductFeature;
-import view.UserFeature;
+import view.*;
 
 public class AppView {
     private final AppMenu appMenu;
@@ -13,13 +10,20 @@ public class AppView {
     private final UserFeature userFeature;
     private final ProductFeature productFeature;
     private final InventoryFeature inventoryFeature;
+    private final SaleFeature saleFeature;
 
-    public AppView(AppMenu appMenu, UserFeature userFeature, ProductFeature productFeature, InventoryFeature inventoryFeature) {
+    public AppView(AppMenu appMenu,
+                   UserFeature userFeature,
+                   ProductFeature productFeature,
+                   InventoryFeature inventoryFeature,
+                   SaleFeature saleFeature) {
+
         this.appMenu = appMenu;
 
         this.userFeature = userFeature;
         this.productFeature = productFeature;
         this.inventoryFeature = inventoryFeature;
+        this.saleFeature = saleFeature;
     }
 
     public void createSession() {
@@ -71,8 +75,17 @@ public class AppView {
                 case 5:
                     inventoryFeature.stockEntry();
                     break;
+                case 6:
+                    saleFeature.setProductPrice();
+                    break;
                 case 8:
                     inventoryFeature.displayStockReport();
+                    break;
+                case 9:
+                    saleFeature.getCurrentProductPrice();
+                    break;
+                case 10:
+                    saleFeature.processSaleTransaction();
                     break;
                 default:
                     IO.println("Feature is not implemented yet.");
@@ -92,13 +105,26 @@ public class AppView {
                 case 4:
                     inventoryFeature.displayStockReport();
                     break;
+                case 5:
+                    saleFeature.getCurrentProductPrice();
+                    break;
                 default:
                     IO.println("Feature is not implemented yet.");
                     break;
             }
         }
         else {
-            IO.println("Feature is not implemented yet.");
+            switch (selectedOption) {
+                case 1:
+                    saleFeature.getCurrentProductPrice();
+                    break;
+                case 2:
+                    saleFeature.processSaleTransaction();
+                    break;
+                default:
+                    IO.println("Feature is not implemented yet.");
+                    break;
+            }
         }
     }
 }
