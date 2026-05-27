@@ -1,6 +1,5 @@
 package view.implementation;
 
-import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.model.SaleItem;
