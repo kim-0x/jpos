@@ -3,16 +3,16 @@ package com.jpos.sale;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.PriceBook;
+import com.jpos.sale.model.ProductRef;
 import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.model.SaleItemData;
 import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
-import com.jpos.sale.service.ProductIdentifierProvider;
+import com.jpos.sale.service.ProductCatalogGateway;
 import com.jpos.sale.service.ProductPriceService;
 import com.jpos.sale.service.SaleTransactionService;
-import com.jpos.sale.service.ProductCostProvider;
 import com.jpos.sale.service.implementation.ProductPriceServiceImpl;
 import com.jpos.sale.service.implementation.SaleTransactionServiceImpl;
 
@@ -22,19 +22,15 @@ import java.util.UUID;
 public class SaleFacade {
     private final SaleTransactionService saleTransactionService;
     private final ProductPriceService productPriceService;
-    private final ProductIdentifierProvider productIdentifierProvider;
-    private final ProductCostProvider productCostProvider;
+    private final ProductCatalogGateway productCatalogGateway;
 
     public SaleFacade(SaleHeaderRepository saleHeaderRepository,
                       SaleItemRepository saleItemRepository,
                       PriceBookRepository priceBookRepository,
-                      ProductCostProvider productCostProvider,
-                      ProductIdentifierProvider productIdentifierProvider) {
+                      ProductCatalogGateway productCatalogGateway) {
         this.saleTransactionService = new SaleTransactionServiceImpl(saleHeaderRepository, saleItemRepository);
-        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCostProvider,
-                productIdentifierProvider);
-        this.productIdentifierProvider = productIdentifierProvider;
-        this.productCostProvider = productCostProvider;
+        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCatalogGateway);
+        this.productCatalogGateway = productCatalogGateway;
     }
 
     /**
@@ -52,9 +48,9 @@ public class SaleFacade {
         SaleTransaction transaction = saleTransactionService.createTransaction(receiptNumber);
 
         for (SaleItemData item : items) {
-            var productQuery = new ProductQuery(null, item.getBarcode());
-            var productId = productIdentifierProvider.getProductId(productQuery);
-            var priceBook = getCurrentProductPrice(productQuery);
+            var productInfo = productCatalogGateway.findBy(new ProductRef(null, item.getBarcode()));
+            var productId = productInfo.productId();
+            var priceBook = getCurrentProductPrice(new ProductQuery(productId, productInfo.barcode()));
 
             SaleItem saleItem = new SaleItem(
                     productId,
@@ -118,11 +114,15 @@ public class SaleFacade {
      */
     public boolean isProductAvailable(String barcode) {
         try {
-            var cost = productCostProvider.getProductCost(new ProductQuery(null, barcode));
-            return cost != 0;
+            var productInfo = productCatalogGateway.findBy(new ProductRef(null, barcode));
+            return productInfo.cost() != 0;
         } catch (ProductNotFoundException e) {
             return false;
         }
+    }
+
+    public String getProductName(UUID productId) {
+        return productCatalogGateway.findBy(new ProductRef(productId, null)).name();
     }
 
 }

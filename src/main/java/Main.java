@@ -11,10 +11,8 @@ import com.jpos.sale.repository.SaleItemRepository;
 import com.jpos.sale.repository.implementation.FilePriceBookRepository;
 import com.jpos.sale.repository.implementation.FileSaleHeaderRepository;
 import com.jpos.sale.repository.implementation.FileSaleItemRepository;
-import com.jpos.sale.service.ProductCostProvider;
-import com.jpos.sale.service.ProductIdentifierProvider;
-import com.jpos.sale.service.implementation.InventoryCostProvider;
-import com.jpos.sale.service.implementation.InventoryProductIdentifierProvider;
+import com.jpos.sale.service.ProductCatalogGateway;
+import com.jpos.sale.service.implementation.InventoryProductCatalogGateway;
 import com.jpos.user.UserFacade;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.repository.implementation.FileUserRepository;
@@ -38,16 +36,15 @@ public class Main {
         SaleHeaderRepository  saleHeaderRepository = new FileSaleHeaderRepository();
         SaleItemRepository saleItemRepository = new FileSaleItemRepository();
         PriceBookRepository priceBookRepository = new FilePriceBookRepository();
-        ProductCostProvider productCostProvider = new InventoryCostProvider(
+        ProductCatalogGateway productCatalogGateway = new InventoryProductCatalogGateway(
+                productRepository,
                 new InventoryServiceImpl(inventoryRepository, productRepository));
-        ProductIdentifierProvider productIdentifierProvider = new InventoryProductIdentifierProvider(productRepository);
 
         SaleFacade saleFacade = new SaleFacade(
                 saleHeaderRepository,
                 saleItemRepository,
                 priceBookRepository,
-                productCostProvider,
-                productIdentifierProvider);
+                productCatalogGateway);
         SaleFeature saleFeatureView = new SaleFeatureView(saleFacade);
 
         AppView appView = new AppView(appMenuView,

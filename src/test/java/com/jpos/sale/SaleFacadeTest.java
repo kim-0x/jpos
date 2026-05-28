@@ -8,8 +8,7 @@ import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.implementation.MockPriceBookRepository;
 import com.jpos.sale.repository.implementation.MockSaleHeaderRepository;
 import com.jpos.sale.repository.implementation.MockSaleItemRepository;
-import com.jpos.sale.service.implementation.MockProductCostProvider;
-import com.jpos.sale.service.implementation.MockProductIdentifierProvider;
+import com.jpos.sale.service.implementation.MockProductCatalogGateway;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,25 +21,21 @@ import static org.junit.Assert.assertThrows;
 
 public class SaleFacadeTest {
     private SaleFacade saleFacade;
-    private MockProductCostProvider costProvider;
-    private MockProductIdentifierProvider productIdentifierProvider;
+    private MockProductCatalogGateway productCatalogGateway;
 
     private void registerPricedProduct(String barcode, UUID productId, double salePrice) {
-        productIdentifierProvider.registerProduct(barcode, productId);
-        costProvider.registerProductCost(productId, salePrice);
+        productCatalogGateway.registerProduct(barcode, productId, "Product-" + barcode, salePrice);
         saleFacade.setProductPrice(new ProductQuery(productId, barcode), 0.0f);
     }
 
     @Before
     public void setUp() {
-        costProvider = new MockProductCostProvider();
-        productIdentifierProvider = new MockProductIdentifierProvider();
+        productCatalogGateway = new MockProductCatalogGateway();
         saleFacade = new SaleFacade(
                 new MockSaleHeaderRepository(),
                 new MockSaleItemRepository(),
                 new MockPriceBookRepository(),
-                costProvider,
-                productIdentifierProvider
+                productCatalogGateway
         );
     }
 
@@ -182,7 +177,7 @@ public class SaleFacadeTest {
     @Test
     public void shouldSetProductPriceAndCalculateSalePriceFromMargin() {
         UUID productId = UUID.randomUUID();
-        costProvider.registerProductCost(productId, 100.0);
+        productCatalogGateway.registerProductCost(productId, 100.0);
 
         saleFacade.setProductPrice(new ProductQuery(productId, null), 0.25f);
 
@@ -205,8 +200,7 @@ public class SaleFacadeTest {
     public void shouldSetAndGetProductPriceByBarcodeQuery() {
         UUID productId = UUID.randomUUID();
         String barcode = "barcode-1";
-        productIdentifierProvider.registerProduct(barcode, productId);
-        costProvider.registerProductCost(productId, 80.0);
+        productCatalogGateway.registerProduct(barcode, productId, "Product-barcode-1", 80.0);
 
         saleFacade.setProductPrice(new ProductQuery(null, barcode), 0.50f);
 
@@ -226,16 +220,30 @@ public class SaleFacadeTest {
     @Test
     public void shouldReturnLatestPriceWhenProductPriceIsUpdatedMultipleTimes() throws InterruptedException {
         UUID productId = UUID.randomUUID();
-        costProvider.registerProductCost(productId, 100.0);
+        productCatalogGateway.registerProductCost(productId, 100.0);
 
         saleFacade.setProductPrice(new ProductQuery(productId, null), 0.10f);
         Thread.sleep(10); // ensure a time gap between entries
-        costProvider.registerProductCost(productId, 120.0);
+        productCatalogGateway.registerProductCost(productId, 120.0);
         saleFacade.setProductPrice(new ProductQuery(productId, null), 0.20f);
 
         PriceBook latest = saleFacade.getCurrentProductPrice(new ProductQuery(productId, null));
         assertNotNull(latest);
         assertEquals(120.0, latest.getCost(), 0.0001);
         assertEquals(144.0, latest.getSalePrice(), 0.0001);
+    }
+
+    @Test
+    public void shouldGetProductNameByProductId() {
+        UUID productId = UUID.randomUUID();
+        productCatalogGateway.registerProduct("barcode-7", productId, "Coffee", 35.0);
+
+        assertEquals("Coffee", saleFacade.getProductName(productId));
+    }
+
+    @Test
+    public void shouldThrowWhenGettingProductNameForUnknownProductId() {
+        assertThrows(ProductNotFoundException.class,
+                () -> saleFacade.getProductName(UUID.randomUUID()));
     }
 }

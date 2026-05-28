@@ -2,22 +2,20 @@ package com.jpos.sale.service.implementation;
 
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.sale.model.PriceBook;
+import com.jpos.sale.model.ProductInfo;
+import com.jpos.sale.model.ProductRef;
 import com.jpos.sale.repository.PriceBookRepository;
-import com.jpos.sale.service.ProductIdentifierProvider;
+import com.jpos.sale.service.ProductCatalogGateway;
 import com.jpos.sale.service.ProductPriceService;
-import com.jpos.sale.service.ProductCostProvider;
 
 public class ProductPriceServiceImpl implements ProductPriceService {
     private final PriceBookRepository priceBookRepository;
-    private final ProductCostProvider costProvider;
-    private final ProductIdentifierProvider productIdentifierProvider;
+    private final ProductCatalogGateway productCatalogGateway;
 
     public ProductPriceServiceImpl(PriceBookRepository priceBookRepository,
-                                   ProductCostProvider costProvider,
-                                   ProductIdentifierProvider productIdentifierProvider) {
+                                   ProductCatalogGateway productCatalogGateway) {
         this.priceBookRepository = priceBookRepository;
-        this.costProvider = costProvider;
-        this.productIdentifierProvider = productIdentifierProvider;
+        this.productCatalogGateway = productCatalogGateway;
     }
 
     @Override
@@ -26,16 +24,14 @@ public class ProductPriceServiceImpl implements ProductPriceService {
             throw new IllegalArgumentException("Product query is required.");
         }
 
-        ProductQuery normalizedQuery = normalizeQuery(productQuery);
-
-        // Get the product cost from the provider (which looks it up in inventory)
-        double cost = costProvider.getProductCost(normalizedQuery);
+        ProductInfo productInfo = resolveProduct(productQuery);
+        double cost = productInfo.cost();
         
         // Calculate sale price: cost * (1 + margin)
         double salePrice = cost * (1 + margin);
         
         // Create and save the new price book entry
-        PriceBook priceBook = new PriceBook(normalizedQuery.getProductId(), cost, margin, salePrice);
+        PriceBook priceBook = new PriceBook(productInfo.productId(), cost, margin, salePrice);
         priceBookRepository.add(priceBook);
     }
 
@@ -45,11 +41,12 @@ public class ProductPriceServiceImpl implements ProductPriceService {
             throw new IllegalArgumentException("Product query is required.");
         }
 
-        ProductQuery normalizedQuery = normalizeQuery(productQuery);
-        return priceBookRepository.getById(normalizedQuery.getProductId());
+        ProductInfo productInfo = resolveProduct(productQuery);
+        return priceBookRepository.getById(productInfo.productId());
     }
 
-    private ProductQuery normalizeQuery(ProductQuery productQuery) {
-        return new ProductQuery(productIdentifierProvider.getProductId(productQuery), productQuery.getBarcode());
+    private ProductInfo resolveProduct(ProductQuery productQuery) {
+        ProductRef ref = new ProductRef(productQuery.getProductId(), productQuery.getBarcode());
+        return productCatalogGateway.findBy(ref);
     }
 }

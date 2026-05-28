@@ -139,8 +139,12 @@ public class SaleFeatureView implements SaleFeature {
         for (SaleItem saleItem : saleItems) {
             String priceFormatted = df.format(saleItem.getPrice());
             String totalPriceFormatted = df.format(saleItem.getTotalPrice());
+            String productName = saleFacade.getProductName(saleItem.getProductId());
+            String productNameFormatted = (productName.length() > 25)
+                    ? String.format("%s...",productName.substring(0, 25))
+                    : productName;
             System.out.printf("%-45s %5s %20s %20s%n",
-                    saleItem.getProductId(),
+                    productNameFormatted,
                     saleItem.getQuantity(),
                     priceFormatted,
                     totalPriceFormatted);
