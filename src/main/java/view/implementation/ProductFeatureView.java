@@ -1,8 +1,8 @@
 package view.implementation;
 
 import com.jpos.inventory.InventoryFacade;
-import com.jpos.inventory.exception.InvalidCategoryException;
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductCategory;
 import utils.IO;
 import view.ProductFeature;
 
@@ -19,7 +19,7 @@ public class ProductFeatureView implements ProductFeature {
             try {
                 var barcode = IO.readln("Enter barcode: ");
                 var productName = IO.readln("Enter product name: ");
-                var category = selectCategory();
+                ProductCategory category = selectCategory();
                 inventoryFacade.createNewProduct(barcode, productName, category);
                 var answer = IO.readln("New product has been created. Do you want to continue? (y/n): ");
                 if (answer.equalsIgnoreCase("n")) {
@@ -63,27 +63,26 @@ public class ProductFeatureView implements ProductFeature {
         }
     }
 
-    private String selectCategory() {
-        try {
-            String[] categorySelectionList = inventoryFacade.getCategories();
-            while (true) {
-                int selectIndex = 1;
-                StringBuilder builder = new StringBuilder();
-                for (String category : categorySelectionList) {
-                    builder.append(String.format("%d - %s\n", selectIndex, category));
-                    selectIndex++;
-                }
-                var userSelectOption = IO.readln(String.format("Select product category \n%s: ", builder));
+    private ProductCategory selectCategory() {
+        ProductCategory[] categories = ProductCategory.values();
+        while (true) {
+            int selectIndex = 1;
+            StringBuilder builder = new StringBuilder();
+            for (ProductCategory category : categories) {
+                builder.append(String.format("%d - %s\n", selectIndex, category.getValue()));
+                selectIndex++;
+            }
+            var userSelectOption = IO.readln(String.format("Select product category \n%s: ", builder));
+            try {
                 int optionIndex = Integer.parseInt(userSelectOption) - 1;
-                if (optionIndex < 0 || optionIndex >= categorySelectionList.length) {
+                if (optionIndex < 0 || optionIndex >= categories.length) {
                     IO.println("Select a valid category. Please enter number in the range.");
                     continue;
                 }
-
-                return categorySelectionList[optionIndex];
+                return categories[optionIndex];
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException(String.format("%s is invalid category selection", userSelectOption));
             }
-        } catch (NumberFormatException | InvalidCategoryException e) {
-            throw new NumberFormatException(String.format("%s is invalid category selection", e.getMessage()));
         }
     }
 }

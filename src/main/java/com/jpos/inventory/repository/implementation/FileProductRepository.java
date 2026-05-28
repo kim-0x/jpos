@@ -1,6 +1,7 @@
 package com.jpos.inventory.repository.implementation;
 
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.repository.ProductRepository;
 import utils.AbstractCsvRepository;
@@ -91,7 +92,7 @@ public class FileProductRepository extends AbstractCsvRepository<Product> implem
             product.setId(UUID.fromString(row[0].trim()));
             product.setBarcode(row[1].trim());
             product.setName(row[2]);
-            product.setCategory(row[3].trim());
+            product.setCategory(ProductCategory.fromString(row[3].trim()));
             return product;
         } catch (IllegalArgumentException exception) {
             throw new IllegalStateException(String.format("Invalid product id at line %d.", lineNumber), exception);
@@ -104,7 +105,7 @@ public class FileProductRepository extends AbstractCsvRepository<Product> implem
                 product.getId().toString(),
                 product.getBarcode(),
                 product.getName(),
-                product.getCategory()
+                product.getCategory().getValue()
         };
     }
 

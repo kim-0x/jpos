@@ -1,12 +1,14 @@
 package com.jpos.inventory.model;
 
+import com.jpos.inventory.exception.InvalidCategoryException;
+
 import java.util.UUID;
 
 public class Product implements Comparable<Product> {
     private UUID id;
     private String barcode;
     private String name;
-    private String category;
+    private ProductCategory category;
 
     public UUID getId() {
         return id;
@@ -32,11 +34,15 @@ public class Product implements Comparable<Product> {
         this.name = name;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
+        if (category == null) {
+            throw new InvalidCategoryException("Invalid category");
+        }
+
         this.category = category;
     }
 

@@ -1,6 +1,7 @@
 package com.jpos.inventory.repository.implementation;
 
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.ProductQuery;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class FileProductRepositoryTest {
         Product product = new Product();
         product.setBarcode("123456789012");
         product.setName("Coffee");
-        product.setCategory("beverage");
+        product.setCategory(ProductCategory.BEVERAGE);
 
         repository.saveProduct(product);
 

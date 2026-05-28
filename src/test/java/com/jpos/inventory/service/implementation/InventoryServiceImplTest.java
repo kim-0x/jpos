@@ -3,6 +3,7 @@ package com.jpos.inventory.service.implementation;
 import com.jpos.inventory.exception.ProductNotFoundException;
 import com.jpos.inventory.model.Inventory;
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.model.StockItem;
 import com.jpos.inventory.model.StockRecord;
@@ -120,7 +121,7 @@ public class InventoryServiceImplTest {
         Product product = new Product();
         product.setBarcode(barcode);
         product.setName(name);
-        product.setCategory(category);
+        product.setCategory(ProductCategory.fromString(category));
         return product;
     }
 

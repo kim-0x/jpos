@@ -1,6 +1,7 @@
 package com.jpos.inventory;
 
 import com.jpos.inventory.model.Product;
+import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.StockRecord;
 import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
@@ -18,16 +19,12 @@ public class InventoryFacade {
         this.productService = new ProductServiceImpl(productRepository);
     }
 
-    public void createNewProduct(String barcode, String name, String category) {
+    public void createNewProduct(String barcode, String name, ProductCategory category) {
         productService.saveProduct(barcode, name, category);
     }
 
     public Product[] getProducts() {
         return productService.getProducts();
-    }
-
-    public String[] getCategories() {
-        return productService.getCategories();
     }
 
     public StockRecord[] getStockReport() {
