@@ -9,10 +9,10 @@ import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
+import com.jpos.sale.service.ProductIdentifierProvider;
 import com.jpos.sale.service.ProductPriceService;
 import com.jpos.sale.service.SaleTransactionService;
 import com.jpos.sale.service.ProductCostProvider;
-import com.jpos.sale.service.ProductIdentifierProvider;
 import com.jpos.sale.service.implementation.ProductPriceServiceImpl;
 import com.jpos.sale.service.implementation.SaleTransactionServiceImpl;
 

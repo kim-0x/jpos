@@ -4,7 +4,6 @@ import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.repository.implementation.FileInventoryRepository;
 import com.jpos.inventory.repository.implementation.FileProductRepository;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
-import com.jpos.inventory.service.implementation.ProductServiceImpl;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;

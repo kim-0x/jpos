@@ -77,23 +77,24 @@ public class SaleFeatureView implements SaleFeature {
     public void processSaleTransaction() {
         while (true) {
             String receiptNumber = generateReceiptNumber();
-            ArrayList<SaleItemData> records = new ArrayList<>();
-            while (true) {
-                try {
-                    var barcode = utils.IO.readln("Enter barcode: ");
-                    records.add(new SaleItemData(barcode, 1));
+            ArrayList<SaleItemData> transactions = new ArrayList<>();
+            try {
+                while (true) {
+                    var barcode = utils.IO.readln("Enter barcode or type 'done' to complete transactions: ");
 
-                    var answer = utils.IO.readln("Do you want to complete transaction? (y/n): ");
-                    if (answer.equalsIgnoreCase("y")) {
-                        var transactionId = saleFacade.processSaleTransaction(receiptNumber,
-                                records.toArray(new SaleItemData[0]));
-                        IO.println(String.format("Transaction completed: %s", transactionId));
-                        displayTransaction(transactionId);
+                    if (barcode.equalsIgnoreCase("done")) {
                         break;
                     }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+
+                    transactions.add(new SaleItemData(barcode, 1));
                 }
+
+                var transactionId = saleFacade.processSaleTransaction(receiptNumber,
+                        transactions.toArray(new SaleItemData[0]));
+                IO.println(String.format("Transaction completed: %s", transactionId));
+                displayTransaction(transactionId);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
 
             var answer = utils.IO.readln("Next customer? (y/n): ");
@@ -126,18 +127,22 @@ public class SaleFeatureView implements SaleFeature {
         var saleTransaction = saleFacade.getTransactionById(transactionId);
         IO.println(String.format("Receipt Number: %s", saleTransaction.getHeader().getReceiptNumber()));
         System.out.printf("%s%n", "-".repeat(110));
-        System.out.printf("%-45s %-20s %-30s %-20s%n", "ProductName", "Quantity", "Price", "Total");
+        System.out.printf("%-45s %-20s %-20s %-5s%n", "ProductName", "Quantity", "Price", "Total");
         System.out.printf("%s%n", "-".repeat(110));
         SaleItem[] saleItems = saleTransaction.getSaleItems();
+        DecimalFormat df = new DecimalFormat("$###,###.00");
         for (SaleItem saleItem : saleItems) {
-            System.out.printf("%-45s %-20s %-30s %-20s%n",
+            String priceFormatted = df.format(saleItem.getPrice());
+            String totalPriceFormatted = df.format(saleItem.getTotalPrice());
+            System.out.printf("%-45s %5s %20s %20s%n",
                     saleItem.getProductId(),
                     saleItem.getQuantity(),
-                    saleItem.getPrice(),
-                    saleItem.getTotalPrice());
+                    priceFormatted,
+                    totalPriceFormatted);
         }
 
         System.out.printf("%s%n", "-".repeat(110));
-        IO.println(String.format("Grad Total: %-100s%n", saleTransaction.getHeader().getGrandTotal()));
+        String grandTotalFormatted = df.format(saleTransaction.getHeader().getGrandTotal());
+        IO.println(String.format("Grad Total: %81s%n", grandTotalFormatted));
     }
 }
