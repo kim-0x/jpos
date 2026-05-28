@@ -12,7 +12,7 @@ public class ManagerUser extends User {
     };
 
     public ManagerUser(String userName, String password) {
-        super(userName, "Manager");
+        super(userName, UserRole.MANAGER.getValue());
         this.setPassword(password);
         this.setId(UUID.randomUUID());
     }

@@ -17,7 +17,7 @@ public class AdminUser extends User {
     };
 
     public AdminUser(String username, String password) {
-        super(username, "Admin");
+        super(username, UserRole.ADMIN.getValue());
         this.setPassword(password);
         this.setId(UUID.randomUUID());
     }

@@ -3,6 +3,7 @@ package view.implementation;
 import utils.IO;
 import utils.WelcomeMessage;
 import view.*;
+import com.jpos.user.model.UserRole;
 
 public class AppView {
     private final AppMenu appMenu;
@@ -57,8 +58,8 @@ public class AppView {
     }
 
     private void selectFeatureOption(int selectedOption) {
-        String userRole = userFeature.getCurrentUserRole();
-        if (userRole.equalsIgnoreCase("Admin")) {
+        UserRole userRole = userFeature.getCurrentUserRole();
+        if (userRole == UserRole.ADMIN) {
             switch (selectedOption) {
                 case 1:
                     userFeature.createNewUser();
@@ -91,7 +92,7 @@ public class AppView {
                     IO.println("Feature is not implemented yet.");
                     break;
             }
-        } else if (userRole.equalsIgnoreCase("Manager")) {
+        } else if (userRole == UserRole.MANAGER) {
             switch (selectedOption) {
                 case 1:
                     productFeature.createNewProduct();

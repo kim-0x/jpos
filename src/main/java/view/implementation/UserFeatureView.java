@@ -7,6 +7,7 @@ import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
+import com.jpos.user.model.UserRole;
 import utils.IO;
 import view.UserFeature;
 
@@ -62,10 +63,10 @@ public class UserFeatureView implements UserFeature {
                     IO.println("Invalid password. Please try again.");
                     continue;
                 }
-                String[] roles = new String[] {"admin", "manager", "cashier"};
+                UserRole[] roles = UserRole.values();
                 var inputRole = IO.readln("Enter role (1: Admin, 2: Store Manager, 3: Cashier): ");
                 int roleIndex = Integer.parseInt(inputRole) - 1;
-                if (roleIndex < 0 || roleIndex >= 3) {
+                if (roleIndex < 0 || roleIndex >= roles.length) {
                     IO.println("Invalid user role. Please try again.");
                     continue;
                 }
@@ -101,9 +102,9 @@ public class UserFeatureView implements UserFeature {
     }
 
     @Override
-    public String getCurrentUserRole() {
+    public UserRole getCurrentUserRole() {
         LoginUser currentLoginUser = userFacade.getCurrentUserLogin();
-        return currentLoginUser.getRole();
+        return UserRole.fromString(currentLoginUser.getRole());
     }
 
     private void clear() {

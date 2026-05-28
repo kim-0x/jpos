@@ -7,6 +7,7 @@ import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.AdminUser;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
+import com.jpos.user.model.UserRole;
 import com.jpos.user.repository.implementation.MockUserRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -71,7 +72,7 @@ public class UserFacadeTest {
     public void shouldCreateUserAsAdminAndIncludeItInUserList() throws Exception {
         userFacade.signIn("admin", "admin");
 
-        userFacade.createNewUser("testUser", "password", "cashier");
+        userFacade.createNewUser("testUser", "password", UserRole.CASHIER);
 
         User[] users = userFacade.getUsers(userFacade.getCurrentUserLogin().getRole());
         assertTrue(Arrays.stream(users).anyMatch(user ->
@@ -83,7 +84,7 @@ public class UserFacadeTest {
         userFacade.signIn("admin", "admin");
 
         assertThrows(UsernameAlreadyExistsException.class,
-                () -> userFacade.createNewUser("admin", "password", "cashier"));
+                () -> userFacade.createNewUser("admin", "password", UserRole.CASHIER));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class UserFacadeTest {
         userFacade.signIn("admin", "admin");
 
         assertThrows(AdminAlreadyExistsException.class,
-                () -> userFacade.createNewUser("otherAdmin", "password", "admin"));
+                () -> userFacade.createNewUser("otherAdmin", "password", UserRole.ADMIN));
     }
 
     @Test
@@ -107,12 +108,12 @@ public class UserFacadeTest {
         signInAsCashier();
 
         assertThrows(UnauthorizedUserActionException.class,
-                () -> userFacade.createNewUser("testUser", "password", "cashier"));
+                () -> userFacade.createNewUser("testUser", "password", UserRole.CASHIER));
     }
 
     private void signInAsCashier() throws Exception {
         userFacade.signIn("admin", "admin");
-        userFacade.createNewUser("cashierUser", "password", "cashier");
+        userFacade.createNewUser("cashierUser", "password", UserRole.CASHIER);
         userFacade.signOut();
         assertTrue(userFacade.signIn("cashierUser", "password"));
     }

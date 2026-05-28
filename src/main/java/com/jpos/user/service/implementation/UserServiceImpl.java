@@ -4,6 +4,7 @@ import com.jpos.user.exception.UnauthorizedUserActionException;
 import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.User;
+import com.jpos.user.model.UserRole;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.service.UserService;
 
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameAlreadyExistsException(username);
         }
 
-        boolean isAdminRole = currentUserRole.equals("Admin");
+        boolean isAdminRole = currentUserRole.equals(UserRole.ADMIN.getValue());
         if (!isAdminRole) {
             throw new UnauthorizedUserActionException(
                     String.format("Role %s is unauthorized access this feature.", currentUserRole));
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User[] getUsers(String role) {
-        boolean isAdminRole = role.equals("Admin");
+        boolean isAdminRole = role.equals(UserRole.ADMIN.getValue());
         if (!isAdminRole) {
             throw new UnauthorizedUserActionException(
                     String.format("Role %s is unauthorized access this feature.", role));

@@ -14,7 +14,7 @@ public class CashierUser extends User {
     }
 
     public CashierUser(String username, String password) {
-        super(username, "Cashier");
+        super(username, UserRole.CASHIER.getValue());
         this.setPassword(password);
         this.setId(UUID.randomUUID());
     }
