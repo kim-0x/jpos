@@ -3,6 +3,7 @@ package view.implementation;
 import com.jpos.user.UserFacade;
 import com.jpos.user.exception.AdminAlreadyExistsException;
 import com.jpos.user.exception.UnauthorizedUserActionException;
+import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
@@ -76,7 +77,7 @@ public class UserFeatureView implements UserFeature {
             }
         } catch (UsernameAlreadyExistsException
                  | AdminAlreadyExistsException
-                 | InstantiationException
+                 | UserCreationException
                  | UnauthorizedUserActionException e) {
             IO.println(e.getMessage());
         }

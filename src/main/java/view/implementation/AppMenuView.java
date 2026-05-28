@@ -1,6 +1,7 @@
 package view.implementation;
 
 import com.jpos.user.UserFacade;
+import com.jpos.user.exception.UserCreationException;
 import utils.IO;
 import view.AppMenu;
 
@@ -40,7 +41,7 @@ public class AppMenuView implements AppMenu {
                     return option;
                 }
             }
-        } catch (IndexOutOfBoundsException | InstantiationException e) {
+        } catch (IndexOutOfBoundsException | UserCreationException e) {
             IO.println(e.getMessage());
             return -1;
         }

@@ -1,6 +1,7 @@
 package com.jpos.user;
 
 import com.jpos.user.exception.UnauthorizedUserActionException;
+import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
@@ -31,7 +32,7 @@ public class UserFacade {
     }
 
     public void createNewUser(String username, String password, String role) throws InvalidParameterException,
-            InstantiationException {
+            UserCreationException {
         if (!Arrays.asList(roles).contains(role.toLowerCase())) {
            throw new InvalidParameterException(String.format("Invalid role %s", role));
         }
@@ -52,17 +53,17 @@ public class UserFacade {
         loginService.signOut();
     }
 
-    public String[] getAccessFeatures() throws InstantiationException {
+    public String[] getAccessFeatures() throws UserCreationException {
         LoginUser currentUser = this.getCurrentUserLogin();
         User user = UserBuilder.createUser(currentUser.getUsername(), "", currentUser.getRole());
         if (user == null) {
-            throw new InstantiationException("Unable to identify user");
+            throw new UserCreationException("Unable to identify user");
         }
 
         return user.getAccessFeatures();
     }
 
-    public boolean validAccessFeatureKey(int key) throws InstantiationException, IndexOutOfBoundsException {
+    public boolean validAccessFeatureKey(int key) throws UserCreationException, IndexOutOfBoundsException {
         String[] allFeatures = this.getAccessFeatures();
 
         if (key <= 0 || key > allFeatures.length) {

@@ -1,6 +1,7 @@
 package com.jpos.user.repository.implementation;
 
 import com.jpos.user.exception.AdminAlreadyExistsException;
+import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.model.AdminUser;
 import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
@@ -14,10 +15,10 @@ public class MockUserRepository implements UserRepository {
     private static final ArrayList<User> users = new ArrayList<>(List.of(new AdminUser("admin", "admin")));
 
     @Override
-    public boolean addUser(String username, String password, String role) throws InstantiationException {
+    public boolean addUser(String username, String password, String role) throws UserCreationException {
         User user = UserBuilder.createUser(username, password, role);
         if (user == null) {
-            throw new InstantiationException("Unable to create user object");
+            throw new UserCreationException("Unable to create user object");
         }
 
         if (user instanceof AdminUser) {

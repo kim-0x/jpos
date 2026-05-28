@@ -1,6 +1,7 @@
 package com.jpos.user.service.implementation;
 
 import com.jpos.user.exception.UnauthorizedUserActionException;
+import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.exception.UsernameAlreadyExistsException;
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
@@ -15,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean addUser(String username, String password, String newUserRole, String currentUserRole)
-            throws InstantiationException {
+            throws UserCreationException {
         if (userRepository.isNameTaken(username)) {
             throw new UsernameAlreadyExistsException(username);
         }

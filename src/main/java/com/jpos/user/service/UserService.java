@@ -1,5 +1,6 @@
 package com.jpos.user.service;
 
+import com.jpos.user.exception.UserCreationException;
 import com.jpos.user.model.User;
 
 public interface UserService {
@@ -10,7 +11,7 @@ public interface UserService {
      * POSTCONDITION: a new user is added to the repository on success; otherwise no user is created.
      */
     boolean addUser(String username, String password, String newUserRole, String currentUserRole)
-            throws InstantiationException;
+            throws UserCreationException;
 
     /**
      * INTENT: Retrieve the list of user accounts visible to the current caller.
