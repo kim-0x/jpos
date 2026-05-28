@@ -97,6 +97,20 @@ Run all tests:
 mvn test
 ```
 
+## Generate JaCoCo coverage report
+
+Run the Maven verify phase to execute tests and produce the HTML coverage report:
+
+```sh
+mvn verify
+```
+
+After the build completes, open the report in your browser:
+
+```text
+target/site/jacoco/index.html
+```
+
 Run a single test class:
 
 ```sh
