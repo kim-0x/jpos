@@ -103,7 +103,11 @@ public class SaleFacade {
      * @return the PriceBook entry for the product or null if not found
      */
     public PriceBook getCurrentProductPrice(ProductQuery productQuery) {
-        return productPriceService.getCurrentProductPrice(productQuery);
+        try {
+            return productPriceService.getCurrentProductPrice(productQuery);
+        } catch (ProductNotFoundException e) {
+            return null;
+        }
     }
 
     /**
