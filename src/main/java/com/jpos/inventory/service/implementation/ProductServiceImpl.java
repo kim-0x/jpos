@@ -1,10 +1,10 @@
 package com.jpos.inventory.service.implementation;
 
+import com.jpos.inventory.exception.InvalidCategoryException;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.service.ProductService;
 
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 
 public class ProductServiceImpl implements ProductService {
@@ -19,7 +19,7 @@ public class ProductServiceImpl implements ProductService {
     public void saveProduct(String barcode, String name, String category) {
         String normalizedCategory = category == null ? null : category.trim().toLowerCase();
         if (normalizedCategory == null || !Arrays.asList(categories).contains(normalizedCategory)) {
-            throw new InvalidParameterException(String.format("Invalid category %s", category));
+            throw new InvalidCategoryException(category);
         }
 
         Product product = new Product();

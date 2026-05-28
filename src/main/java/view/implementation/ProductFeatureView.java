@@ -1,6 +1,7 @@
 package view.implementation;
 
 import com.jpos.inventory.InventoryFacade;
+import com.jpos.inventory.exception.InvalidCategoryException;
 import com.jpos.inventory.model.Product;
 import utils.IO;
 import view.ProductFeature;
@@ -81,7 +82,7 @@ public class ProductFeatureView implements ProductFeature {
 
                 return categorySelectionList[optionIndex];
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | InvalidCategoryException e) {
             throw new NumberFormatException(String.format("%s is invalid category selection", e.getMessage()));
         }
     }

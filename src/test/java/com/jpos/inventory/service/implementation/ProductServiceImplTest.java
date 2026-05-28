@@ -1,5 +1,6 @@
 package com.jpos.inventory.service.implementation;
 
+import com.jpos.inventory.exception.InvalidCategoryException;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.repository.implementation.MockProductRepository;
 import org.junit.After;
@@ -45,7 +46,7 @@ public class ProductServiceImplTest {
 
     @Test
     public void shouldThrowWhenCategoryDoesNotExist() {
-        assertThrows(InvalidParameterException.class,
+        assertThrows(InvalidCategoryException.class,
                 () -> productService.saveProduct("barcode-1", "Milk", "invalid-category"));
     }
 
