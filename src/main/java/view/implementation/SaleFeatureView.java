@@ -152,6 +152,6 @@ public class SaleFeatureView implements SaleFeature {
 
         System.out.printf("%s%n", "-".repeat(110));
         String grandTotalFormatted = df.format(saleTransaction.getHeader().getGrandTotal());
-        IO.println(String.format("Grad Total: %81s%n", grandTotalFormatted));
+        IO.println(String.format("Grand Total: %80s%n", grandTotalFormatted));
     }
 }

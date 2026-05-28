@@ -2,3 +2,4 @@ id,name,password,role
 00000000-0000-0000-0000-0085374aeb72,admin,admin,admin
 f866dc79-ff3f-4ce4-9d79-3bd0aa254ce9,john,123,manager
 d9bfad8b-ea8d-4f6b-8250-0c17150f4dcc,marry,123,cashier
+13020006-8a13-4fef-b433-b5afbcc01bda,Tom,123,manager
