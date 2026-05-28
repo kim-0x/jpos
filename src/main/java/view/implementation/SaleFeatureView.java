@@ -86,7 +86,12 @@ public class SaleFeatureView implements SaleFeature {
                         break;
                     }
 
-                    transactions.add(new SaleItemData(barcode, 1));
+                    boolean isAvailable = saleFacade.isProductAvailable(barcode);
+                    if (isAvailable) {
+                        transactions.add(new SaleItemData(barcode, 1));
+                    } else {
+                        IO.println("No items available in stock!");
+                    }
                 }
 
                 var transactionId = saleFacade.processSaleTransaction(receiptNumber,

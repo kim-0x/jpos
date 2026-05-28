@@ -23,6 +23,7 @@ public class SaleFacade {
     private final SaleTransactionService saleTransactionService;
     private final ProductPriceService productPriceService;
     private final ProductIdentifierProvider productIdentifierProvider;
+    private final ProductCostProvider productCostProvider;
 
     public SaleFacade(SaleHeaderRepository saleHeaderRepository,
                       SaleItemRepository saleItemRepository,
@@ -33,6 +34,7 @@ public class SaleFacade {
         this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCostProvider,
                 productIdentifierProvider);
         this.productIdentifierProvider = productIdentifierProvider;
+        this.productCostProvider = productCostProvider;
     }
 
     /**
@@ -107,4 +109,20 @@ public class SaleFacade {
     public PriceBook getCurrentProductPrice(ProductQuery productQuery) {
         return productPriceService.getCurrentProductPrice(productQuery);
     }
+
+    /**
+     * Validate if product with barcode is available in inventory
+     *
+     * @param barcode product barcode
+     * @return true if product is available to buy. Otherwise, false
+     */
+    public boolean isProductAvailable(String barcode) {
+        try {
+            var cost = productCostProvider.getProductCost(new ProductQuery(null, barcode));
+            return cost != 0;
+        } catch (ProductNotFoundException e) {
+            return false;
+        }
+    }
+
 }
