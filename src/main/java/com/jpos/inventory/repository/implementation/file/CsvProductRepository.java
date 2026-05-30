@@ -1,4 +1,4 @@
-package com.jpos.inventory.repository.implementation;
+package com.jpos.inventory.repository.implementation.file;
 
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductCategory;
@@ -11,17 +11,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class FileProductRepository extends AbstractCsvRepository<Product> implements ProductRepository {
+public class CsvProductRepository extends AbstractCsvRepository<Product> implements ProductRepository {
     private static final String DATA_LABEL = "Product data";
     private static final String[] HEADER = new String[] {"id", "barcode", "name", "category"};
 
     private final ArrayList<Product> products = new ArrayList<>();
 
-    public FileProductRepository() {
+    public CsvProductRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("product.csv"));
     }
 
-    public FileProductRepository(Path filePath) {
+    public CsvProductRepository(Path filePath) {
         super(filePath);
         loadProducts();
     }

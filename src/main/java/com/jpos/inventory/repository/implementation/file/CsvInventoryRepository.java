@@ -1,4 +1,4 @@
-package com.jpos.inventory.repository.implementation;
+package com.jpos.inventory.repository.implementation.file;
 
 import com.jpos.inventory.model.Inventory;
 import com.jpos.inventory.model.ProductQuery;
@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-public class FileInventoryRepository extends AbstractCsvRepository<StockItem> implements InventoryRepository {
+public class CsvInventoryRepository extends AbstractCsvRepository<StockItem> implements InventoryRepository {
     private static final String DATA_LABEL = "Inventory data";
     private static final String[] HEADER = new String[] {"id", "numberInStock", "cost", "productId", "createdAt"};
 
     private final Inventory inventory = new Inventory();
 
-    public FileInventoryRepository() {
+    public CsvInventoryRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("inventory.csv"));
     }
 
-    public FileInventoryRepository(Path filePath) {
+    public CsvInventoryRepository(Path filePath) {
         super(filePath);
         loadStockItems();
     }

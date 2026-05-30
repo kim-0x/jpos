@@ -1,4 +1,4 @@
-package com.jpos.sale.repository.implementation;
+package com.jpos.sale.repository.implementation.file;
 
 import com.jpos.sale.model.SaleHeader;
 import com.jpos.sale.repository.SaleHeaderRepository;
@@ -9,17 +9,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class FileSaleHeaderRepository extends AbstractCsvRepository<SaleHeader> implements SaleHeaderRepository {
+public class CsvSaleHeaderRepository extends AbstractCsvRepository<SaleHeader> implements SaleHeaderRepository {
     private static final String DATA_LABEL = "Sale transaction data";
     private static final String[] HEADER = new String[] {"transactionId", "receiptNumber", "grandTotal", "transactionDate"};
 
     private final ArrayList<SaleHeader> headers = new ArrayList<>();
 
-    public FileSaleHeaderRepository() {
+    public CsvSaleHeaderRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("saletransaction.csv"));
     }
 
-    public FileSaleHeaderRepository(Path filePath) {
+    public CsvSaleHeaderRepository(Path filePath) {
         super(filePath);
         headers.addAll(loadFromCsv());
     }

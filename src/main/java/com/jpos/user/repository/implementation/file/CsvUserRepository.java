@@ -1,4 +1,4 @@
-package com.jpos.user.repository.implementation;
+package com.jpos.user.repository.implementation.file;
 
 import com.jpos.user.exception.AdminAlreadyExistsException;
 import com.jpos.user.exception.UserCreationException;
@@ -15,17 +15,17 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 
-public class FileUserRepository extends AbstractCsvRepository<User> implements UserRepository {
+public class CsvUserRepository extends AbstractCsvRepository<User> implements UserRepository {
     private static final String DATA_LABEL = "User data";
     private static final String[] HEADER = new String[] {"id", "name", "password", "role"};
 
     private final ArrayList<User> users = new ArrayList<>();
 
-    public FileUserRepository() {
+    public CsvUserRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("user.csv"));
     }
 
-    public FileUserRepository(Path filePath) {
+    public CsvUserRepository(Path filePath) {
         super(filePath);
         loadUsers();
     }

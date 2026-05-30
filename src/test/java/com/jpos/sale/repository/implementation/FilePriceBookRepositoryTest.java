@@ -1,6 +1,7 @@
 package com.jpos.sale.repository.implementation;
 
 import com.jpos.sale.model.PriceBook;
+import com.jpos.sale.repository.implementation.file.CsvPriceBookRepository;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -29,7 +30,7 @@ public class FilePriceBookRepositoryTest {
     @Test
     public void shouldVerifyTwoDistinctProductIdsWhenSavingTwoDifferentProductPrices() throws Exception {
         File priceBookFile = createEmptyPriceBookFile("pricebook.csv");
-        FilePriceBookRepository repository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository repository = new CsvPriceBookRepository(priceBookFile.toPath());
 
         UUID productIdA = UUID.randomUUID();
         UUID productIdB = UUID.randomUUID();
@@ -37,7 +38,7 @@ public class FilePriceBookRepositoryTest {
         repository.add(buildPriceBook(productIdA, 10.0, 0.2f, 12.0, daysAgo(2)));
         repository.add(buildPriceBook(productIdB, 20.0, 0.3f, 26.0, daysAgo(1)));
 
-        FilePriceBookRepository reloadedRepository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository reloadedRepository = new CsvPriceBookRepository(priceBookFile.toPath());
         PriceBook[] allEntries = reloadedRepository.getAll();
 
         assertEquals(2, allEntries.length);
@@ -56,14 +57,14 @@ public class FilePriceBookRepositoryTest {
     @Test
     public void shouldVerifyTwoRecordsWithSingleProductIdWhenSavingSameProductPriceTwice() throws Exception {
         File priceBookFile = createEmptyPriceBookFile("pricebook.csv");
-        FilePriceBookRepository repository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository repository = new CsvPriceBookRepository(priceBookFile.toPath());
 
         UUID sharedProductId = UUID.randomUUID();
 
         repository.add(buildPriceBook(sharedProductId, 10.0, 0.2f, 12.0, daysAgo(2)));
         repository.add(buildPriceBook(sharedProductId, 11.0, 0.2f, 13.2, daysAgo(1)));
 
-        FilePriceBookRepository reloadedRepository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository reloadedRepository = new CsvPriceBookRepository(priceBookFile.toPath());
         PriceBook[] allEntries = reloadedRepository.getAll();
 
         assertEquals(2, allEntries.length);
@@ -82,7 +83,7 @@ public class FilePriceBookRepositoryTest {
     @Test
     public void shouldReturnLatestPriceByEffectiveAtDateWhenProductIdIsDuplicated() throws Exception {
         File priceBookFile = createEmptyPriceBookFile("pricebook.csv");
-        FilePriceBookRepository repository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository repository = new CsvPriceBookRepository(priceBookFile.toPath());
 
         UUID sharedProductId = UUID.randomUUID();
         Date olderDate  = daysAgo(3);
@@ -91,7 +92,7 @@ public class FilePriceBookRepositoryTest {
         repository.add(buildPriceBook(sharedProductId, 10.0, 0.2f, 12.0, olderDate));
         repository.add(buildPriceBook(sharedProductId, 15.0, 0.25f, 18.75, newerDate));
 
-        FilePriceBookRepository reloadedRepository = new FilePriceBookRepository(priceBookFile.toPath());
+        CsvPriceBookRepository reloadedRepository = new CsvPriceBookRepository(priceBookFile.toPath());
         PriceBook latest = reloadedRepository.getById(sharedProductId);
 
         assertNotNull(latest);

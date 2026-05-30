@@ -1,6 +1,8 @@
 package com.jpos.user.repository.implementation;
 
 import com.jpos.user.model.User;
+import com.jpos.user.repository.UserRepository;
+import com.jpos.user.repository.implementation.file.CsvUserRepository;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -26,7 +28,7 @@ public class FileUserRepositoryTest {
                 00000000-0000-0000-0000-00a12b34c56d,cashier,password,cashier
                 """);
 
-        FileUserRepository repository = new FileUserRepository(userFile.toPath());
+        UserRepository repository = new CsvUserRepository(userFile.toPath());
         User[] users = repository.getUsers();
 
         assertEquals(2, users.length);
@@ -41,10 +43,10 @@ public class FileUserRepositoryTest {
                 00000000-0000-0000-0000-0085374aeb72,admin,gjsot,admin
                 """);
 
-        FileUserRepository repository = new FileUserRepository(userFile.toPath());
+        UserRepository repository = new CsvUserRepository(userFile.toPath());
         repository.addUser("cashier", "password", "cashier");
 
-        FileUserRepository reloadedRepository = new FileUserRepository(userFile.toPath());
+        UserRepository reloadedRepository = new CsvUserRepository(userFile.toPath());
 
         assertEquals(2, reloadedRepository.getUsers().length);
         assertTrue(reloadedRepository.validUser("cashier", "password"));
@@ -53,7 +55,7 @@ public class FileUserRepositoryTest {
     @Test
     public void shouldThrowWhenUserFileDoesNotExist() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> new FileUserRepository(temporaryFolder.getRoot().toPath().resolve("missing-user.csv")));
+                () -> new CsvUserRepository(temporaryFolder.getRoot().toPath().resolve("missing-user.csv")));
 
         assertTrue(exception.getMessage().contains("does not exist"));
     }

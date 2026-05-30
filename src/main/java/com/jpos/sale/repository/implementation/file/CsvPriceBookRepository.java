@@ -1,4 +1,4 @@
-package com.jpos.sale.repository.implementation;
+package com.jpos.sale.repository.implementation.file;
 
 import com.jpos.sale.model.PriceBook;
 import com.jpos.sale.repository.PriceBookRepository;
@@ -9,17 +9,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> implements PriceBookRepository {
+public class CsvPriceBookRepository extends AbstractCsvRepository<PriceBook> implements PriceBookRepository {
     private static final String DATA_LABEL = "Price book data";
     private static final String[] HEADER = new String[] {"productId", "cost", "margin", "salePrice", "effectiveAt"};
 
     private final ArrayList<PriceBook> priceBooks = new ArrayList<>();
 
-    public FilePriceBookRepository() {
+    public CsvPriceBookRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("pricebook.csv"));
     }
 
-    public FilePriceBookRepository(Path filePath) {
+    public CsvPriceBookRepository(Path filePath) {
         super(filePath);
         priceBooks.addAll(loadFromCsv());
     }

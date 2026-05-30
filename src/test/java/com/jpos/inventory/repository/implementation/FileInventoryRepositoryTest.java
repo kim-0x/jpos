@@ -2,6 +2,7 @@ package com.jpos.inventory.repository.implementation;
 
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.model.StockItem;
+import com.jpos.inventory.repository.implementation.file.CsvInventoryRepository;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -28,7 +29,7 @@ public class FileInventoryRepositoryTest {
                 00000000-0000-0000-0000-0045ce9cdd30,-2.0,1.0,00000000-0000-0000-0000-0050454d6969,2026-02-27 22:11:17.660994
                 """);
 
-        FileInventoryRepository repository = new FileInventoryRepository(inventoryFile.toPath());
+        CsvInventoryRepository repository = new CsvInventoryRepository(inventoryFile.toPath());
         UUID productId = repository.getStockItems()[0].getProductId();
 
         assertEquals(2, repository.getStockItems().length);
@@ -42,7 +43,7 @@ public class FileInventoryRepositoryTest {
                 id,numberInStock,cost,productId,createdAt
                 """);
 
-        FileInventoryRepository repository = new FileInventoryRepository(inventoryFile.toPath());
+        CsvInventoryRepository repository = new CsvInventoryRepository(inventoryFile.toPath());
         StockItem stockItem = new StockItem();
         stockItem.setId(UUID.randomUUID());
         stockItem.setProductId(UUID.randomUUID());
@@ -52,7 +53,7 @@ public class FileInventoryRepositoryTest {
 
         repository.stockIn(stockItem);
 
-        FileInventoryRepository reloadedRepository = new FileInventoryRepository(inventoryFile.toPath());
+        CsvInventoryRepository reloadedRepository = new CsvInventoryRepository(inventoryFile.toPath());
         assertEquals(1, reloadedRepository.getStockItems().length);
         assertEquals(5.0f, reloadedRepository.getStockItems()[0].getNumberInStock(), 0.0f);
     }
@@ -60,7 +61,7 @@ public class FileInventoryRepositoryTest {
     @Test
     public void shouldThrowWhenInventoryFileDoesNotExist() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> new FileInventoryRepository(temporaryFolder.getRoot().toPath().resolve("missing-inventory.csv")));
+                () -> new CsvInventoryRepository(temporaryFolder.getRoot().toPath().resolve("missing-inventory.csv")));
 
         assertTrue(exception.getMessage().contains("does not exist"));
     }

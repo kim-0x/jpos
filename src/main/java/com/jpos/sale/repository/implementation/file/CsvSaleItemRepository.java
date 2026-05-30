@@ -1,4 +1,4 @@
-package com.jpos.sale.repository.implementation;
+package com.jpos.sale.repository.implementation.file;
 
 import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.repository.SaleItemRepository;
@@ -9,17 +9,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class FileSaleItemRepository extends AbstractCsvRepository<SaleItem> implements SaleItemRepository {
+public class CsvSaleItemRepository extends AbstractCsvRepository<SaleItem> implements SaleItemRepository {
     private static final String DATA_LABEL = "Sale item data";
     private static final String[] HEADER = new String[] {"productId", "quantity", "price", "transactionId"};
 
     private final ArrayList<SaleItem> saleItems = new ArrayList<>();
 
-    public FileSaleItemRepository() {
+    public CsvSaleItemRepository() {
         this(CsvRepositorySupport.getDefaultCsvFilePath("saleitem.csv"));
     }
 
-    public FileSaleItemRepository(Path filePath) {
+    public CsvSaleItemRepository(Path filePath) {
         super(filePath);
         saleItems.addAll(loadFromCsv());
     }

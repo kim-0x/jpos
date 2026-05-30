@@ -3,6 +3,7 @@ package com.jpos.inventory.repository.implementation;
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.ProductQuery;
+import com.jpos.inventory.repository.implementation.file.CsvProductRepository;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -28,7 +29,7 @@ public class FileProductRepositoryTest {
                 00000000-0000-0000-0000-008c5cb57a84,001234567890,Milk,dairy
                 """);
 
-        FileProductRepository repository = new FileProductRepository(productFile.toPath());
+        CsvProductRepository repository = new CsvProductRepository(productFile.toPath());
 
         Product[] products = repository.getProducts();
         Product lemons = repository.getProductBy(new ProductQuery(null, "045678901231"));
@@ -45,7 +46,7 @@ public class FileProductRepositoryTest {
                 00000000-0000-0000-0000-0050454d6969,045678901231,Lemons,fruit
                 """);
 
-        FileProductRepository repository = new FileProductRepository(productFile.toPath());
+        CsvProductRepository repository = new CsvProductRepository(productFile.toPath());
         Product product = new Product();
         product.setBarcode("123456789012");
         product.setName("Coffee");
@@ -53,7 +54,7 @@ public class FileProductRepositoryTest {
 
         repository.saveProduct(product);
 
-        FileProductRepository reloadedRepository = new FileProductRepository(productFile.toPath());
+        CsvProductRepository reloadedRepository = new CsvProductRepository(productFile.toPath());
         Product savedProduct = reloadedRepository.getProductBy(new ProductQuery(null, "123456789012"));
 
         assertNotNull(savedProduct);
@@ -64,7 +65,7 @@ public class FileProductRepositoryTest {
     @Test
     public void shouldThrowWhenProductFileDoesNotExist() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> new FileProductRepository(temporaryFolder.getRoot().toPath().resolve("missing-product.csv")));
+                () -> new CsvProductRepository(temporaryFolder.getRoot().toPath().resolve("missing-product.csv")));
 
         assertTrue(exception.getMessage().contains("does not exist"));
     }
