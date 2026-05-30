@@ -18,10 +18,9 @@ JPOS currently includes these modules:
 
 - **User module** for login, user management, and role-based access
 - **Inventory module** for product catalog and stock tracking
+- **Sale module** for processing sale transactions and displaying transaction summaries
 
-The **sales module** is planned for the next release.
-
-The project also includes unit tests for the currently implemented modules.
+The project includes comprehensive unit tests for all implemented modules.
 
 ## Prerequisites
 
@@ -77,12 +76,15 @@ username: admin
 password: admin
 ```
 
-The application now reads its initial users, products, and inventory data from:
+The application now reads its initial users, products, inventory, pricing, and sales data from:
 
 ```text
 data/user.csv
 data/product.csv
 data/inventory.csv
+data/pricebook.csv
+data/saleitem.csv
+data/saletransaction.csv
 ```
 
 ## Test setup
@@ -120,5 +122,91 @@ mvn -Dtest=UserFacadeTest test
 Current test coverage includes unit tests for:
 
 - User module
-- Inventory services
-- Inventory repositories
+- Inventory services and repositories
+- Sale module (facade, models, and repositories)
+
+## Contributing
+
+To contribute to JPOS, follow these guidelines:
+
+### Code Organization
+
+The project follows a modular architecture with the following structure:
+
+```text
+src/main/java/
+├── Main.java                # Entry point; bootstraps all components (views, facades, services, repositories)
+├── view/                    # User interface layer; handles input/output and coordinates facades
+│   ├── AppMenu.java         # Main menu interface
+│   ├── UserFeature.java     # User login and management interface
+│   ├── ProductFeature.java  # Product catalog interface
+│   ├── InventoryFeature.java # Inventory management interface
+│   ├── SaleFeature.java     # Sale transaction interface
+│   └── implementation/      # View implementations
+└── com/jpos/
+    ├── user/                # User authentication and role management
+    │   ├── model/
+    │   ├── repository/
+    │   ├── service/
+    │   └── facade/
+    ├── inventory/           # Product catalog and stock tracking
+    │   ├── model/
+    │   ├── repository/
+    │   └── service/
+    └── sale/                # Sale transactions and pricing
+        ├── model/
+        ├── repository/
+        ├── service/
+        └── facade/
+```
+
+#### Architecture Pattern
+
+- **Business Logic Modules** (`user/`, `inventory/`, `sale/`): Each follows the pattern `model` → `repository` → `service` → `facade`, ensuring separation of concerns.
+- **View Layer** (`view/`): Handles all user interaction (input/output) and coordinates between multiple facade objects.
+- **Main Class**: Bootstraps the entire application by instantiating all repositories, services, facades, and views, then starts the application session.
+
+#### Component Responsibilities
+
+- **Models**: Data structures representing business entities
+- **Repositories**: Persist and retrieve data (CSV file handling)
+- **Services**: Business logic and operations on models
+- **Facades**: Simplified interfaces for views to interact with multiple services
+- **Views**: Handle user interaction, display information, and coordinate facade calls
+- **Main**: Application entry point and component initialization
+
+### Development Workflow
+
+1. **Create a feature branch** from `main` for your changes
+2. **Implement your feature** following the architecture pattern:
+   - Start with the **model** (data structure)
+   - Create the **repository** (data persistence)
+   - Implement the **service** (business logic)
+   - Add the **facade** (simplified interface for views)
+   - Create the **view** (user interaction)
+3. **Write unit tests** in `src/test/java` for all modules
+4. **Run tests locally** to ensure all tests pass:
+   ```sh
+   mvn test
+   ```
+5. **Check code coverage** to maintain high test coverage:
+   ```sh
+   mvn verify
+   ```
+6. **Update the Main class** if bootstrapping changes are needed for new components
+7. **Submit a pull request** with a clear description of your changes
+
+### Data Management
+
+New features may require CSV files in the `data/` directory for test data. Ensure:
+- CSV files follow the existing naming convention
+- Headers match the corresponding model classes
+- Test data is realistic and covers edge cases
+
+### Best Practices
+
+- Follow Java naming conventions (camelCase for methods/variables, PascalCase for classes)
+- Write unit tests for all new functionality
+- Keep test coverage above 70%
+- Use meaningful commit messages
+- Document any new public APIs or significant changes
