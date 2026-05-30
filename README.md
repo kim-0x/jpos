@@ -43,7 +43,8 @@ mvn -version
 ```text
 src/main/java   Application source code
 src/test/java   JUnit test source code
-data            CSV application data
+data/           Application data root
+data/csv/       CSV application data
 pom.xml         Maven build configuration
 ```
 
@@ -79,12 +80,12 @@ password: admin
 The application now reads its initial users, products, inventory, pricing, and sales data from:
 
 ```text
-data/user.csv
-data/product.csv
-data/inventory.csv
-data/pricebook.csv
-data/saleitem.csv
-data/saletransaction.csv
+data/csv/user.csv
+data/csv/product.csv
+data/csv/inventory.csv
+data/csv/pricebook.csv
+data/csv/saleitem.csv
+data/csv/saletransaction.csv
 ```
 
 ## Test setup
@@ -198,7 +199,7 @@ src/main/java/
 
 ### Data Management
 
-New features may require CSV files in the `data/` directory for test data. Ensure:
+New features may require CSV files in the `data/csv/` directory for test data. Ensure:
 - CSV files follow the existing naming convention
 - Headers match the corresponding model classes
 - Test data is realistic and covers edge cases

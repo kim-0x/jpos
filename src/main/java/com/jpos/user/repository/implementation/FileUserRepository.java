@@ -22,7 +22,7 @@ public class FileUserRepository extends AbstractCsvRepository<User> implements U
     private final ArrayList<User> users = new ArrayList<>();
 
     public FileUserRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("user.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("user.csv"));
     }
 
     public FileUserRepository(Path filePath) {

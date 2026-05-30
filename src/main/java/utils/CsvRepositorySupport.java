@@ -19,9 +19,10 @@ public final class CsvRepositorySupport {
     private CsvRepositorySupport() {
     }
 
-    public static Path getDefaultDataFilePath(String fileName) {
+    public static Path getDefaultCsvFilePath(String fileName) {
         return findProjectRoot(Path.of("").toAbsolutePath().normalize())
                 .resolve("data")
+                .resolve("csv")
                 .resolve(fileName)
                 .normalize();
     }

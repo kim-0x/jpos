@@ -16,7 +16,7 @@ public class FileSaleHeaderRepository extends AbstractCsvRepository<SaleHeader> 
     private final ArrayList<SaleHeader> headers = new ArrayList<>();
 
     public FileSaleHeaderRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("saletransaction.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("saletransaction.csv"));
     }
 
     public FileSaleHeaderRepository(Path filePath) {

@@ -15,9 +15,9 @@ public class CsvRepositorySupportTest {
         try {
             System.setProperty("user.dir", projectRoot.toString());
 
-            Path dataFilePath = CsvRepositorySupport.getDefaultDataFilePath("user.csv");
+            Path dataFilePath = CsvRepositorySupport.getDefaultCsvFilePath("user.csv");
 
-            assertEquals(projectRoot.resolve("data").resolve("user.csv").normalize(), dataFilePath);
+            assertEquals(projectRoot.resolve("data").resolve("csv").resolve("user.csv").normalize(), dataFilePath);
         } finally {
             System.setProperty("user.dir", originalUserDir);
         }
@@ -32,9 +32,9 @@ public class CsvRepositorySupportTest {
         try {
             System.setProperty("user.dir", targetDirectory.toString());
 
-            Path dataFilePath = CsvRepositorySupport.getDefaultDataFilePath("user.csv");
+            Path dataFilePath = CsvRepositorySupport.getDefaultCsvFilePath("user.csv");
 
-            assertEquals(projectRoot.resolve("data").resolve("user.csv").normalize(), dataFilePath);
+            assertEquals(projectRoot.resolve("data").resolve("csv").resolve("user.csv").normalize(), dataFilePath);
         } finally {
             System.setProperty("user.dir", originalUserDir);
         }

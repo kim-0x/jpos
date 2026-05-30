@@ -16,7 +16,7 @@ public class FilePriceBookRepository extends AbstractCsvRepository<PriceBook> im
     private final ArrayList<PriceBook> priceBooks = new ArrayList<>();
 
     public FilePriceBookRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("pricebook.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("pricebook.csv"));
     }
 
     public FilePriceBookRepository(Path filePath) {

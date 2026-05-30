@@ -16,7 +16,7 @@ public class FileSaleItemRepository extends AbstractCsvRepository<SaleItem> impl
     private final ArrayList<SaleItem> saleItems = new ArrayList<>();
 
     public FileSaleItemRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("saleitem.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("saleitem.csv"));
     }
 
     public FileSaleItemRepository(Path filePath) {

@@ -18,7 +18,7 @@ public class FileProductRepository extends AbstractCsvRepository<Product> implem
     private final ArrayList<Product> products = new ArrayList<>();
 
     public FileProductRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("product.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("product.csv"));
     }
 
     public FileProductRepository(Path filePath) {

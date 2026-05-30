@@ -19,7 +19,7 @@ public class FileInventoryRepository extends AbstractCsvRepository<StockItem> im
     private final Inventory inventory = new Inventory();
 
     public FileInventoryRepository() {
-        this(CsvRepositorySupport.getDefaultDataFilePath("inventory.csv"));
+        this(CsvRepositorySupport.getDefaultCsvFilePath("inventory.csv"));
     }
 
     public FileInventoryRepository(Path filePath) {
