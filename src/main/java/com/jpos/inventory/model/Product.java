@@ -2,9 +2,13 @@ package com.jpos.inventory.model;
 
 import com.jpos.inventory.exception.InvalidCategoryException;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Product implements Comparable<Product> {
+public class Product implements Comparable<Product>, Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private String barcode;
     private String name;

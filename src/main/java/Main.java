@@ -1,8 +1,8 @@
 import com.jpos.inventory.InventoryFacade;
 import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
+import com.jpos.inventory.repository.implementation.file.BinProductRepository;
 import com.jpos.inventory.repository.implementation.file.CsvInventoryRepository;
-import com.jpos.inventory.repository.implementation.file.CsvProductRepository;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.repository.PriceBookRepository;
@@ -28,7 +28,7 @@ public class Main {
         UserFeature userFeatureView = new UserFeatureView(userFacade);
 
         InventoryRepository inventoryRepository = new CsvInventoryRepository();
-        ProductRepository productRepository = new CsvProductRepository();
+        ProductRepository productRepository = new BinProductRepository();
         InventoryFacade inventoryFacade = new InventoryFacade(inventoryRepository, productRepository);
         ProductFeature productFeatureView = new ProductFeatureView(inventoryFacade);
         InventoryFeature inventoryFeatureView = new InventoryFeatureView(inventoryFacade);

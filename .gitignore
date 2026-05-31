@@ -14,6 +14,8 @@ out/
 .project
 .settings/
 bin/
+!data/bin/
+!data/bin/**
 
 # NetBeans
 nbproject/private/

@@ -1,6 +1,8 @@
 package com.jpos.inventory.model;
 
-public enum ProductCategory {
+import java.io.Serializable;
+
+public enum ProductCategory implements Serializable {
     FOOD("food"),
     BEVERAGE("beverage"),
     HOUSEHOLD("household"),
