@@ -2,7 +2,7 @@ package com.jpos.user.repository.implementation;
 
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
-import com.jpos.user.repository.implementation.file.DatUserRepository;
+import com.jpos.user.repository.implementation.file.BinUserRepository;
 import com.jpos.user.utils.UserBuilder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,18 +20,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-public class DatUserRepositoryTest {
+public class BinUserRepositoryTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void shouldLoadUsersFromDat() throws Exception {
-        File userFile = temporaryFolder.newFile("users.dat");
+        File userFile = temporaryFolder.newFile("user.dat");
         writeUsers(userFile, List.of(
                 createUser("00000000-0000-0000-0000-0085374aeb72", "admin", "gjsot", "admin"),
                 createUser("00000000-0000-0000-0000-00a12b34c56d", "cashier", "password", "cashier")));
 
-        UserRepository repository = new DatUserRepository(userFile.toPath());
+        UserRepository repository = new BinUserRepository(userFile.toPath());
 
         assertEquals(2, repository.getUsers().length);
         assertTrue(repository.validUser("admin", "gjsot"));
@@ -40,10 +40,10 @@ public class DatUserRepositoryTest {
 
     @Test
     public void shouldBootstrapDefaultAdminWhenDatIsEmpty() throws Exception {
-        File userFile = temporaryFolder.newFile("users.dat");
+        File userFile = temporaryFolder.newFile("user.dat");
         Files.write(userFile.toPath(), new byte[0]);
 
-        UserRepository repository = new DatUserRepository(userFile.toPath());
+        UserRepository repository = new BinUserRepository(userFile.toPath());
 
         assertEquals(1, repository.getUsers().length);
         assertTrue(repository.validUser("admin", "admin"));
@@ -51,13 +51,13 @@ public class DatUserRepositoryTest {
 
     @Test
     public void shouldPersistAddedUser() throws Exception {
-        File userFile = temporaryFolder.newFile("users.dat");
+        File userFile = temporaryFolder.newFile("user.dat");
         Files.write(userFile.toPath(), new byte[0]);
 
-        UserRepository repository = new DatUserRepository(userFile.toPath());
+        UserRepository repository = new BinUserRepository(userFile.toPath());
         repository.addUser("cashier", "password", "cashier");
 
-        UserRepository reloadedRepository = new DatUserRepository(userFile.toPath());
+        UserRepository reloadedRepository = new BinUserRepository(userFile.toPath());
 
         assertEquals(2, reloadedRepository.getUsers().length);
         assertTrue(reloadedRepository.validUser("admin", "admin"));
@@ -67,7 +67,7 @@ public class DatUserRepositoryTest {
     @Test
     public void shouldThrowWhenUserDatFileDoesNotExist() {
         IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> new DatUserRepository(temporaryFolder.getRoot().toPath().resolve("missing-users.dat")));
+                () -> new BinUserRepository(temporaryFolder.getRoot().toPath().resolve("missing-user.dat")));
 
         assertTrue(exception.getMessage().contains("does not exist"));
     }

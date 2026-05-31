@@ -9,10 +9,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDatRepository<T extends Serializable> {
+public abstract class AbstractBinRepository<T extends Serializable> {
     private final Path filePath;
 
-    protected AbstractDatRepository(Path filePath) {
+    protected AbstractBinRepository(Path filePath) {
         this.filePath = filePath;
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractDatRepository<T extends Serializable> {
     protected static Path getDefaultDatFilePath(String... relativeSegments) {
         Path currentPath = findProjectRoot(Path.of("").toAbsolutePath().normalize())
                 .resolve("data")
-                .resolve("dat");
+                .resolve("bin");
 
         for (String relativeSegment : relativeSegments) {
             currentPath = currentPath.resolve(relativeSegment);

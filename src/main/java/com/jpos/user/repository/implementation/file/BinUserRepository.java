@@ -7,22 +7,22 @@ import com.jpos.user.model.LoginUser;
 import com.jpos.user.model.User;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.utils.UserBuilder;
-import utils.AbstractDatRepository;
+import utils.AbstractBinRepository;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-public class DatUserRepository extends AbstractDatRepository<User> implements UserRepository {
+public class BinUserRepository extends AbstractBinRepository<User> implements UserRepository {
     private static final String DEFAULT_ADMIN_USERNAME = "admin";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin";
 
     private final ArrayList<User> users = new ArrayList<>();
 
-    public DatUserRepository() {
-        this(getDefaultDatFilePath("user", "users.dat"));
+    public BinUserRepository() {
+        this(getDefaultDatFilePath("user.dat"));
     }
 
-    public DatUserRepository(Path filePath) {
+    public BinUserRepository(Path filePath) {
         super(filePath);
         loadUsers();
     }
