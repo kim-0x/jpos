@@ -1,8 +1,12 @@
 package com.jpos.user.model;
 
+import java.io.Serial;
 import java.util.UUID;
 
 public class AdminUser extends User {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private final String[] accessFeatures = new String[] {
             "Create New User",
             "Show All Users",

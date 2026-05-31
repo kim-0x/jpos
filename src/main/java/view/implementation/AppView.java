@@ -28,32 +28,37 @@ public class AppView {
     }
 
     public void createSession() {
-        userFeature.loginForm();
         int option = -1;
-        while (true) {
-            int selectedOption = option;
-            if (option == -1) {
-                selectedOption = appMenu.selectAppMenu();
-            }
+        String choice = "";
+        try {
+            userFeature.loginForm();
+            while (true) {
+                int selectedOption = option;
+                if (option == -1) {
+                    selectedOption = appMenu.selectAppMenu();
+                }
 
-            if (selectedOption != -1) {
-                this.selectFeatureOption(selectedOption);
-            }
+                if (selectedOption != -1) {
+                    this.selectFeatureOption(selectedOption);
+                }
 
-            var choice = IO.readln("Select an option to start or type 'quit', 'logout' to exit main menu: ");
-            if (choice.equals("logout")) {
-                userFeature.logoutSession();
-                WelcomeMessage.displayWelcomeMessage();
-                userFeature.loginForm();
-                option = -1;
-                continue;
-            }
+                choice = IO.readln("Select an option to start or type 'quit', 'logout' to exit main menu: ");
+                if (choice.equals("logout")) {
+                    userFeature.logoutSession();
+                    WelcomeMessage.displayWelcomeMessage();
+                    userFeature.loginForm();
+                    option = -1;
+                    continue;
+                }
 
-            if (choice.equalsIgnoreCase("quit")) {
-                return;
-            }
+                if (choice.equalsIgnoreCase("quit")) {
+                    return;
+                }
 
-            option = Integer.parseInt(choice);
+                option = Integer.parseInt(choice);
+            }
+        } catch(NumberFormatException e) {
+            IO.println(String.format("ERROR: Create session with selected option '%s' - Application Exit.", choice));
         }
     }
 

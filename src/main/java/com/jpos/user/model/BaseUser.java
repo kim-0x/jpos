@@ -1,6 +1,12 @@
 package com.jpos.user.model;
 
-public class BaseUser {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class BaseUser implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String username;
     private String role;
 

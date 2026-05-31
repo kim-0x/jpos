@@ -70,12 +70,14 @@ mvn compile
 java -cp target/classes Main
 ```
 
-For the current CSV-backed setup, the default admin login is:
+Default admin login credentials:
 
 ```sh
 username: admin
 password: admin
 ```
+
+If the app is using `DatUserRepository`, these credentials are auto-seeded into `data/dat/user/users.dat` when the DAT file exists but is empty.
 
 The application now reads its initial users, products, inventory, pricing, and sales data from:
 

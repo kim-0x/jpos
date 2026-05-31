@@ -1,8 +1,12 @@
 package com.jpos.user.model;
 
+import java.io.Serial;
 import java.util.UUID;
 
 public abstract class User extends BaseUser {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String password;
     private UUID id;
 

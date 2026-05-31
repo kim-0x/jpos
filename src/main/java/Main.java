@@ -15,14 +15,14 @@ import com.jpos.sale.service.ProductCatalogGateway;
 import com.jpos.sale.service.implementation.InventoryProductCatalogGateway;
 import com.jpos.user.UserFacade;
 import com.jpos.user.repository.UserRepository;
-import com.jpos.user.repository.implementation.file.CsvUserRepository;
+import com.jpos.user.repository.implementation.file.DatUserRepository;
 import utils.WelcomeMessage;
 import view.*;
 import view.implementation.*;
 
 public class Main {
     public static void main(String[] args) {
-        UserRepository userRepository = new CsvUserRepository();
+        UserRepository userRepository = new DatUserRepository();
         UserFacade userFacade = new UserFacade(userRepository);
         AppMenu appMenuView = new AppMenuView(userFacade);
         UserFeature userFeatureView = new UserFeatureView(userFacade);

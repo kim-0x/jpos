@@ -79,8 +79,9 @@ public class UserFeatureView implements UserFeature {
         } catch (UsernameAlreadyExistsException
                  | AdminAlreadyExistsException
                  | UserCreationException
-                 | UnauthorizedUserActionException e) {
-            IO.println(e.getMessage());
+                 | UnauthorizedUserActionException
+                 | NumberFormatException e) {
+            IO.println(String.format("ERROR - %s%n", e.getMessage()));
         }
     }
 
@@ -91,10 +92,10 @@ public class UserFeatureView implements UserFeature {
             LoginUser currentLoginUser = userFacade.getCurrentUserLogin();
             User[] allUsers = userFacade.getUsers(currentLoginUser.getRole());
             System.out.printf("%s%n", "-".repeat(70));
-            System.out.printf("%-35s %20s %10s%n", "ID", "Name", "Role");
+            System.out.printf("%-40s %-15s %-10s%n", "ID", "Name", "Role");
             System.out.printf("%s%n", "-".repeat(70));
             for (User user : allUsers) {
-                System.out.printf("%-35s %20s %10s%n", user.getId(), user.getUsername(), user.getRole());
+                System.out.printf("%-40s %-15s %-10s%n", user.getId(), user.getUsername(), user.getRole());
             }
         } catch (UnauthorizedUserActionException e) {
            IO.println(e.getMessage());
