@@ -40,6 +40,32 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    public void reduceStock(ProductQuery productQuery, float numberOfStock) {
+        if (numberOfStock <= 0) {
+            throw new IllegalArgumentException("Number of stock must be greater than zero.");
+        }
+
+        Product product = productRepository.getProductBy(productQuery);
+        if (product == null) {
+            throw new ProductNotFoundException(productQuery == null
+                    ? "null"
+                    : String.valueOf(productQuery.getProductId() != null
+                    ? productQuery.getProductId()
+                    : productQuery.getBarcode()));
+        }
+
+        ProductQuery normalizedQuery = new ProductQuery(product.getId(), product.getBarcode());
+        StockItem stockItem = new StockItem();
+        stockItem.setId(UUID.randomUUID());
+        stockItem.setProductId(product.getId());
+        stockItem.setNumberInStock(numberOfStock);
+        stockItem.setCost(inventoryRepository.getProductCost(normalizedQuery));
+        stockItem.setCreatedAt(new Date());
+
+        inventoryRepository.stockOut(stockItem);
+    }
+
+    @Override
     public StockRecord[] getStockReport() {
         ArrayList<StockRecord> stockRecords = new ArrayList<>();
         for (Product product : productRepository.getProducts()) {

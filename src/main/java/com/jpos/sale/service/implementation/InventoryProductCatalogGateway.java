@@ -35,6 +35,16 @@ public class InventoryProductCatalogGateway implements ProductCatalogGateway {
         }
     }
 
+    @Override
+    public void reduceStock(ProductRef ref, float numberOfStock) {
+        ProductQuery query = new ProductQuery(ref == null ? null : ref.productId(), ref == null ? null : ref.barcode());
+        try {
+            inventoryService.reduceStock(query, numberOfStock);
+        } catch (com.jpos.inventory.exception.ProductNotFoundException e) {
+            throw new ProductNotFoundException(resolveIdentifier(ref));
+        }
+    }
+
     private String resolveIdentifier(ProductRef ref) {
         if (ref == null) {
             return "null";

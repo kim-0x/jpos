@@ -5,4 +5,5 @@ import com.jpos.sale.model.ProductRef;
 
 public interface ProductCatalogGateway {
     ProductInfo findBy(ProductRef ref);
+    void reduceStock(ProductRef ref, float numberOfStock);
 }

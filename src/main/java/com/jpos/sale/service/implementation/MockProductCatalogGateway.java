@@ -49,4 +49,14 @@ public class MockProductCatalogGateway implements ProductCatalogGateway {
 
         return productInfo;
     }
+
+    @Override
+    public void reduceStock(ProductRef ref, float numberOfStock) {
+        if (numberOfStock <= 0) {
+            throw new IllegalArgumentException("Number of stock must be greater than zero.");
+        }
+
+        // For mock behavior, validating that the referenced product exists is sufficient.
+        findBy(ref);
+    }
 }

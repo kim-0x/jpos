@@ -48,7 +48,8 @@ public class SaleFacade {
         SaleTransaction transaction = saleTransactionService.createTransaction(receiptNumber);
 
         for (SaleItemData item : items) {
-            var productInfo = productCatalogGateway.findBy(new ProductRef(null, item.getBarcode()));
+            var productRef = new ProductRef(null, item.getBarcode());
+            var productInfo = productCatalogGateway.findBy(productRef);
             var productId = productInfo.productId();
             var priceBook = getCurrentProductPrice(new ProductQuery(productId, productInfo.barcode()));
 
@@ -59,6 +60,7 @@ public class SaleFacade {
                     transaction.getHeader().getTransactionId()
             );
             saleTransactionService.addItemToTransaction(transaction, saleItem);
+            productCatalogGateway.reduceStock(productRef, item.getQuantity());
         }
 
         saleTransactionService.completeTransaction(transaction);
