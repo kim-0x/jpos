@@ -5,17 +5,17 @@ import com.jpos.sale.model.PriceBook;
 import com.jpos.sale.model.ProductInfo;
 import com.jpos.sale.model.ProductRef;
 import com.jpos.sale.repository.PriceBookRepository;
-import com.jpos.sale.service.ProductCatalogGateway;
+import com.jpos.sale.service.InventoryGateway;
 import com.jpos.sale.service.ProductPriceService;
 
 public class ProductPriceServiceImpl implements ProductPriceService {
     private final PriceBookRepository priceBookRepository;
-    private final ProductCatalogGateway productCatalogGateway;
+    private final InventoryGateway inventoryGateway;
 
     public ProductPriceServiceImpl(PriceBookRepository priceBookRepository,
-                                   ProductCatalogGateway productCatalogGateway) {
+                                   InventoryGateway inventoryGateway) {
         this.priceBookRepository = priceBookRepository;
-        this.productCatalogGateway = productCatalogGateway;
+        this.inventoryGateway = inventoryGateway;
     }
 
     @Override
@@ -47,6 +47,6 @@ public class ProductPriceServiceImpl implements ProductPriceService {
 
     private ProductInfo resolveProduct(ProductQuery productQuery) {
         ProductRef ref = new ProductRef(productQuery.getProductId(), productQuery.getBarcode());
-        return productCatalogGateway.findBy(ref);
+        return inventoryGateway.findBy(ref);
     }
 }

@@ -7,13 +7,13 @@ import com.jpos.inventory.service.InventoryService;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.ProductInfo;
 import com.jpos.sale.model.ProductRef;
-import com.jpos.sale.service.ProductCatalogGateway;
+import com.jpos.sale.service.InventoryGateway;
 
-public class InventoryProductCatalogGateway implements ProductCatalogGateway {
+public class InventoryGatewayImpl implements InventoryGateway {
     private final ProductRepository productRepository;
     private final InventoryService inventoryService;
 
-    public InventoryProductCatalogGateway(ProductRepository productRepository, InventoryService inventoryService) {
+    public InventoryGatewayImpl(ProductRepository productRepository, InventoryService inventoryService) {
         this.productRepository = productRepository;
         this.inventoryService = inventoryService;
     }

@@ -3,13 +3,13 @@ package com.jpos.sale.service.implementation;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.ProductInfo;
 import com.jpos.sale.model.ProductRef;
-import com.jpos.sale.service.ProductCatalogGateway;
+import com.jpos.sale.service.InventoryGateway;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class MockProductCatalogGateway implements ProductCatalogGateway {
+public class MockInventoryGateway implements InventoryGateway {
     private final Map<UUID, ProductInfo> byProductId = new HashMap<>();
     private final Map<String, UUID> barcodeToProductId = new HashMap<>();
 

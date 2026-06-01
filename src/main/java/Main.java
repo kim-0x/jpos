@@ -3,15 +3,14 @@ import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.repository.implementation.file.BinInventoryRepository;
 import com.jpos.inventory.repository.implementation.file.BinProductRepository;
-import com.jpos.inventory.repository.implementation.file.CsvInventoryRepository;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
 import com.jpos.sale.repository.implementation.file.*;
-import com.jpos.sale.service.ProductCatalogGateway;
-import com.jpos.sale.service.implementation.InventoryProductCatalogGateway;
+import com.jpos.sale.service.InventoryGateway;
+import com.jpos.sale.service.implementation.InventoryGatewayImpl;
 import com.jpos.user.UserFacade;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.repository.implementation.file.BinUserRepository;
@@ -35,7 +34,7 @@ public class Main {
         SaleHeaderRepository  saleHeaderRepository = new BinSaleHeaderRepository();
         SaleItemRepository saleItemRepository = new BinSaleItemRepository();
         PriceBookRepository priceBookRepository = new BinPriceBookRepository();
-        ProductCatalogGateway productCatalogGateway = new InventoryProductCatalogGateway(
+        InventoryGateway inventoryGateway = new InventoryGatewayImpl(
                 productRepository,
                 new InventoryServiceImpl(inventoryRepository, productRepository));
 
@@ -43,7 +42,7 @@ public class Main {
                 saleHeaderRepository,
                 saleItemRepository,
                 priceBookRepository,
-                productCatalogGateway);
+                inventoryGateway);
         SaleFeature saleFeatureView = new SaleFeatureView(saleFacade);
 
         AppView appView = new AppView(appMenuView,

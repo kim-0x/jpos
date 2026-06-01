@@ -8,7 +8,7 @@ import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.implementation.MockPriceBookRepository;
 import com.jpos.sale.repository.implementation.MockSaleHeaderRepository;
 import com.jpos.sale.repository.implementation.MockSaleItemRepository;
-import com.jpos.sale.service.implementation.MockProductCatalogGateway;
+import com.jpos.sale.service.implementation.MockInventoryGateway;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThrows;
 
 public class SaleFacadeTest {
     private SaleFacade saleFacade;
-    private MockProductCatalogGateway productCatalogGateway;
+    private MockInventoryGateway productCatalogGateway;
 
     private void registerPricedProduct(String barcode, UUID productId, double salePrice) {
         productCatalogGateway.registerProduct(barcode, productId, "Product-" + barcode, salePrice);
@@ -30,7 +30,7 @@ public class SaleFacadeTest {
 
     @Before
     public void setUp() {
-        productCatalogGateway = new MockProductCatalogGateway();
+        productCatalogGateway = new MockInventoryGateway();
         saleFacade = new SaleFacade(
                 new MockSaleHeaderRepository(),
                 new MockSaleItemRepository(),

@@ -10,7 +10,7 @@ import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
-import com.jpos.sale.service.ProductCatalogGateway;
+import com.jpos.sale.service.InventoryGateway;
 import com.jpos.sale.service.ProductPriceService;
 import com.jpos.sale.service.SaleTransactionService;
 import com.jpos.sale.service.implementation.ProductPriceServiceImpl;
@@ -22,15 +22,15 @@ import java.util.UUID;
 public class SaleFacade {
     private final SaleTransactionService saleTransactionService;
     private final ProductPriceService productPriceService;
-    private final ProductCatalogGateway productCatalogGateway;
+    private final InventoryGateway inventoryGateway;
 
     public SaleFacade(SaleHeaderRepository saleHeaderRepository,
                       SaleItemRepository saleItemRepository,
                       PriceBookRepository priceBookRepository,
-                      ProductCatalogGateway productCatalogGateway) {
+                      InventoryGateway inventoryGateway) {
         this.saleTransactionService = new SaleTransactionServiceImpl(saleHeaderRepository, saleItemRepository);
-        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, productCatalogGateway);
-        this.productCatalogGateway = productCatalogGateway;
+        this.productPriceService = new ProductPriceServiceImpl(priceBookRepository, inventoryGateway);
+        this.inventoryGateway = inventoryGateway;
     }
 
     /**
@@ -49,7 +49,7 @@ public class SaleFacade {
 
         for (SaleItemData item : items) {
             var productRef = new ProductRef(null, item.getBarcode());
-            var productInfo = productCatalogGateway.findBy(productRef);
+            var productInfo = inventoryGateway.findBy(productRef);
             var productId = productInfo.productId();
             var priceBook = getCurrentProductPrice(new ProductQuery(productId, productInfo.barcode()));
 
@@ -60,7 +60,7 @@ public class SaleFacade {
                     transaction.getHeader().getTransactionId()
             );
             saleTransactionService.addItemToTransaction(transaction, saleItem);
-            productCatalogGateway.reduceStock(productRef, item.getQuantity());
+            inventoryGateway.reduceStock(productRef, item.getQuantity());
         }
 
         saleTransactionService.completeTransaction(transaction);
@@ -120,7 +120,7 @@ public class SaleFacade {
      */
     public boolean isProductAvailable(String barcode) {
         try {
-            var productInfo = productCatalogGateway.findBy(new ProductRef(null, barcode));
+            var productInfo = inventoryGateway.findBy(new ProductRef(null, barcode));
             return productInfo.cost() != 0;
         } catch (ProductNotFoundException e) {
             return false;
@@ -128,7 +128,7 @@ public class SaleFacade {
     }
 
     public String getProductName(UUID productId) {
-        return productCatalogGateway.findBy(new ProductRef(productId, null)).name();
+        return inventoryGateway.findBy(new ProductRef(productId, null)).name();
     }
 
 }
