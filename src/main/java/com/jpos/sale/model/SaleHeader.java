@@ -1,10 +1,14 @@
 package com.jpos.sale.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
-public class SaleHeader {
+public class SaleHeader implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID transactionId;
     private final String receiptNumber;
     private double grandTotal;

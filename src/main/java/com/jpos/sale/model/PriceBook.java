@@ -1,9 +1,13 @@
 package com.jpos.sale.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class PriceBook {
+public class PriceBook implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID productId;
     private final double cost;
     private final float margin;

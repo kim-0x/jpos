@@ -1,8 +1,12 @@
 package com.jpos.sale.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class SaleItem {
+public class SaleItem implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID productId;
     private final float quantity;
     private final double price;

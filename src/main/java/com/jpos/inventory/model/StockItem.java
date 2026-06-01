@@ -1,9 +1,13 @@
 package com.jpos.inventory.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class StockItem {
+public class StockItem implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private float numberInStock;
     private double cost;
