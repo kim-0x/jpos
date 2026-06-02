@@ -10,8 +10,10 @@ import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.service.InventoryService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
@@ -75,6 +77,22 @@ public class InventoryServiceImpl implements InventoryService {
             stockRecords.add(new StockRecord(product, cost, numberInStock));
         }
         return stockRecords.toArray(new StockRecord[0]);
+    }
+
+    @Override
+    public Stream<StockRecord> getStockOutReport(Date fromDate, Date toDate) {
+        var stockItems = inventoryRepository.getStockItems();
+        var stockOutItems = Arrays.stream(stockItems).filter(stockItem ->
+                stockItem.getCreatedAt().before(fromDate) &&
+                stockItem.getCreatedAt().after(toDate) &&
+                stockItem.getNumberInStock() < 0);
+        ArrayList<StockRecord> stockRecords = new ArrayList<>();
+        stockOutItems.forEach(stockItem -> {
+           ProductQuery productQuery = new ProductQuery(stockItem.getProductId(), null);
+           var product = productRepository.getProductBy(productQuery);
+           stockRecords.add(new StockRecord(product, stockItem.getCost(), stockItem.getNumberInStock()));
+        });
+        return stockRecords.stream();
     }
 
     @Override

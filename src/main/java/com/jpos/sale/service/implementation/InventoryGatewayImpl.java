@@ -2,12 +2,17 @@ package com.jpos.sale.service.implementation;
 
 import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductQuery;
+import com.jpos.inventory.model.StockItem;
+import com.jpos.inventory.model.StockRecord;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.service.InventoryService;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.ProductInfo;
 import com.jpos.sale.model.ProductRef;
 import com.jpos.sale.service.InventoryGateway;
+
+import java.util.Date;
+import java.util.stream.Stream;
 
 public class InventoryGatewayImpl implements InventoryGateway {
     private final ProductRepository productRepository;
@@ -43,6 +48,11 @@ public class InventoryGatewayImpl implements InventoryGateway {
         } catch (com.jpos.inventory.exception.ProductNotFoundException e) {
             throw new ProductNotFoundException(resolveIdentifier(ref));
         }
+    }
+
+    @Override
+    public Stream<StockRecord> getAllStockOutTransaction(Date fromDate, Date toDate) {
+        return inventoryService.getStockOutReport(fromDate, toDate);
     }
 
     private String resolveIdentifier(ProductRef ref) {

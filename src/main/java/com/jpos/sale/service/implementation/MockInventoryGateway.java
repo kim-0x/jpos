@@ -1,13 +1,16 @@
 package com.jpos.sale.service.implementation;
 
+import com.jpos.inventory.model.StockRecord;
 import com.jpos.sale.exception.ProductNotFoundException;
 import com.jpos.sale.model.ProductInfo;
 import com.jpos.sale.model.ProductRef;
 import com.jpos.sale.service.InventoryGateway;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class MockInventoryGateway implements InventoryGateway {
     private final Map<UUID, ProductInfo> byProductId = new HashMap<>();
@@ -58,5 +61,10 @@ public class MockInventoryGateway implements InventoryGateway {
 
         // For mock behavior, validating that the referenced product exists is sufficient.
         findBy(ref);
+    }
+
+    @Override
+    public Stream<StockRecord> getAllStockOutTransaction(Date fromDate, Date toDate) {
+        return Stream.empty();
     }
 }
