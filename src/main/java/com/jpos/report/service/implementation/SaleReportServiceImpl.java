@@ -1,11 +1,18 @@
 package com.jpos.report.service.implementation;
 
+import com.jpos.report.model.SaleDetail;
 import com.jpos.report.model.SaleReport;
+import com.jpos.report.model.SaleSummary;
 import com.jpos.report.service.SaleGateway;
 import com.jpos.report.service.SaleReportService;
+import com.jpos.sale.model.ProductInfo;
+import com.jpos.sale.model.ProductRef;
+import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.service.InventoryGateway;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 public class SaleReportServiceImpl implements SaleReportService {
     private final SaleGateway saleGateway;
@@ -18,20 +25,38 @@ public class SaleReportServiceImpl implements SaleReportService {
 
     @Override
     public SaleReport getReport(Date fromDate, Date toDate) {
-        var totalRevenue = saleGateway.getAllTransactions(fromDate, toDate)
-                .mapToDouble(st -> st.getHeader().getGrandTotal())
-                .sum();
+        var finalSaleSummary = saleGateway.getAllTransactions(fromDate, toDate)
+                .map(st -> {
+                    double revenue = st.getHeader().getGrandTotal();
+                    double cost = Arrays.stream(st.getSaleItems())
+                            .mapToDouble(in -> Math.abs(in.getCost() * in.getQuantity()))
+                            .sum();
+                    double profit = revenue - cost;
+                    return new SaleSummary(revenue, profit, cost);
+                })
+                .reduce(new SaleSummary(0,0,0), SaleSummary::accumulate);
 
-        var totalCost = inventoryGateway.getAllStockOutTransaction(fromDate, toDate)
-                .mapToDouble(in -> Math.abs(in.getCost() * in.getNumberInStock()))
-                .sum();
+        var finalProductSummary = saleGateway.getAllTransactions(fromDate, toDate)
+                .flatMap(st -> Arrays.stream(st.getSaleItems()))
+                .collect(Collectors.toMap(
+                        SaleItem::getProductId,
+                        si -> {
+                            ProductRef productRef = new ProductRef(si.getProductId(), null);
+                            ProductInfo productInfo = inventoryGateway.findBy(productRef);
+                            float totalQuantity = si.getQuantity();
+                            double totalCost = si.getCost() *  si.getQuantity();
+                            double totalSalePrice = si.getTotalPrice() * si.getQuantity();
+
+                            return new SaleDetail(productInfo.name(), totalQuantity, totalCost, totalSalePrice);
+                        },
+                        SaleDetail::accumulate
+                ));
 
         SaleReport report = new SaleReport();
         report.setFromDate(fromDate);
         report.setToDate(toDate);
-        report.setTotalRevenue(totalRevenue);
-        report.setTotalCost(totalCost);
-        report.setTotalProfit(totalRevenue - totalCost);
+        report.setSaleSummary(finalSaleSummary);
+        report.setSaleDetails(finalProductSummary);
 
         return report;
     }

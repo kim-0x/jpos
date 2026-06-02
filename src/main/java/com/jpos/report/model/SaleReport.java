@@ -5,10 +5,9 @@ import java.util.*;
 public class SaleReport {
     private Date fromDate;
     private Date toDate;
+    private SaleSummary saleSummary;
 
-    private double totalRevenue;
-    private double totalProfit;
-    private double totalCost;
+    private Map<UUID, SaleDetail> saleDetails;
 
     public Date getFromDate() {
         return fromDate;
@@ -26,27 +25,19 @@ public class SaleReport {
         this.toDate = toDate;
     }
 
-    public double getTotalRevenue() {
-        return totalRevenue;
+    public SaleSummary getSaleSummary() {
+        return saleSummary;
     }
 
-    public void setTotalRevenue(double totalRevenue) {
-        this.totalRevenue = totalRevenue;
+    public void setSaleSummary(SaleSummary saleSummary) {
+        this.saleSummary = saleSummary;
     }
 
-    public double getTotalProfit() {
-        return totalProfit;
+    public Map<UUID, SaleDetail> getSaleDetails() {
+        return saleDetails;
     }
 
-    public void setTotalProfit(double totalProfit) {
-        this.totalProfit = totalProfit;
-    }
-
-    public double getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
+    public void setSaleDetails(Map<UUID, SaleDetail> saleDetails) {
+        this.saleDetails = saleDetails;
     }
 }
