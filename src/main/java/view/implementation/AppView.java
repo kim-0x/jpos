@@ -12,12 +12,14 @@ public class AppView {
     private final ProductFeature productFeature;
     private final InventoryFeature inventoryFeature;
     private final SaleFeature saleFeature;
+    private final ReportFeature reportFeature;
 
     public AppView(AppMenu appMenu,
                    UserFeature userFeature,
                    ProductFeature productFeature,
                    InventoryFeature inventoryFeature,
-                   SaleFeature saleFeature) {
+                   SaleFeature saleFeature,
+                   ReportFeature reportFeature) {
 
         this.appMenu = appMenu;
 
@@ -25,6 +27,7 @@ public class AppView {
         this.productFeature = productFeature;
         this.inventoryFeature = inventoryFeature;
         this.saleFeature = saleFeature;
+        this.reportFeature = reportFeature;
     }
 
     public void createSession() {
@@ -83,6 +86,9 @@ public class AppView {
                     break;
                 case 6:
                     saleFeature.setProductPrice();
+                    break;
+                case 7:
+                    reportFeature.getSaleReport();
                     break;
                 case 8:
                     inventoryFeature.displayStockReport();
