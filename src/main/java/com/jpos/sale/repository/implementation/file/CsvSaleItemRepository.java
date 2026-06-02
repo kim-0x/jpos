@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class CsvSaleItemRepository extends AbstractCsvRepository<SaleItem> implements SaleItemRepository {
     private static final String DATA_LABEL = "Sale item data";
-    private static final String[] HEADER = new String[] {"productId", "quantity", "price", "transactionId"};
+    private static final String[] HEADER = new String[] {"productId", "quantity", "cost", "price", "transactionId"};
 
     private final ArrayList<SaleItem> saleItems = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class CsvSaleItemRepository extends AbstractCsvRepository<SaleItem> imple
 
     @Override
     protected SaleItem toEntity(String[] row, int lineNumber) {
-        if (row.length != 4) {
+        if (row.length != 5) {
             throw new IllegalStateException(String.format("Invalid sale item row at line %d.", lineNumber));
         }
 
@@ -75,7 +75,8 @@ public class CsvSaleItemRepository extends AbstractCsvRepository<SaleItem> imple
                     UUID.fromString(row[0].trim()),
                     Float.parseFloat(row[1]),
                     Double.parseDouble(row[2]),
-                    UUID.fromString(row[3].trim())
+                    Double.parseDouble(row[3]),
+                    UUID.fromString(row[4].trim())
             );
         } catch (RuntimeException exception) {
             throw new IllegalStateException(String.format("Invalid sale item row at line %d.", lineNumber), exception);
@@ -87,6 +88,7 @@ public class CsvSaleItemRepository extends AbstractCsvRepository<SaleItem> imple
         return new String[] {
                 saleItem.getProductId().toString(),
                 String.valueOf(saleItem.getQuantity()),
+                String.valueOf(saleItem.getCost()),
                 String.valueOf(saleItem.getPrice()),
                 saleItem.getTransactionId().toString()
         };

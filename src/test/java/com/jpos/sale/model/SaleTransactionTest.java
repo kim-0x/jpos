@@ -15,8 +15,8 @@ public class SaleTransactionTest {
                 new SaleHeader(UUID.randomUUID(), "R-001", 0.0, new Date())
         );
 
-        transaction.addItem(new SaleItem(UUID.randomUUID(), 2.0f, 10.0, transaction.getHeader().getTransactionId()));
-        transaction.addItem(new SaleItem(UUID.randomUUID(), 1.0f, 5.0, transaction.getHeader().getTransactionId()));
+        transaction.addItem(new SaleItem(UUID.randomUUID(), 2.0f, 4.5, 10.0, transaction.getHeader().getTransactionId()));
+        transaction.addItem(new SaleItem(UUID.randomUUID(), 1.0f, 2.0, 5.0, transaction.getHeader().getTransactionId()));
 
         assertEquals(2, transaction.getSaleItems().length);
         assertEquals(25.0, transaction.getHeader().getGrandTotal(), 0.0001);
@@ -29,11 +29,12 @@ public class SaleTransactionTest {
         );
         UUID productId = UUID.randomUUID();
 
-        transaction.addItem(new SaleItem(productId, 1.0f, 10.0, transaction.getHeader().getTransactionId()));
-        transaction.addItem(new SaleItem(productId, 3.0f, 10.0, transaction.getHeader().getTransactionId()));
+        transaction.addItem(new SaleItem(productId, 1.0f, 4.5, 10.0, transaction.getHeader().getTransactionId()));
+        transaction.addItem(new SaleItem(productId, 3.0f, 4.5, 10.0, transaction.getHeader().getTransactionId()));
 
         assertEquals(1, transaction.getSaleItems().length);
         assertEquals(4.0f, transaction.getSaleItems()[0].getQuantity(), 0.0001f);
+        assertEquals(4.5, transaction.getSaleItems()[0].getCost(), 0.0001);
         assertEquals(40.0, transaction.getHeader().getGrandTotal(), 0.0001);
     }
 }

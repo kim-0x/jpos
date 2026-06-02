@@ -64,6 +64,8 @@ public class SaleFacadeTest {
         assertNotNull(result);
         assertEquals("REC-001", result.getHeader().getReceiptNumber());
         assertEquals(2, result.getSaleItems().length);
+        assertEquals(10.0, result.getSaleItems()[0].getCost(), 0.0001);
+        assertEquals(5.0, result.getSaleItems()[1].getCost(), 0.0001);
         assertEquals(25.0, result.getHeader().getGrandTotal(), 0.0001);
     }
 

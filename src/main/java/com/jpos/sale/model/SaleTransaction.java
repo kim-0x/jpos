@@ -30,6 +30,7 @@ public class SaleTransaction {
                 saleItems[i] = new SaleItem(
                         existing.getProductId(),
                         mergedQuantity,
+                        existing.getCost(),
                         existing.getPrice(),
                         header.getTransactionId()
                 );

@@ -56,6 +56,7 @@ public class SaleFacade {
             SaleItem saleItem = new SaleItem(
                     productId,
                     item.getQuantity(),
+                    productInfo.cost(),
                     priceBook.getSalePrice(),
                     transaction.getHeader().getTransactionId()
             );
