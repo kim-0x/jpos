@@ -79,6 +79,41 @@ password: admin
 
 If the app is using `DatUserRepository`, these credentials are auto-seeded into `data/dat/user/users.dat` when the DAT file exists but is empty.
 
+## Generate seed data for BIN repositories
+
+You can generate high-volume historical sale transactions (for example, 500-1000 transactions/day over 3 or 6 months) directly into `.dat` files:
+
+```sh
+mvn compile
+java -cp target/classes com.jpos.seed.SeedDataGenerator --months=3 --minTxPerDay=500 --maxTxPerDay=1000 --reset
+```
+
+For a larger period (6 months):
+
+```sh
+java -cp target/classes com.jpos.seed.SeedDataGenerator --months=6 --minTxPerDay=500 --maxTxPerDay=1000 --reset
+```
+
+Export generated BIN records to CSV (Excel-compatible):
+
+```sh
+java -cp target/classes com.jpos.seed.SeedDataGenerator \
+  --months=3 --minTxPerDay=500 --maxTxPerDay=1000 --reset \
+  --exportCsvDir=data/export
+```
+
+Notes:
+
+- The generator creates products (if needed), sets prices, and writes transactions into BIN (`.dat`) repositories.
+- The generator reuses the predefined product catalog (`data/csv/product.csv`) when BIN product data is empty instead of generating random products.
+- Product prices are refreshed once per month during generation.
+- Sale item generation uses quantity `1` per barcode scan event.
+- It performs automatic low-stock restock and bulk monthly restock (at the start of each month) to sustain large transaction volumes.
+- It logs start/end time and processing duration for each day to help track daily transaction generation time.
+- If daily generation exceeds the safeguard timeout (default `120` seconds), it asks whether to continue. Override with `--dayTimeoutSeconds=<seconds>`.
+- Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
+- Use `--exportCsvDir=<path>` to export BIN records (`product`, `inventory`, `pricebook`, `saletransaction`, `saleitem`) as CSV files for verification in spreadsheet tools.
+
 The application now reads its initial users, products, inventory, pricing, and sales data from:
 
 ```text

@@ -23,12 +23,16 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
 
     @Override
     public SaleTransaction createTransaction(String receiptNumber) {
+        return createTransaction(receiptNumber, new Date());
+    }
+
+    @Override
+    public SaleTransaction createTransaction(String receiptNumber, Date transactionDate) {
         Objects.requireNonNull(receiptNumber, "receiptNumber must not be null");
-        
+        Objects.requireNonNull(transactionDate, "transactionDate must not be null");
+
         UUID transactionId = UUID.randomUUID();
-        Date transactionDate = new Date();
-        
-        SaleHeader header = new SaleHeader(transactionId, receiptNumber, 0.0, transactionDate);
+        SaleHeader header = new SaleHeader(transactionId, receiptNumber, 0.0, new Date(transactionDate.getTime()));
         return new SaleTransaction(header);
     }
 
