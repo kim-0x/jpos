@@ -3,6 +3,7 @@ package com.jpos.sale.service;
 import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.model.SaleTransaction;
 
+import java.util.Date;
 import java.util.UUID;
 
 public interface SaleTransactionService {
@@ -13,6 +14,14 @@ public interface SaleTransactionService {
      * POSTCONDITION: a new transaction is created but not yet persisted.
      */
     SaleTransaction createTransaction(String receiptNumber);
+
+    /**
+     * INTENT: Create a new sale transaction with the given receipt number and transaction date.
+     * PRECONDITION: receiptNumber and transactionDate are provided.
+     * RETURNS: a new SaleTransaction object ready for adding items.
+     * POSTCONDITION: a new transaction is created but not yet persisted.
+     */
+    SaleTransaction createTransaction(String receiptNumber, Date transactionDate);
 
     /**
      * INTENT: Add an item to an existing sale transaction.

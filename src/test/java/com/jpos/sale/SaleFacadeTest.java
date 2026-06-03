@@ -12,6 +12,7 @@ import com.jpos.sale.service.implementation.MockInventoryGateway;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -111,6 +112,22 @@ public class SaleFacadeTest {
     public void shouldThrowWhenItemsArrayIsNull() {
         assertThrows(NullPointerException.class,
                 () -> saleFacade.processSaleTransaction("REC-004", null));
+    }
+
+    @Test
+    public void shouldCreateTransactionWithProvidedDate() {
+        UUID productId = UUID.randomUUID();
+        String barcode = "barcode-date";
+        Date transactionDate = new Date(System.currentTimeMillis() - 86_400_000L);
+        registerPricedProduct(barcode, productId, 12.0);
+
+        UUID transactionId = saleFacade.processSaleTransaction("REC-DATE", new SaleItemData[]{
+                new SaleItemData(barcode, 1.0f)
+        }, transactionDate);
+
+        SaleTransaction result = saleFacade.getTransactionById(transactionId);
+        assertNotNull(result);
+        assertEquals(transactionDate, result.getHeader().getTransactionDate());
     }
 
     // ---------------------------------------------------------------------------

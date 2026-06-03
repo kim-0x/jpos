@@ -79,6 +79,27 @@ password: admin
 
 If the app is using `DatUserRepository`, these credentials are auto-seeded into `data/dat/user/users.dat` when the DAT file exists but is empty.
 
+## Generate seed data for BIN repositories
+
+You can generate high-volume historical sale transactions (for example, 500-1000 transactions/day over 3 or 6 months) directly into `.dat` files:
+
+```sh
+mvn compile
+java -cp target/classes com.jpos.seed.SeedDataGenerator --months=3 --minTxPerDay=500 --maxTxPerDay=1000 --reset
+```
+
+For a larger period (6 months):
+
+```sh
+java -cp target/classes com.jpos.seed.SeedDataGenerator --months=6 --minTxPerDay=500 --maxTxPerDay=1000 --reset
+```
+
+Notes:
+
+- The generator creates products (if needed), sets prices, and writes transactions into BIN (`.dat`) repositories.
+- It performs automatic low-stock restock and bulk monthly restock (at the start of each month) to sustain large transaction volumes.
+- Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
+
 The application now reads its initial users, products, inventory, pricing, and sales data from:
 
 ```text

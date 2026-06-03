@@ -16,6 +16,7 @@ import com.jpos.sale.service.SaleTransactionService;
 import com.jpos.sale.service.implementation.ProductPriceServiceImpl;
 import com.jpos.sale.service.implementation.SaleTransactionServiceImpl;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -42,10 +43,15 @@ public class SaleFacade {
      * @return the transaction ID of the completed SaleTransaction
      */
     public UUID processSaleTransaction(String receiptNumber, SaleItemData[] items) {
+        return processSaleTransaction(receiptNumber, items, new Date());
+    }
+
+    public UUID processSaleTransaction(String receiptNumber, SaleItemData[] items, Date transactionDate) {
         Objects.requireNonNull(receiptNumber, "receiptNumber must not be null");
         Objects.requireNonNull(items, "items must not be null");
+        Objects.requireNonNull(transactionDate, "transactionDate must not be null");
 
-        SaleTransaction transaction = saleTransactionService.createTransaction(receiptNumber);
+        SaleTransaction transaction = saleTransactionService.createTransaction(receiptNumber, transactionDate);
 
         for (SaleItemData item : items) {
             var productRef = new ProductRef(null, item.getBarcode());
