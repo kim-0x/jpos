@@ -29,7 +29,9 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,8 +109,22 @@ public final class SeedDataGenerator {
         long createdTransactions = 0L;
         long skippedTransactions = 0L;
         long restockEvents = 0L;
+        YearMonth activeMonth = null;
+
+        System.out.printf("Starting seed generation for period %s to %s%n", startDate, endDate);
 
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            YearMonth processingMonth = YearMonth.from(date);
+            if (!processingMonth.equals(activeMonth)) {
+                activeMonth = processingMonth;
+                LocalDate monthEndDate = processingMonth.atEndOfMonth().isAfter(endDate) ? endDate : processingMonth.atEndOfMonth();
+                long processingDays = ChronoUnit.DAYS.between(date, monthEndDate) + 1;
+                long estimatedMonthlyTransactions = Math.round(
+                        processingDays * ((options.minTransactionsPerDay + options.maxTransactionsPerDay) / 2.0));
+                System.out.printf("Processing month: %s%n", processingMonth);
+                System.out.printf("Estimated transactions for %s: %d%n", processingMonth, estimatedMonthlyTransactions);
+            }
+
             if (date.getDayOfMonth() == 1) {
                 restockEvents += bulkRestockMonthStart(context, productStateByBarcode, options);
             }
@@ -143,6 +159,7 @@ public final class SeedDataGenerator {
 
         if (options.exportCsvDir != null && !options.exportCsvDir.isBlank()) {
             Path exportDirectory = resolveExportDirectory(options.exportCsvDir);
+            System.out.printf("Starting CSV export to: %s%n", exportDirectory);
             exportCsvSnapshot(context, exportDirectory);
             System.out.printf("CSV export generated at: %s%n", exportDirectory);
         }
