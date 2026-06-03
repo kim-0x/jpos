@@ -94,11 +94,20 @@ For a larger period (6 months):
 java -cp target/classes com.jpos.seed.SeedDataGenerator --months=6 --minTxPerDay=500 --maxTxPerDay=1000 --reset
 ```
 
+Export generated BIN records to CSV (Excel-compatible):
+
+```sh
+java -cp target/classes com.jpos.seed.SeedDataGenerator \
+  --months=3 --minTxPerDay=500 --maxTxPerDay=1000 --reset \
+  --exportCsvDir=data/export
+```
+
 Notes:
 
 - The generator creates products (if needed), sets prices, and writes transactions into BIN (`.dat`) repositories.
 - It performs automatic low-stock restock and bulk monthly restock (at the start of each month) to sustain large transaction volumes.
 - Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
+- Use `--exportCsvDir=<path>` to export BIN records (`product`, `inventory`, `pricebook`, `saletransaction`, `saleitem`) as CSV files for verification in spreadsheet tools.
 
 The application now reads its initial users, products, inventory, pricing, and sales data from:
 

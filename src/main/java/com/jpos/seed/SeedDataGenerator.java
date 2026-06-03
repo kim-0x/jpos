@@ -22,6 +22,7 @@ import com.jpos.sale.repository.implementation.file.BinSaleItemRepository;
 import com.jpos.sale.service.InventoryGateway;
 import com.jpos.sale.service.implementation.InventoryGatewayImpl;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,9 +35,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import utils.CsvRepositorySupport;
 
 public final class SeedDataGenerator {
     private static final DateTimeFormatter RECEIPT_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -79,7 +82,14 @@ public final class SeedDataGenerator {
                 priceBookRepository,
                 inventoryGateway);
 
-        return new GeneratorContext(inventoryFacade, saleFacade);
+        return new GeneratorContext(
+                inventoryFacade,
+                saleFacade,
+                productRepository,
+                inventoryRepository,
+                priceBookRepository,
+                saleHeaderRepository,
+                saleItemRepository);
     }
 
     private static void runSeed(GeneratorContext context, Options options) {
@@ -130,6 +140,121 @@ public final class SeedDataGenerator {
         System.out.printf("Transactions skipped: %d%n", skippedTransactions);
         System.out.printf("Restock events: %d%n", restockEvents);
         System.out.printf("Products in catalog: %d%n", productStateByBarcode.size());
+
+        if (options.exportCsvDir != null && !options.exportCsvDir.isBlank()) {
+            Path exportDirectory = resolveExportDirectory(options.exportCsvDir);
+            exportCsvSnapshot(context, exportDirectory);
+            System.out.printf("CSV export generated at: %s%n", exportDirectory);
+        }
+    }
+
+    private static Path resolveExportDirectory(String exportCsvDir) {
+        Path exportPath = Path.of(exportCsvDir);
+        if (exportPath.isAbsolute()) {
+            return exportPath.normalize();
+        }
+        return locateProjectRoot().resolve(exportPath).normalize();
+    }
+
+    private static void exportCsvSnapshot(GeneratorContext context, Path exportDirectory) {
+        try {
+            Files.createDirectories(exportDirectory);
+
+            writeCsvFile(
+                    exportDirectory.resolve("product.csv"),
+                    "id,barcode,name,category",
+                    List.of(context.productRepository.getProducts()).stream()
+                            .map(product -> new String[] {
+                                    product.getId().toString(),
+                                    product.getBarcode(),
+                                    product.getName(),
+                                    product.getCategory().getValue()
+                            }).toList()
+            );
+
+            writeCsvFile(
+                    exportDirectory.resolve("inventory.csv"),
+                    "id,numberInStock,cost,productId,createdAt",
+                    List.of(context.inventoryRepository.getStockItems()).stream()
+                            .map(stockItem -> new String[] {
+                                    stockItem.getId().toString(),
+                                    String.valueOf(stockItem.getNumberInStock()),
+                                    String.valueOf(stockItem.getCost()),
+                                    stockItem.getProductId().toString(),
+                                    CsvRepositorySupport.formatTimestamp(stockItem.getCreatedAt())
+                            }).toList()
+            );
+
+            writeCsvFile(
+                    exportDirectory.resolve("pricebook.csv"),
+                    "productId,cost,margin,salePrice,effectiveAt",
+                    List.of(context.priceBookRepository.getAll()).stream()
+                            .map(priceBook -> new String[] {
+                                    priceBook.getProductId().toString(),
+                                    String.valueOf(priceBook.getCost()),
+                                    String.valueOf(priceBook.getMargin()),
+                                    String.valueOf(priceBook.getSalePrice()),
+                                    CsvRepositorySupport.formatTimestamp(priceBook.getEffectiveAt())
+                            }).toList()
+            );
+
+            writeCsvFile(
+                    exportDirectory.resolve("saletransaction.csv"),
+                    "transactionId,receiptNumber,grandTotal,transactionDate",
+                    List.of(context.saleHeaderRepository.getAll()).stream()
+                            .map(header -> new String[] {
+                                    header.getTransactionId().toString(),
+                                    header.getReceiptNumber(),
+                                    String.valueOf(header.getGrandTotal()),
+                                    CsvRepositorySupport.formatTimestamp(header.getTransactionDate())
+                            }).toList()
+            );
+
+            writeCsvFile(
+                    exportDirectory.resolve("saleitem.csv"),
+                    "productId,quantity,cost,price,transactionId",
+                    List.of(context.saleItemRepository.getAll()).stream()
+                            .map(item -> new String[] {
+                                    item.getProductId().toString(),
+                                    String.valueOf(item.getQuantity()),
+                                    String.valueOf(item.getCost()),
+                                    String.valueOf(item.getPrice()),
+                                    item.getTransactionId().toString()
+                            }).toList()
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to export CSV records.", exception);
+        }
+    }
+
+    private static void writeCsvFile(Path outputPath, String header, List<String[]> rows) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+            writer.write(header);
+            writer.newLine();
+            for (String[] row : rows) {
+                writer.write(toCsvLine(row));
+                writer.newLine();
+            }
+        }
+    }
+
+    private static String toCsvLine(String[] row) {
+        StringBuilder builder = new StringBuilder();
+        for (int index = 0; index < row.length; index++) {
+            if (index > 0) {
+                builder.append(',');
+            }
+            String value = row[index] == null ? "" : row[index];
+            boolean requiresQuotes = value.contains(",") || value.contains("\"") || value.contains("\n");
+            if (requiresQuotes) {
+                builder.append('"');
+                builder.append(value.replace("\"", "\"\""));
+                builder.append('"');
+                continue;
+            }
+            builder.append(value);
+        }
+        return builder.toString();
     }
 
     private static Map<String, ProductState> ensureProductCatalog(GeneratorContext context, Options options, Random random) {
@@ -313,7 +438,13 @@ public final class SeedDataGenerator {
         return startPath;
     }
 
-    private record GeneratorContext(InventoryFacade inventoryFacade, SaleFacade saleFacade) {
+    private record GeneratorContext(InventoryFacade inventoryFacade,
+                                    SaleFacade saleFacade,
+                                    ProductRepository productRepository,
+                                    InventoryRepository inventoryRepository,
+                                    PriceBookRepository priceBookRepository,
+                                    SaleHeaderRepository saleHeaderRepository,
+                                    SaleItemRepository saleItemRepository) {
     }
 
     private static final class ProductState {
@@ -342,6 +473,7 @@ public final class SeedDataGenerator {
         private float margin = 0.25f;
         private boolean reset = false;
         private boolean append = true;
+        private String exportCsvDir = null;
         private long randomSeed = System.currentTimeMillis();
 
         private static Options from(String[] args) {
@@ -371,6 +503,7 @@ public final class SeedDataGenerator {
                     case "lowStockRestock" -> options.lowStockRestockQuantity = Math.max(10.0f, Float.parseFloat(value));
                     case "margin" -> options.margin = Math.max(0.0f, Float.parseFloat(value));
                     case "seed" -> options.randomSeed = Long.parseLong(value);
+                    case "exportCsvDir" -> options.exportCsvDir = value;
                     default -> {
                     }
                 }
