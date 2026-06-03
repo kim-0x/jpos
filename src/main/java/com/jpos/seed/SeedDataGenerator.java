@@ -23,6 +23,7 @@ import com.jpos.sale.service.InventoryGateway;
 import com.jpos.sale.service.implementation.InventoryGatewayImpl;
 
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ import utils.CsvRepositorySupport;
 
 public final class SeedDataGenerator {
     private static final DateTimeFormatter RECEIPT_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter LOG_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final float REPOSITORY_LOW_STOCK_LEVEL = 3.0f;
 
     private SeedDataGenerator() {
@@ -125,6 +127,11 @@ public final class SeedDataGenerator {
                 System.out.printf("Estimated transactions for %s: %d%n", processingMonth, estimatedMonthlyTransactions);
             }
 
+            LocalDateTime dayStartTime = LocalDateTime.now();
+            long dayCreatedStart = createdTransactions;
+            long daySkippedStart = skippedTransactions;
+            System.out.printf("Day %s started at %s%n", date, dayStartTime.format(LOG_TIMESTAMP_FORMAT));
+
             if (date.getDayOfMonth() == 1) {
                 restockEvents += bulkRestockMonthStart(context, productStateByBarcode, options);
             }
@@ -147,6 +154,24 @@ public final class SeedDataGenerator {
                 } catch (Exception exception) {
                     skippedTransactions++;
                 }
+            }
+
+            LocalDateTime dayEndTime = LocalDateTime.now();
+            long dayDurationSeconds = Math.max(0, ChronoUnit.SECONDS.between(dayStartTime, dayEndTime));
+            long dayCreatedTransactions = createdTransactions - dayCreatedStart;
+            long daySkippedTransactions = skippedTransactions - daySkippedStart;
+            System.out.printf(
+                    "Day %s ended at %s | duration=%ds | created=%d | skipped=%d%n",
+                    date,
+                    dayEndTime.format(LOG_TIMESTAMP_FORMAT),
+                    dayDurationSeconds,
+                    dayCreatedTransactions,
+                    daySkippedTransactions);
+
+            if (dayDurationSeconds > options.dayProcessingTimeoutSeconds
+                    && !shouldContinueAfterTimeout(date, dayDurationSeconds, options.dayProcessingTimeoutSeconds)) {
+                System.out.println("Seed generation stopped by timeout safeguard.");
+                break;
             }
         }
 
@@ -171,6 +196,22 @@ public final class SeedDataGenerator {
             return exportPath.normalize();
         }
         return locateProjectRoot().resolve(exportPath).normalize();
+    }
+
+    private static boolean shouldContinueAfterTimeout(LocalDate processingDate, long elapsedSeconds, long timeoutSeconds) {
+        System.out.printf(
+                "Day %s exceeded timeout (%ds > %ds).%n",
+                processingDate,
+                elapsedSeconds,
+                timeoutSeconds);
+        Console console = System.console();
+        if (console == null) {
+            System.out.println("No interactive console detected. Exiting to honor timeout safeguard.");
+            return false;
+        }
+        String userAnswer = console.readLine("Continue processing remaining days? [y/N]: ");
+        return userAnswer != null
+                && ("y".equalsIgnoreCase(userAnswer.trim()) || "yes".equalsIgnoreCase(userAnswer.trim()));
     }
 
     private static void exportCsvSnapshot(GeneratorContext context, Path exportDirectory) {
@@ -491,6 +532,7 @@ public final class SeedDataGenerator {
         private boolean reset = false;
         private boolean append = true;
         private String exportCsvDir = null;
+        private long dayProcessingTimeoutSeconds = 120L;
         private long randomSeed = System.currentTimeMillis();
 
         private static Options from(String[] args) {
@@ -520,6 +562,7 @@ public final class SeedDataGenerator {
                     case "lowStockRestock" -> options.lowStockRestockQuantity = Math.max(10.0f, Float.parseFloat(value));
                     case "margin" -> options.margin = Math.max(0.0f, Float.parseFloat(value));
                     case "seed" -> options.randomSeed = Long.parseLong(value);
+                    case "dayTimeoutSeconds" -> options.dayProcessingTimeoutSeconds = Math.max(1L, Long.parseLong(value));
                     case "exportCsvDir" -> options.exportCsvDir = value;
                     default -> {
                     }

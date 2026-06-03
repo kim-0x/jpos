@@ -106,6 +106,8 @@ Notes:
 
 - The generator creates products (if needed), sets prices, and writes transactions into BIN (`.dat`) repositories.
 - It performs automatic low-stock restock and bulk monthly restock (at the start of each month) to sustain large transaction volumes.
+- It logs start/end time and processing duration for each day to help track daily transaction generation time.
+- If daily generation exceeds the safeguard timeout (default `120` seconds), it asks whether to continue. Override with `--dayTimeoutSeconds=<seconds>`.
 - Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
 - Use `--exportCsvDir=<path>` to export BIN records (`product`, `inventory`, `pricebook`, `saletransaction`, `saleitem`) as CSV files for verification in spreadsheet tools.
 
