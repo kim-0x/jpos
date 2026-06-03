@@ -9,6 +9,7 @@ import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.repository.implementation.file.BinInventoryRepository;
 import com.jpos.inventory.repository.implementation.file.BinProductRepository;
+import com.jpos.inventory.repository.implementation.file.CsvProductRepository;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.model.PriceBook;
@@ -37,11 +38,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import utils.CsvRepositorySupport;
 
 public final class SeedDataGenerator {
@@ -125,6 +124,7 @@ public final class SeedDataGenerator {
                         processingDays * ((options.minTransactionsPerDay + options.maxTransactionsPerDay) / 2.0));
                 System.out.printf("Processing month: %s%n", processingMonth);
                 System.out.printf("Estimated transactions for %s: %d%n", processingMonth, estimatedMonthlyTransactions);
+                applyMonthlyProductPrices(context, productStateByBarcode, options.margin);
             }
 
             LocalDateTime dayStartTime = LocalDateTime.now();
@@ -318,23 +318,21 @@ public final class SeedDataGenerator {
     private static Map<String, ProductState> ensureProductCatalog(GeneratorContext context, Options options, Random random) {
         Map<String, ProductState> productStateByBarcode = new HashMap<>();
         Product[] existingProducts = context.inventoryFacade.getProducts();
-        Set<String> existingBarcodes = new HashSet<>();
-
-        for (Product product : existingProducts) {
-            existingBarcodes.add(product.getBarcode());
+        if (existingProducts.length == 0) {
+            Product[] predefinedProducts = new CsvProductRepository().getProducts();
+            for (Product predefinedProduct : predefinedProducts) {
+                context.productRepository.saveProduct(predefinedProduct);
+            }
+            existingProducts = context.inventoryFacade.getProducts();
+            System.out.printf("Loaded predefined product catalog: %d products%n", existingProducts.length);
         }
 
-        int productsToCreate = Math.max(0, options.productCount - existingProducts.length);
-        for (int index = 0; index < productsToCreate; index++) {
-            String barcode = nextBarcode(existingBarcodes, existingProducts.length + index);
-            ProductCategory category = ProductCategory.values()[random.nextInt(ProductCategory.values().length)];
-            context.inventoryFacade.createNewProduct(barcode, "Seed Product " + barcode, category);
-            existingBarcodes.add(barcode);
+        if (existingProducts.length == 0) {
+            throw new IllegalStateException("No product catalog available for seed generation.");
         }
 
-        Product[] allProducts = context.inventoryFacade.getProducts();
         Map<String, Float> stockByBarcode = currentStockByBarcode(context.inventoryFacade.getStockReport());
-        for (Product product : allProducts) {
+        for (Product product : existingProducts) {
             String barcode = product.getBarcode();
             double currentCost = currentCostForBarcode(context.inventoryFacade.getStockReport(), barcode);
             if (currentCost <= 0) {
@@ -347,16 +345,18 @@ public final class SeedDataGenerator {
                 currentStock += options.monthlyOpeningStock;
             }
 
-            PriceBook priceBook = context.saleFacade.getCurrentProductPrice(new ProductQuery(product.getId(), barcode));
-            if (priceBook == null) {
-                context.saleFacade.setProductPrice(new ProductQuery(product.getId(), barcode), options.margin);
-                priceBook = context.saleFacade.getCurrentProductPrice(new ProductQuery(product.getId(), barcode));
-            }
-
-            productStateByBarcode.put(barcode, new ProductState(barcode, currentCost, currentStock));
+            productStateByBarcode.put(barcode, new ProductState(product.getId(), barcode, currentCost, currentStock));
         }
 
         return productStateByBarcode;
+    }
+
+    private static void applyMonthlyProductPrices(GeneratorContext context,
+                                                  Map<String, ProductState> productStateByBarcode,
+                                                  float margin) {
+        for (ProductState productState : productStateByBarcode.values()) {
+            context.saleFacade.setProductPrice(new ProductQuery(productState.productId, productState.barcode), margin);
+        }
     }
 
     private static long bulkRestockMonthStart(GeneratorContext context,
@@ -381,7 +381,7 @@ public final class SeedDataGenerator {
 
         for (int index = 0; index < itemCount && !products.isEmpty(); index++) {
             ProductState product = products.get(random.nextInt(products.size()));
-            float quantity = randomInRange(random, options.minQuantityPerItem, options.maxQuantityPerItem);
+            float quantity = 1.0f;
             float projectedStock = product.currentStock - quantity;
 
             if (projectedStock <= REPOSITORY_LOW_STOCK_LEVEL) {
@@ -448,17 +448,6 @@ public final class SeedDataGenerator {
         return randomInRange(random, 1.0f, 40.0f);
     }
 
-    private static String nextBarcode(Set<String> existingBarcodes, int seed) {
-        int next = seed + 1;
-        while (true) {
-            String barcode = "seed-" + String.format("%06d", next);
-            if (!existingBarcodes.contains(barcode)) {
-                return barcode;
-            }
-            next++;
-        }
-    }
-
     private static void truncateDataFiles() {
         Path binDirectory = locateProjectRoot()
                 .resolve("data")
@@ -506,11 +495,13 @@ public final class SeedDataGenerator {
     }
 
     private static final class ProductState {
+        private final java.util.UUID productId;
         private final String barcode;
         private final double cost;
         private float currentStock;
 
-        private ProductState(String barcode, double cost, float currentStock) {
+        private ProductState(java.util.UUID productId, String barcode, double cost, float currentStock) {
+            this.productId = productId;
             this.barcode = barcode;
             this.cost = cost;
             this.currentStock = currentStock;

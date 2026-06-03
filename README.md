@@ -105,6 +105,9 @@ java -cp target/classes com.jpos.seed.SeedDataGenerator \
 Notes:
 
 - The generator creates products (if needed), sets prices, and writes transactions into BIN (`.dat`) repositories.
+- The generator reuses the predefined product catalog (`data/csv/product.csv`) when BIN product data is empty instead of generating random products.
+- Product prices are refreshed once per month during generation.
+- Sale item generation uses quantity `1` per barcode scan event.
 - It performs automatic low-stock restock and bulk monthly restock (at the start of each month) to sustain large transaction volumes.
 - It logs start/end time and processing duration for each day to help track daily transaction generation time.
 - If daily generation exceeds the safeguard timeout (default `120` seconds), it asks whether to continue. Override with `--dayTimeoutSeconds=<seconds>`.
