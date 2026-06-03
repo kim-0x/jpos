@@ -5,6 +5,7 @@ import com.jpos.report.model.SaleReport;
 import utils.IO;
 import view.ReportFeature;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -67,12 +68,12 @@ public class ReportFeatureView implements ReportFeature {
         System.out.printf("From: %s%n", saleReport.getFromDate());
         System.out.printf("To: %s%n", saleReport.getToDate());
         System.out.printf("%s%n", "-".repeat(120));
-        System.out.printf("%-30s %20s %20s %20s %20s%n", "Name", "Total Qty", "Total Cost", "Total Revenue", "Total Profit");
+        System.out.printf("%-30s %20s %20s %20s %20s%n", "Name", "Total Qty", "Total Revenue", "Total Cost", "Total Profit");
         System.out.printf("%s%n", "-".repeat(120));
 
         saleReport.getSaleDetails().forEach((productId, saleDetail) -> {
             double cost = saleDetail.getTotalCost();
-            double revenue = saleDetail.getTotalPrice();
+            double revenue = saleDetail.getTotalRevenue();
             double profit = revenue - cost;
 
             String productName = saleDetail.getProductName();
@@ -83,21 +84,23 @@ public class ReportFeatureView implements ReportFeature {
             System.out.printf("%-30s %20s %20s %20s %20s%n",
                     formatProductName,
                     saleDetail.getTotalQuantity(),
-                    currencyFormat(cost),
-                    currencyFormat(revenue),
-                    currencyFormat(profit)
+                    accountingFormat(revenue),
+                    accountingFormat(-1 * Math.abs(cost)),
+                    accountingFormat(profit)
             );
         });
         System.out.printf("%s%n", "-".repeat(120));
         var summary = saleReport.getSaleSummary();
         System.out.printf("%-51s %20s %20s %20s%n", "Summary:",
-                currencyFormat(summary.getTotalCost()),
-                currencyFormat(summary.getTotalRevenue()),
-                currencyFormat(summary.getTotalProfit()));
+                accountingFormat(summary.getTotalRevenue()),
+                accountingFormat(-1 * Math.abs(summary.getTotalCost())),
+                accountingFormat(summary.getTotalProfit()));
     }
 
-    private String currencyFormat(double money) {
-        DecimalFormat df = new DecimalFormat("$###,###.00");
-        return df.format(money);
+    private String accountingFormat(double money) {
+        BigDecimal amount = new BigDecimal(money);
+        // The pattern handles: Positive ; Negative
+        DecimalFormat accountingFormat = new DecimalFormat("$#,##0.00;($#,##0.00)");
+        return accountingFormat.format(amount);
     }
 }

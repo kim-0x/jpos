@@ -4,13 +4,13 @@ public class SaleDetail {
     private final String productName;
     private final float totalQuantity;
     private final double totalCost;
-    private final double totalPrice;
+    private final double totalRevenue;
 
-    public SaleDetail(String productName, float totalQuantity, double totalCost, double totalPrice) {
+    public SaleDetail(String productName, float totalQuantity, double totalCost, double totalRevenue) {
         this.productName = productName;
         this.totalQuantity = totalQuantity;
         this.totalCost = totalCost;
-        this.totalPrice = totalPrice;
+        this.totalRevenue = totalRevenue;
     }
 
     public String getProductName() {
@@ -25,8 +25,8 @@ public class SaleDetail {
         return totalCost;
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
+    public double getTotalRevenue() {
+        return totalRevenue;
     }
 
     public SaleDetail accumulate(SaleDetail other) {
@@ -34,7 +34,7 @@ public class SaleDetail {
                 this.productName,
                 this.totalQuantity + other.totalQuantity,
                 this.totalCost + other.totalCost,
-                this.totalPrice + other.totalPrice
+                this.totalRevenue + other.totalRevenue
         );
     }
 }

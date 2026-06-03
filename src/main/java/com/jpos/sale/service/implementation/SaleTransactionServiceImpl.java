@@ -7,6 +7,7 @@ import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
 import com.jpos.sale.service.SaleTransactionService;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -79,7 +80,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
             
             transactions[i] = transaction;
         }
-        
+
         return transactions;
     }
 

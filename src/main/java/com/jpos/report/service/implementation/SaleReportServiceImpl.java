@@ -43,21 +43,16 @@ public class SaleReportServiceImpl implements SaleReportService {
                         si -> {
                             ProductRef productRef = new ProductRef(si.getProductId(), null);
                             ProductInfo productInfo = inventoryGateway.findBy(productRef);
-                            float totalQuantity = si.getQuantity();
-                            double totalCost = si.getCost() *  si.getQuantity();
-                            double totalSalePrice = si.getTotalPrice() * si.getQuantity();
 
-                            return new SaleDetail(productInfo.name(), totalQuantity, totalCost, totalSalePrice);
+                            return new SaleDetail(
+                                    productInfo.name(),
+                                    si.getQuantity(),
+                                    si.getCost(),
+                                    si.getTotalPrice());
                         },
                         SaleDetail::accumulate
                 ));
 
-        SaleReport report = new SaleReport();
-        report.setFromDate(fromDate);
-        report.setToDate(toDate);
-        report.setSaleSummary(finalSaleSummary);
-        report.setSaleDetails(finalProductSummary);
-
-        return report;
+        return new SaleReport(fromDate, toDate, finalSaleSummary, finalProductSummary);
     }
 }

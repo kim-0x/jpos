@@ -106,7 +106,7 @@ public class SaleReportServiceImplTest {
         assertEquals("Product 1", detail.getProductName());
         assertEquals(1f, detail.getTotalQuantity(), 0.001f);
         assertEquals(20.0, detail.getTotalCost(), 0.001);
-        assertEquals(40.0, detail.getTotalPrice(), 0.001);
+        assertEquals(40.0, detail.getTotalRevenue(), 0.001);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class SaleReportServiceImplTest {
         assertNotNull(detail);
         assertEquals(2f, detail.getTotalQuantity(), 0.001f);
         assertEquals(40.0, detail.getTotalCost(), 0.001);
-        assertEquals(80.0, detail.getTotalPrice(), 0.001);
+        assertEquals(80.0, detail.getTotalRevenue(), 0.001);
     }
 
     @Test

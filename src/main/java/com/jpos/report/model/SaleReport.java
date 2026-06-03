@@ -3,41 +3,31 @@ package com.jpos.report.model;
 import java.util.*;
 
 public class SaleReport {
-    private Date fromDate;
-    private Date toDate;
-    private SaleSummary saleSummary;
+    private final Date fromDate;
+    private final Date toDate;
+    private final SaleSummary saleSummary;
+    private final Map<UUID, SaleDetail> saleDetails;
 
-    private Map<UUID, SaleDetail> saleDetails;
+    public SaleReport(Date  fromDate, Date toDate, SaleSummary saleSummary,  Map<UUID, SaleDetail> saleDetails) {
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.saleSummary = saleSummary;
+        this.saleDetails = saleDetails;
+    }
 
     public Date getFromDate() {
         return fromDate;
-    }
-
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
     }
 
     public Date getToDate() {
         return toDate;
     }
 
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
-    }
-
     public SaleSummary getSaleSummary() {
         return saleSummary;
     }
 
-    public void setSaleSummary(SaleSummary saleSummary) {
-        this.saleSummary = saleSummary;
-    }
-
     public Map<UUID, SaleDetail> getSaleDetails() {
         return saleDetails;
-    }
-
-    public void setSaleDetails(Map<UUID, SaleDetail> saleDetails) {
-        this.saleDetails = saleDetails;
     }
 }
