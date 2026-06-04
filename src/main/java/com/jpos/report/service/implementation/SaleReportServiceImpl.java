@@ -43,7 +43,7 @@ public class SaleReportServiceImpl implements SaleReportService {
                         si -> {
                             ProductRef productRef = new ProductRef(si.getProductId(), null);
                             ProductInfo productInfo = inventoryGateway.findBy(productRef);
-
+    
                             return new SaleDetail(
                                     productInfo.name(),
                                     si.getQuantity(),

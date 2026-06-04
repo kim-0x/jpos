@@ -62,9 +62,4 @@ public class MockInventoryGateway implements InventoryGateway {
         // For mock behavior, validating that the referenced product exists is sufficient.
         findBy(ref);
     }
-
-    @Override
-    public Stream<StockRecord> getAllStockOutTransaction(Date fromDate, Date toDate) {
-        return Stream.empty();
-    }
 }

@@ -50,11 +50,6 @@ public class InventoryGatewayImpl implements InventoryGateway {
         }
     }
 
-    @Override
-    public Stream<StockRecord> getAllStockOutTransaction(Date fromDate, Date toDate) {
-        return inventoryService.getStockOutReport(fromDate, toDate);
-    }
-
     private String resolveIdentifier(ProductRef ref) {
         if (ref == null) {
             return "null";

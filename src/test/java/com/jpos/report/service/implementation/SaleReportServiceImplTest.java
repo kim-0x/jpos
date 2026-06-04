@@ -218,11 +218,6 @@ public class SaleReportServiceImplTest {
 
             @Override
             public void reduceStock(ProductRef ref, float numberOfStock) {}
-
-            @Override
-            public Stream<StockRecord> getAllStockOutTransaction(Date fromDate, Date toDate) {
-                return Stream.empty();
-            }
         };
     }
 }
