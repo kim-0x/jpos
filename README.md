@@ -1,5 +1,7 @@
 # JPOS
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/kim-0x/jpos)
+
 JPOS is a point of sale system for small grocery stores. It helps store owners manage products, inventory, pricing, sales activity, and reporting from a single Java application.
 
 ## Overview
