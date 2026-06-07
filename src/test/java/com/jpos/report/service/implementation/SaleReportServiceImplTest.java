@@ -4,7 +4,7 @@ import com.jpos.inventory.model.StockRecord;
 import com.jpos.report.model.SaleDetail;
 import com.jpos.report.model.SaleReport;
 import com.jpos.report.model.SaleSummary;
-import com.jpos.report.service.SaleGateway;
+import com.jpos.report.service.SaleReportGateway;
 import com.jpos.sale.model.*;
 import com.jpos.sale.service.InventoryGateway;
 import org.junit.Before;
@@ -77,7 +77,7 @@ public class SaleReportServiceImplTest {
         SaleTransaction transaction = buildTransaction("REC-001", new SaleItemSpec(PRODUCT_ID_1, 1f, 30.0, 50.0));
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(transaction),
+                stubSaleReportGateway(transaction),
                 stubInventoryGateway()
         );
 
@@ -95,7 +95,7 @@ public class SaleReportServiceImplTest {
         SaleTransaction transaction = buildTransaction("REC-001", new SaleItemSpec(PRODUCT_ID_1, 1f, 20.0, 40.0));
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(transaction),
+                stubSaleReportGateway(transaction),
                 stubInventoryGateway()
         );
 
@@ -118,7 +118,7 @@ public class SaleReportServiceImplTest {
         SaleTransaction txn2 = buildTransaction("REC-002", new SaleItemSpec(PRODUCT_ID_2, 1f, 10.0, 25.0));
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(txn1, txn2),
+                stubSaleReportGateway(txn1, txn2),
                 stubInventoryGateway()
         );
 
@@ -138,7 +138,7 @@ public class SaleReportServiceImplTest {
         );
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(transaction),
+                stubSaleReportGateway(transaction),
                 stubInventoryGateway()
         );
 
@@ -159,7 +159,7 @@ public class SaleReportServiceImplTest {
         SaleTransaction txn2 = buildTransaction("REC-002", new SaleItemSpec(PRODUCT_ID_1, 1f, 20.0, 40.0));
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(txn1, txn2),
+                stubSaleReportGateway(txn1, txn2),
                 stubInventoryGateway()
         );
 
@@ -179,7 +179,7 @@ public class SaleReportServiceImplTest {
         SaleTransaction txn3 = buildTransaction("REC-003", new SaleItemSpec(PRODUCT_ID_2, 1f, 15.0, 30.0));
 
         SaleReportServiceImpl service = new SaleReportServiceImpl(
-                stubSaleGateway(txn1, txn2, txn3),
+                stubSaleReportGateway(txn1, txn2, txn3),
                 stubInventoryGateway()
         );
 
@@ -202,7 +202,7 @@ public class SaleReportServiceImplTest {
         return transaction;
     }
 
-    private SaleGateway stubSaleGateway(SaleTransaction... transactions) {
+    private SaleReportGateway stubSaleReportGateway(SaleTransaction... transactions) {
         return (from, to) -> Stream.of(transactions);
     }
 

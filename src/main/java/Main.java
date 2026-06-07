@@ -5,9 +5,9 @@ import com.jpos.inventory.repository.implementation.file.BinInventoryRepository;
 import com.jpos.inventory.repository.implementation.file.BinProductRepository;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.report.ReportFacade;
-import com.jpos.report.service.SaleGateway;
+import com.jpos.report.service.SaleReportGateway;
 import com.jpos.report.service.SaleReportService;
-import com.jpos.report.service.implementation.SaleGetewayImpl;
+import com.jpos.report.service.implementation.SaleReportGatewayImpl;
 import com.jpos.report.service.implementation.SaleReportServiceImpl;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.repository.PriceBookRepository;
@@ -56,8 +56,8 @@ public class Main {
                 saleHeaderRepository,
                 saleItemRepository);
 
-        SaleGateway saleGateway = new SaleGetewayImpl(saleTransactionService);
-        SaleReportService saleReportService = new SaleReportServiceImpl(saleGateway, inventoryGateway);
+        SaleReportGateway saleReportGateway = new SaleReportGatewayImpl(saleTransactionService);
+        SaleReportService saleReportService = new SaleReportServiceImpl(saleReportGateway, inventoryGateway);
         ReportFacade saleReportFacade = new ReportFacade(saleReportService);
         ReportFeature reportFeatureView = new ReportFeatureView(saleReportFacade);
 
