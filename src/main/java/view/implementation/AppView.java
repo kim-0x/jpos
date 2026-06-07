@@ -90,13 +90,13 @@ public class AppView {
                 case 7:
                     reportFeature.getSaleReport();
                     break;
-                case 8:
-                    inventoryFeature.displayStockReport();
-                    break;
                 case 9:
-                    saleFeature.getCurrentProductPrice();
+                    inventoryFeature.displayCurrentStock();
                     break;
                 case 10:
+                    saleFeature.getCurrentProductPrice();
+                    break;
+                case 11:
                     saleFeature.processSaleTransaction();
                     break;
                 default:
@@ -114,10 +114,10 @@ public class AppView {
                 case 3:
                     inventoryFeature.stockEntry();
                     break;
-                case 4:
-                    inventoryFeature.displayStockReport();
-                    break;
                 case 5:
+                    inventoryFeature.displayCurrentStock();
+                    break;
+                case 6:
                     saleFeature.getCurrentProductPrice();
                     break;
                 default:

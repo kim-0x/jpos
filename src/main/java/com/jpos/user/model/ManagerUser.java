@@ -12,6 +12,7 @@ public class ManagerUser extends User {
             "Show All Products",
             "Create New Stock Item",
             "View Inventory Report",
+            "Check Latest Inventory",
             "Check Latest Price for Product"
     };
 

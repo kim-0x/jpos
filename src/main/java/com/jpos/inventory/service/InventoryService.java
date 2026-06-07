@@ -10,6 +10,6 @@ public interface InventoryService {
     abstract void entryStock(String barcode, double cost, float numberInStock);
     abstract void reduceStock(ProductQuery productQuery, float numberOfStock);
     abstract StockRecord[] getStockReport();
-    abstract Stream<StockRecord> getStockOutReport(Date fromDate, Date toDate);
+    abstract Stream<StockRecord> getAllStockTransactions(Date fromDate, Date toDate);
     abstract double getProductCostBy(ProductQuery productQuery);
 }

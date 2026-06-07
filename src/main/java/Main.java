@@ -3,10 +3,15 @@ import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;
 import com.jpos.inventory.repository.implementation.file.BinInventoryRepository;
 import com.jpos.inventory.repository.implementation.file.BinProductRepository;
+import com.jpos.inventory.service.InventoryService;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.report.ReportFacade;
+import com.jpos.report.service.InventoryReportGateway;
+import com.jpos.report.service.InventoryReportService;
 import com.jpos.report.service.SaleReportGateway;
 import com.jpos.report.service.SaleReportService;
+import com.jpos.report.service.implementation.InventoryReportGatewayImpl;
+import com.jpos.report.service.implementation.InventoryReportServiceImpl;
 import com.jpos.report.service.implementation.SaleReportGatewayImpl;
 import com.jpos.report.service.implementation.SaleReportServiceImpl;
 import com.jpos.sale.SaleFacade;
@@ -41,9 +46,9 @@ public class Main {
         SaleHeaderRepository  saleHeaderRepository = new BinSaleHeaderRepository();
         SaleItemRepository saleItemRepository = new BinSaleItemRepository();
         PriceBookRepository priceBookRepository = new BinPriceBookRepository();
+        InventoryService inventoryService = new InventoryServiceImpl(inventoryRepository, productRepository);
         InventoryGateway inventoryGateway = new InventoryGatewayImpl(
-                productRepository,
-                new InventoryServiceImpl(inventoryRepository, productRepository));
+                productRepository, inventoryService);
 
         SaleFacade saleFacade = new SaleFacade(
                 saleHeaderRepository,
@@ -58,7 +63,9 @@ public class Main {
 
         SaleReportGateway saleReportGateway = new SaleReportGatewayImpl(saleTransactionService);
         SaleReportService saleReportService = new SaleReportServiceImpl(saleReportGateway, inventoryGateway);
-        ReportFacade saleReportFacade = new ReportFacade(saleReportService);
+        InventoryReportGateway inventoryReportGateway = new InventoryReportGatewayImpl(inventoryService);
+        InventoryReportService inventoryReportService = new InventoryReportServiceImpl(inventoryReportGateway);
+        ReportFacade saleReportFacade = new ReportFacade(saleReportService, inventoryReportService);
         ReportFeature reportFeatureView = new ReportFeatureView(saleReportFacade);
 
         AppView appView = new AppView(appMenuView,

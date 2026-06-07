@@ -39,8 +39,8 @@ public class InventoryFeatureView implements InventoryFeature {
     }
 
     @Override
-    public void displayStockReport() {
-        IO.println("Inventory Report:");
+    public void displayCurrentStock() {
+        IO.println("Current Stock:");
         try {
             System.out.printf("%s%n", "*".repeat(120));
             System.out.printf("%-20s %-30s %-20s %20s %20s%n", "Barcode", "Name", "Category", "On Hand", "Cost");

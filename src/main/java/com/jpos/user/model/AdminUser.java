@@ -16,6 +16,7 @@ public class AdminUser extends User {
             "Create New Item Price",
             "View Sale Report",
             "View Inventory Report",
+            "Check Latest Inventory",
             "Check Latest Price for Product",
             "Start Sale"
     };

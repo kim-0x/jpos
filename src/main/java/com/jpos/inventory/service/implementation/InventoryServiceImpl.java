@@ -80,19 +80,16 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Stream<StockRecord> getStockOutReport(Date fromDate, Date toDate) {
+    public Stream<StockRecord> getAllStockTransactions(Date fromDate, Date toDate) {
         var stockItems = inventoryRepository.getStockItems();
-        var stockOutItems = Arrays.stream(stockItems).filter(stockItem ->
-                stockItem.getCreatedAt().before(fromDate) &&
-                stockItem.getCreatedAt().after(toDate) &&
-                stockItem.getNumberInStock() < 0);
-        ArrayList<StockRecord> stockRecords = new ArrayList<>();
-        stockOutItems.forEach(stockItem -> {
-           ProductQuery productQuery = new ProductQuery(stockItem.getProductId(), null);
-           var product = productRepository.getProductBy(productQuery);
-           stockRecords.add(new StockRecord(product, stockItem.getCost(), stockItem.getNumberInStock()));
-        });
-        return stockRecords.stream();
+        return Arrays.stream(stockItems).filter(si ->
+                        si.getCreatedAt().after(fromDate) &&
+                                si.getCreatedAt().before(toDate))
+                .map(si -> {
+                    ProductQuery productQuery = new ProductQuery(si.getProductId(), null);
+                    var product = productRepository.getProductBy(productQuery);
+                    return new StockRecord(product, si.getCost(), si.getNumberInStock());
+                });
     }
 
     @Override
