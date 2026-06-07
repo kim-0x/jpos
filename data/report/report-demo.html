@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retail Reports Dashboard</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; background:#f4f6f8; color:#333; }
+header { background:#1f2937; color:white; padding:20px; }
+.container { max-width:1200px; margin:auto; padding:20px; }
+.cards { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
+.card { background:white; padding:16px; border-radius:8px; flex:1; min-width:200px; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+.controls { background:white; padding:16px; border-radius:8px; margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; background:white; }
+th, td { padding:12px; border-bottom:1px solid #ddd; text-align:left; }
+th { background:#f0f0f0; }
+.hidden { display:none; }
+button { padding:10px 16px; margin-right:8px; cursor:pointer; }
+input { padding:8px; }
+.money { text-align:right; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>Retail Reporting Dashboard</h1>
+<p>Demo report generated from JSON data</p>
+</header>
+
+<div class="container">
+
+<div class="controls">
+<label>From Date: <input type="date" value="2026-06-01"></label>
+<label>To Date: <input type="date" value="2026-06-30"></label>
+<button onclick="showReport('inventory')">Inventory Report</button>
+<button onclick="showReport('sales')">Sales Report</button>
+<input id="search" placeholder="Search product..." oninput="renderCurrent()">
+</div>
+
+<div id="summary"></div>
+
+<div id="report"></div>
+
+</div>
+
+<script>
+const inventoryData = {
+  fromDate:"2026-06-01",
+  toDate:"2026-06-30",
+  totalInventoryValue:735521.69,
+  items:[
+    {name:"Paper Towels",qty:3182,status:"In Stock",cost:28.36,value:90236.34},
+    {name:"Zero Calories Coca Cola",qty:3251,status:"In Stock",cost:35.63,value:115848.29},
+    {name:"Lemons",qty:3275,status:"In Stock",cost:36.58,value:119784.98},
+    {name:"Spring Water",qty:3241,status:"In Stock",cost:15.35,value:49743.10},
+    {name:"Canada Dry Ginger Ale",qty:3260,status:"In Stock",cost:34.33,value:111927.41}
+  ]
+};
+
+const salesData = {
+  fromDate:"2026-05-01",
+  toDate:"2026-05-31",
+  totalRevenue:217728.06,
+  totalCost:174182.45,
+  totalProfit:43545.61,
+  items:[
+    {name:"Paper Towels",qty:818,revenue:28996.44,cost:20559.82,profit:8436.62},
+    {name:"Zero Calories Coca Cola",qty:749,revenue:33362.95,cost:23518.88,profit:9844.08},
+    {name:"Lemons",qty:724,revenue:33100.89,cost:23408.36,profit:9692.52},
+    {name:"Spring Water",qty:759,revenue:14561.48,cost:10298.56,profit:4262.93},
+    {name:"Canada Dry Ginger Ale",qty:740,revenue:31758.54,cost:22282.48,profit:9476.06}
+  ]
+};
+
+let current = "inventory";
+
+function money(v){
+ return "$" + v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function showReport(type){
+ current = type;
+ renderCurrent();
+}
+
+function renderCurrent(){
+ const search = document.getElementById("search").value.toLowerCase();
+ const report = document.getElementById("report");
+ const summary = document.getElementById("summary");
+
+ if(current==="inventory"){
+   const data = inventoryData;
+   const items = data.items.filter(i=>i.name.toLowerCase().includes(search));
+
+   summary.innerHTML = `
+   <div class="cards">
+      <div class="card"><h3>Total Inventory Value</h3><h2>${money(data.totalInventoryValue)}</h2></div>
+      <div class="card"><h3>Products</h3><h2>${data.items.length}</h2></div>
+      <div class="card"><h3>Date Range</h3><h2>${data.fromDate} → ${data.toDate}</h2></div>
+   </div>`;
+
+   report.innerHTML = `
+   <table>
+   <tr><th>Name</th><th>Qty</th><th>Status</th><th>Latest Cost</th><th>Stock Value</th></tr>
+   ${items.map(i=>`
+      <tr>
+      <td>${i.name}</td>
+      <td>${i.qty}</td>
+      <td>${i.status}</td>
+      <td class="money">${money(i.cost)}</td>
+      <td class="money">${money(i.value)}</td>
+      </tr>`).join("")}
+   </table>`;
+ } else {
+   const data = salesData;
+   const items = data.items.filter(i=>i.name.toLowerCase().includes(search));
+
+   summary.innerHTML = `
+   <div class="cards">
+      <div class="card"><h3>Total Revenue</h3><h2>${money(data.totalRevenue)}</h2></div>
+      <div class="card"><h3>Total Cost</h3><h2>${money(data.totalCost)}</h2></div>
+      <div class="card"><h3>Total Profit</h3><h2>${money(data.totalProfit)}</h2></div>
+   </div>`;
+
+   report.innerHTML = `
+   <table>
+   <tr><th>Name</th><th>Qty</th><th>Revenue</th><th>Cost</th><th>Profit</th></tr>
+   ${items.map(i=>`
+      <tr>
+      <td>${i.name}</td>
+      <td>${i.qty}</td>
+      <td class="money">${money(i.revenue)}</td>
+      <td class="money">${money(i.cost)}</td>
+      <td class="money">${money(i.profit)}</td>
+      </tr>`).join("")}
+   </table>`;
+ }
+}
+
+renderCurrent();
+</script>
+
+</body>
+</html>
