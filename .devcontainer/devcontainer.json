@@ -1,0 +1,8 @@
+{
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "17",
+            "jdkDistro": "ms"
+        }
+    }
+}
