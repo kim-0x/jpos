@@ -90,6 +90,9 @@ public class AppView {
                 case 7:
                     reportFeature.getSaleReport();
                     break;
+                case 8:
+                    reportFeature.getInventoryReport();
+                    break;
                 case 9:
                     inventoryFeature.displayCurrentStock();
                     break;
@@ -113,6 +116,9 @@ public class AppView {
                     break;
                 case 3:
                     inventoryFeature.stockEntry();
+                    break;
+                case 4:
+                    reportFeature.getInventoryReport();
                     break;
                 case 5:
                     inventoryFeature.displayCurrentStock();

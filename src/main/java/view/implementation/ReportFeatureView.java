@@ -1,6 +1,7 @@
 package view.implementation;
 
 import com.jpos.report.ReportFacade;
+import com.jpos.report.model.InventoryReport;
 import com.jpos.report.model.SaleReport;
 import utils.IO;
 import view.ReportFeature;
@@ -61,6 +62,80 @@ public class ReportFeatureView implements ReportFeature {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void getInventoryReport() {
+        while (true) {
+            try {
+                var fromDateInput = utils.IO.readln("Enter from date (YYYY-MM-DD): ");
+                var toDateInput = utils.IO.readln("Enter to date (YYYY-MM-DD): ");
+
+                LocalDate fromDate = LocalDate.parse(fromDateInput);
+                LocalDate toDate = LocalDate.parse(toDateInput);
+
+                Date reportStart = Date.from(fromDate.atTime(LocalTime.MIN)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
+                Date reportEnd = Date.from(toDate.atTime(LocalTime.MAX)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
+
+                InventoryReport report = reportFacade.getInventoryReport(reportStart, reportEnd);
+
+                if (report == null || report.getStockDetails().isEmpty()) {
+                    System.out.println("No report has been displayed");
+                    return;
+                }
+
+                this.displayInventoryReport(report);
+
+                var continuing = IO.readln("Do you want to continue? (y/n): ");
+                if (continuing.equalsIgnoreCase("n")) {
+                    break;
+                }
+
+            } catch (DateTimeParseException e) {
+                var continuing = IO.readln(String.format("%s. Unable to process report with given date range." +
+                        " Do you want to continue? (y/n): ", e.getMessage()));
+                if (continuing.equalsIgnoreCase("n")) {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void displayInventoryReport(InventoryReport inventoryReport) {
+        System.out.printf("%n%nInventory Report%n");
+        System.out.printf("From: %s%n", inventoryReport.getFromDate());
+        System.out.printf("To: %s%n", inventoryReport.getToDate());
+        System.out.printf("%s%n", "-".repeat(120));
+        System.out.printf("%-30s %20s %20s %20s %20s%n", "Name", "Total Qty", "Reorder Status", "Latest Cost", "Stock Value");
+        System.out.printf("%s%n", "-".repeat(120));
+
+        inventoryReport.getStockDetails().forEach((productId, stockDetail) -> {
+            double cost = stockDetail.getLatestCost();
+            double qty = stockDetail.getTotalNumberInStock();
+            double stockValue = stockDetail.getTotalStockValue();
+
+            String productName = stockDetail.getProductName();
+            String formatProductName = (productName.length() > 25)
+                    ? String.format("%s...", productName.substring(0, 25))
+                    : productName;
+
+            System.out.printf("%-30s %20s %20s %20s %20s%n",
+                    formatProductName,
+                    qty,
+                    stockDetail.getReorderStatus().getValue(),
+                    accountingFormat(cost),
+                    accountingFormat(stockValue)
+            );
+        });
+        System.out.printf("%s%n", "-".repeat(120));
+        var totalInventoryValue = inventoryReport.getTotalInventoryValue();
+        System.out.printf("%-53s %60s%n", "Total Inventory Value:", accountingFormat(totalInventoryValue));
     }
 
     private void displaySaleReport(SaleReport saleReport) {

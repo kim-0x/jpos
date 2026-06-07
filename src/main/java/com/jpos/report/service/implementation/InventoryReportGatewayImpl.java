@@ -21,14 +21,13 @@ public class InventoryReportGatewayImpl implements InventoryReportGateway {
                 .map(sr -> {
                     UUID productId = sr.getProduct().getId();
                     String productName = sr.getProduct().getName();
-                    double totalStockValue = sr.getCost() * sr.getNumberInStock();
 
                     return new StockDetail(
                             productId,
                             productName,
                             sr.getCost(),
                             (float) sr.getNumberInStock(),
-                            totalStockValue
+                            sr.getCreatedAt()
                     );
                 });
     }

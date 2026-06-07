@@ -1,21 +1,22 @@
 package com.jpos.report.model;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class StockDetail {
     private final UUID productId;
     private final String productName;
-    private final double totalCost;
+    private final double latestCost;
     private final float totalNumberInStock;
-    private final double totalStockValue;
+    private final Date lastModifiedAt;
     private final float lowStockLevel = 3.0f;
 
-    public StockDetail(UUID productId, String productName, double totalCost, float totalNumberInStock, double totalStockValue) {
+    public StockDetail(UUID productId, String productName, double latestCost, float totalNumberInStock, Date lastModifiedAt) {
         this.productId = productId;
         this.productName = productName;
-        this.totalCost = totalCost;
+        this.latestCost = latestCost;
         this.totalNumberInStock = totalNumberInStock;
-        this.totalStockValue = totalStockValue;
+        this.lastModifiedAt = lastModifiedAt;
     }
 
     public UUID getProductId() { return productId; }
@@ -24,8 +25,8 @@ public class StockDetail {
         return productName;
     }
 
-    public double getTotalCost() {
-        return totalCost;
+    public double getLatestCost() {
+        return latestCost;
     }
 
     public float getTotalNumberInStock() {
@@ -33,7 +34,7 @@ public class StockDetail {
     }
 
     public double getTotalStockValue() {
-        return totalStockValue;
+        return totalNumberInStock * latestCost;
     }
 
     public ReorderStatus getReorderStatus() {
@@ -47,9 +48,9 @@ public class StockDetail {
         return new StockDetail(
                 this.productId,
                 this.productName,
-                this.totalCost + other.totalCost,
+                (this.lastModifiedAt.before(other.lastModifiedAt)) ? other.latestCost : this.latestCost,
                 this.totalNumberInStock + other.totalNumberInStock,
-                this.totalStockValue + other.totalStockValue
+                (this.lastModifiedAt.before(other.lastModifiedAt)) ? other.lastModifiedAt : this.lastModifiedAt
         );
     }
 }

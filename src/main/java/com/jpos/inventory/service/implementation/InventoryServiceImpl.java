@@ -74,7 +74,9 @@ public class InventoryServiceImpl implements InventoryService {
             ProductQuery productQuery = new ProductQuery(product.getId(), product.getBarcode());
             double cost = inventoryRepository.getProductCost(productQuery);
             float numberInStock = inventoryRepository.getStockLevelOf(productQuery);
-            stockRecords.add(new StockRecord(product, cost, numberInStock));
+            // better find the right date from inventory repository just like getProductCost, getStockLevelOf
+            Date lastModifiedAt = new Date();
+            stockRecords.add(new StockRecord(product, cost, numberInStock, lastModifiedAt));
         }
         return stockRecords.toArray(new StockRecord[0]);
     }
@@ -88,7 +90,7 @@ public class InventoryServiceImpl implements InventoryService {
                 .map(si -> {
                     ProductQuery productQuery = new ProductQuery(si.getProductId(), null);
                     var product = productRepository.getProductBy(productQuery);
-                    return new StockRecord(product, si.getCost(), si.getNumberInStock());
+                    return new StockRecord(product, si.getCost(), si.getNumberInStock(), si.getCreatedAt());
                 });
     }
 

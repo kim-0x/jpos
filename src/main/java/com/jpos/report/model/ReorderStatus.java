@@ -1,9 +1,9 @@
 package com.jpos.report.model;
 
 public enum ReorderStatus {
-    IN_STOCK("InStock"),
-    LOW_STOCK("LowStock"),
-    OUT_OF_STOCK("OutOfStock");
+    IN_STOCK("In Stock"),
+    LOW_STOCK("Low Stock"),
+    OUT_OF_STOCK("Out of Stock");
 
     private final String value;
 
