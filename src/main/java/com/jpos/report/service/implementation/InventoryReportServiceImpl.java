@@ -30,4 +30,9 @@ public class InventoryReportServiceImpl implements InventoryReportService {
 
         return new InventoryReport(fromDate, toDate, totalInventoryValue, finalStockDetails);
     }
+
+    @Override
+    public String toJson(InventoryReport inventoryReport) {
+        return "";
+    }
 }

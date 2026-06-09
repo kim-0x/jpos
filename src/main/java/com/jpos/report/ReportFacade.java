@@ -4,8 +4,14 @@ import com.jpos.report.model.InventoryReport;
 import com.jpos.report.model.SaleReport;
 import com.jpos.report.service.InventoryReportService;
 import com.jpos.report.service.SaleReportService;
+import utils.DataSourcePathHelper;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ReportFacade {
     private final SaleReportService saleReportService;
@@ -22,5 +28,38 @@ public class ReportFacade {
 
     public InventoryReport getInventoryReport(Date fromDate, Date toDate) {
         return this.inventoryReportService.getReport(fromDate, toDate);
+    }
+
+    public void exportReports(Date fromDate, Date toDate) {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        Runnable saleReportRunnable = () -> {
+            var saleReport = this.saleReportService.getReport(fromDate, toDate);
+            String jsonContent = this.saleReportService.toJson(saleReport);
+            String filePath = String.format("sale-report_%s-%s.json", fromDate, toDate);
+            var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
+            writeReportFile(jsonContent, resolvePath);
+        };
+
+        Runnable inventoryReportRunnable = () -> {
+            var inventoryReport = this.inventoryReportService.getReport(fromDate, toDate);
+            String jsonContent = this.inventoryReportService.toJson(inventoryReport);
+            String filePath = String.format("inventory-report_%s-%s.json", fromDate, toDate);
+            var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
+            writeReportFile(jsonContent, resolvePath);
+        };
+
+        executorService.submit(saleReportRunnable);
+        executorService.submit(inventoryReportRunnable);
+
+        executorService.shutdown();
+    }
+
+    private void writeReportFile(String jsonContent, Path filePath) {
+        try {
+            Files.write(filePath, jsonContent.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (Exception exception){
+            throw new IllegalStateException(String.format("Unable to write json file: %s", filePath), exception);
+        }
     }
 }

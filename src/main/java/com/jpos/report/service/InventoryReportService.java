@@ -6,4 +6,5 @@ import java.util.Date;
 
 public interface InventoryReportService {
     InventoryReport getReport(Date fromDate, Date toDate);
+    String toJson(InventoryReport inventoryReport);
 }

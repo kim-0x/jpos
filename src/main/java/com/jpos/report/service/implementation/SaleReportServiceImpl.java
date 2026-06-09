@@ -55,4 +55,9 @@ public class SaleReportServiceImpl implements SaleReportService {
 
         return new SaleReport(fromDate, toDate, finalSaleSummary, finalProductSummary);
     }
+
+    @Override
+    public String toJson(SaleReport saleReport) {
+        return "";
+    }
 }
