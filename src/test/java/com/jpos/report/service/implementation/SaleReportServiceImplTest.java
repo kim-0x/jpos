@@ -1,6 +1,6 @@
 package com.jpos.report.service.implementation;
 
-import com.jpos.inventory.model.StockRecord;
+import com.jpos.report.exception.InvalidSaleReportException;
 import com.jpos.report.model.SaleDetail;
 import com.jpos.report.model.SaleReport;
 import com.jpos.report.model.SaleSummary;
@@ -187,6 +187,76 @@ public class SaleReportServiceImplTest {
 
         assertEquals(2, report.getSaleDetails().size());
     }
+
+    @Test
+    public void shouldSerializeSaleReportToJson() {
+        SaleTransaction txn1 = buildTransaction("REC-001", new SaleItemSpec(PRODUCT_ID_1, 1f, 20.0, 40.0));
+        SaleTransaction txn2 = buildTransaction("REC-002", new SaleItemSpec(PRODUCT_ID_2, 1f, 15.0, 30.0));
+
+        SaleReportServiceImpl service = new SaleReportServiceImpl(
+                stubSaleReportGateway(txn1, txn2),
+                stubInventoryGateway()
+        );
+
+        SaleReport report = service.getReport(fromDate, toDate);
+        String json = service.toJson(report);
+
+        assertTrue(json.contains("\"fromDate\":\"Dec-1969\""));
+        assertTrue(json.contains("\"totalRevenue\":70.0"));
+        assertTrue(json.contains("\"totalCost\":35.0"));
+        assertTrue(json.contains("\"totalProfit\":35.0"));
+        assertTrue(json.contains("\"items\":["));
+        assertTrue(json.contains("\"name\":\"Product 1\""));
+        assertTrue(json.contains("\"name\":\"Product 2\""));
+        assertTrue(json.contains("\"profit\":20.0"));
+    }
+
+        @Test
+        public void shouldThrowWhenSaleReportIsNullDuringJsonSerialization() {
+        SaleReportServiceImpl service = new SaleReportServiceImpl(
+            (from, to) -> Stream.empty(),
+            stubInventoryGateway()
+        );
+
+        InvalidSaleReportException exception = assertThrows(
+            InvalidSaleReportException.class,
+            () -> service.toJson(null)
+        );
+
+        assertEquals("Sale report must not be null.", exception.getMessage());
+        }
+
+        @Test
+        public void shouldThrowWhenSaleSummaryIsNullDuringJsonSerialization() {
+        SaleReportServiceImpl service = new SaleReportServiceImpl(
+            (from, to) -> Stream.empty(),
+            stubInventoryGateway()
+        );
+        SaleReport report = new SaleReport(fromDate, toDate, null, Map.of());
+
+        InvalidSaleReportException exception = assertThrows(
+            InvalidSaleReportException.class,
+            () -> service.toJson(report)
+        );
+
+        assertEquals("Sale report summary must not be null.", exception.getMessage());
+        }
+
+        @Test
+        public void shouldThrowWhenSaleDetailsAreNullDuringJsonSerialization() {
+        SaleReportServiceImpl service = new SaleReportServiceImpl(
+            (from, to) -> Stream.empty(),
+            stubInventoryGateway()
+        );
+        SaleReport report = new SaleReport(fromDate, toDate, new SaleSummary(0, 0, 0), null);
+
+        InvalidSaleReportException exception = assertThrows(
+            InvalidSaleReportException.class,
+            () -> service.toJson(report)
+        );
+
+        assertEquals("Sale report details must not be null.", exception.getMessage());
+        }
 
     // --- helpers ---
 

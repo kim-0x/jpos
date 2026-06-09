@@ -5,6 +5,7 @@ import com.jpos.report.model.SaleReport;
 import com.jpos.report.service.InventoryReportService;
 import com.jpos.report.service.SaleReportService;
 import utils.DataSourcePathHelper;
+import utils.JsonWriter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,11 +33,13 @@ public class ReportFacade {
 
     public void exportReports(Date fromDate, Date toDate) {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
+        String fromDateStr = JsonWriter.formatDate(fromDate);
+        String toDateStr = JsonWriter.formatDate(toDate);
 
         Runnable saleReportRunnable = () -> {
             var saleReport = this.saleReportService.getReport(fromDate, toDate);
             String jsonContent = this.saleReportService.toJson(saleReport);
-            String filePath = String.format("sale-report_%s-%s.json", fromDate, toDate);
+            String filePath = String.format("sale-report__%s__%s.json", fromDateStr, toDateStr);
             var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
             writeReportFile(jsonContent, resolvePath);
         };
@@ -44,7 +47,7 @@ public class ReportFacade {
         Runnable inventoryReportRunnable = () -> {
             var inventoryReport = this.inventoryReportService.getReport(fromDate, toDate);
             String jsonContent = this.inventoryReportService.toJson(inventoryReport);
-            String filePath = String.format("inventory-report_%s-%s.json", fromDate, toDate);
+            String filePath = String.format("inventory-report__%s__%s.json", fromDateStr, toDateStr);
             var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
             writeReportFile(jsonContent, resolvePath);
         };
