@@ -20,11 +20,7 @@ public final class CsvRepositorySupport {
     }
 
     public static Path getDefaultCsvFilePath(String fileName) {
-        return findProjectRoot(Path.of("").toAbsolutePath().normalize())
-                .resolve("data")
-                .resolve("csv")
-                .resolve(fileName)
-                .normalize();
+        return DataSourcePathHelper.getDefaultFilePath("csv", fileName);
     }
 
     /**
@@ -95,25 +91,6 @@ public final class CsvRepositorySupport {
 
         LocalDateTime localDateTime = LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
         return TIMESTAMP_FORMATTER.format(localDateTime);
-    }
-
-    /**
-     * INTENT: Locate the repository root directory that contains the project descriptor and data folder.
-     * PRECONDITION: startPath identifies a directory within or near the project tree that can be walked
-     * upward through its parent paths.
-     * RETURNS: the nearest ancestor path containing both pom.xml and the data directory, or startPath
-     * when no matching project root is found.
-     * POSTCONDITION: no filesystem content is modified while determining the project root path.
-     */
-    private static Path findProjectRoot(Path startPath) {
-        for (Path currentPath = startPath; currentPath != null; currentPath = currentPath.getParent()) {
-            if (Files.isRegularFile(currentPath.resolve("pom.xml"))
-                    && Files.isDirectory(currentPath.resolve("data"))) {
-                return currentPath;
-            }
-        }
-
-        return startPath;
     }
 
     private static void ensureFileExists(Path filePath, String dataLabel) {

@@ -52,26 +52,7 @@ public abstract class AbstractBinRepository<T extends Serializable> {
     }
 
     protected static Path getDefaultDatFilePath(String... relativeSegments) {
-        Path currentPath = findProjectRoot(Path.of("").toAbsolutePath().normalize())
-                .resolve("data")
-                .resolve("bin");
-
-        for (String relativeSegment : relativeSegments) {
-            currentPath = currentPath.resolve(relativeSegment);
-        }
-
-        return currentPath.normalize();
-    }
-
-    private static Path findProjectRoot(Path startPath) {
-        for (Path currentPath = startPath; currentPath != null; currentPath = currentPath.getParent()) {
-            if (Files.isRegularFile(currentPath.resolve("pom.xml"))
-                    && Files.isDirectory(currentPath.resolve("data"))) {
-                return currentPath;
-            }
-        }
-
-        return startPath;
+        return DataSourcePathHelper.getDefaultFilePath("bin", relativeSegments);
     }
 
     private List<T> castContent(Object content) {
