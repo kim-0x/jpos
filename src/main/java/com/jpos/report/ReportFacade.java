@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -32,30 +33,29 @@ public class ReportFacade {
     }
 
     public void exportReports(Date fromDate, Date toDate) {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService reportsThreadPool = Executors.newFixedThreadPool(2);
         String fromDateStr = JsonWriter.formatDate(fromDate);
         String toDateStr = JsonWriter.formatDate(toDate);
 
-        Runnable saleReportRunnable = () -> {
+        CompletableFuture<Void> saleReportTask = CompletableFuture.runAsync(() -> {
             var saleReport = this.saleReportService.getReport(fromDate, toDate);
             String jsonContent = this.saleReportService.toJson(saleReport);
             String filePath = String.format("sale-report__%s__%s.json", fromDateStr, toDateStr);
             var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
             writeReportFile(jsonContent, resolvePath);
-        };
+        }, reportsThreadPool);
 
-        Runnable inventoryReportRunnable = () -> {
+        CompletableFuture<Void> inventoryReportTask = CompletableFuture.runAsync(() -> {
             var inventoryReport = this.inventoryReportService.getReport(fromDate, toDate);
             String jsonContent = this.inventoryReportService.toJson(inventoryReport);
             String filePath = String.format("inventory-report__%s__%s.json", fromDateStr, toDateStr);
             var resolvePath = DataSourcePathHelper.getDefaultFilePath("report/json", filePath);
             writeReportFile(jsonContent, resolvePath);
-        };
+        }, reportsThreadPool);
 
-        executorService.submit(saleReportRunnable);
-        executorService.submit(inventoryReportRunnable);
+        CompletableFuture.allOf(saleReportTask, inventoryReportTask).join();
 
-        executorService.shutdown();
+        reportsThreadPool.shutdown();
     }
 
     private void writeReportFile(String jsonContent, Path filePath) {

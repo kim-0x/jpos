@@ -18,7 +18,8 @@ public class AdminUser extends User {
             "View Inventory Report",
             "Check Latest Inventory",
             "Check Latest Price for Product",
-            "Start Sale"
+            "Start Sale",
+            "Export Reports to JSON"
     };
 
     public AdminUser(String username, String password) {

@@ -107,6 +107,42 @@ public class ReportFeatureView implements ReportFeature {
         }
     }
 
+    @Override
+    public void exportReports() {
+        while (true) {
+            try {
+                var fromDateInput = utils.IO.readln("Enter from date (YYYY-MM-DD): ");
+                var toDateInput = utils.IO.readln("Enter to date (YYYY-MM-DD): ");
+
+                LocalDate fromDate = LocalDate.parse(fromDateInput);
+                LocalDate toDate = LocalDate.parse(toDateInput);
+
+                Date reportStart = Date.from(fromDate.atTime(LocalTime.MIN)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
+                Date reportEnd = Date.from(toDate.atTime(LocalTime.MAX)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
+
+                reportFacade.exportReports(reportStart, reportEnd);
+
+                var continuing = IO.readln("Export completed. Do you want to continue? (y/n): ");
+                if (continuing.equalsIgnoreCase("n")) {
+                    break;
+                }
+
+            } catch (DateTimeParseException e) {
+                var continuing = IO.readln(String.format("%s. Unable to process report with given date range." +
+                        " Do you want to continue? (y/n): ", e.getMessage()));
+                if (continuing.equalsIgnoreCase("n")) {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     private void displayInventoryReport(InventoryReport inventoryReport) {
         System.out.printf("%n%nInventory Report%n");
         System.out.printf("From: %s%n", inventoryReport.getFromDate());

@@ -102,8 +102,11 @@ public class AppView {
                 case 11:
                     saleFeature.processSaleTransaction();
                     break;
+                case 12:
+                    reportFeature.exportReports();
+                    break;
                 default:
-                    IO.println("Feature is not implemented yet.");
+                    IO.println("Invalid feature option.");
                     break;
             }
         } else if (userRole == UserRole.MANAGER) {
@@ -127,7 +130,7 @@ public class AppView {
                     saleFeature.getCurrentProductPrice();
                     break;
                 default:
-                    IO.println("Feature is not implemented yet.");
+                    IO.println("Invalid feature option.");
                     break;
             }
         }
@@ -140,7 +143,7 @@ public class AppView {
                     saleFeature.processSaleTransaction();
                     break;
                 default:
-                    IO.println("Feature is not implemented yet.");
+                    IO.println("Invalid feature option.");
                     break;
             }
         }
