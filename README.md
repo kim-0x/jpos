@@ -21,6 +21,7 @@ JPOS currently includes these modules:
 - **User module** for login, user management, and role-based access
 - **Inventory module** for product catalog and stock tracking
 - **Sale module** for processing sale transactions and displaying transaction summaries
+- **Report module** for exporting and viewing sales and inventory reports from `data/report`
 
 The project includes comprehensive unit tests for all implemented modules.
 
@@ -46,7 +47,9 @@ mvn -version
 src/main/java   Application source code
 src/test/java   JUnit test source code
 data/           Application data root
-data/csv/       CSV application data
+data/bin/       Binary application data used by the app at runtime
+data/csv/       CSV seed/reference data
+data/report/    Exported report output and generated report assets
 pom.xml         Maven build configuration
 ```
 
@@ -116,15 +119,21 @@ Notes:
 - Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
 - Use `--exportCsvDir=<path>` to export BIN records (`product`, `inventory`, `pricebook`, `saletransaction`, `saleitem`) as CSV files for verification in spreadsheet tools.
 
-The application now reads its initial users, products, inventory, pricing, and sales data from:
+The application now loads its users, products, inventory, pricing, and sales data from the binary repository files in:
 
 ```text
-data/csv/user.csv
-data/csv/product.csv
-data/csv/inventory.csv
-data/csv/pricebook.csv
-data/csv/saleitem.csv
-data/csv/saletransaction.csv
+data/bin/user.dat
+data/bin/product.dat
+data/bin/inventory.dat
+data/bin/pricebook.dat
+data/bin/saleitem.dat
+data/bin/saletransaction.dat
+```
+
+Reports are exported to and viewed from:
+
+```text
+data/report/
 ```
 
 ## Test setup
@@ -182,6 +191,7 @@ src/main/java/
 │   ├── ProductFeature.java  # Product catalog interface
 │   ├── InventoryFeature.java # Inventory management interface
 │   ├── SaleFeature.java     # Sale transaction interface
+│   ├── ReportFeature.java   # Report export and viewing interface
 │   └── implementation/      # View implementations
 └── com/jpos/
     ├── user/                # User authentication and role management
@@ -193,6 +203,10 @@ src/main/java/
     │   ├── model/
     │   ├── repository/
     │   └── service/
+    ├── report/              # Report generation, export, and viewing
+    │   ├── model/
+    │   ├── service/
+    │   └── facade/
     └── sale/                # Sale transactions and pricing
         ├── model/
         ├── repository/
@@ -202,14 +216,14 @@ src/main/java/
 
 #### Architecture Pattern
 
-- **Business Logic Modules** (`user/`, `inventory/`, `sale/`): Each follows the pattern `model` → `repository` → `service` → `facade`, ensuring separation of concerns.
+- **Business Logic Modules** (`user/`, `inventory/`, `sale/`, `report/`): Each follows the pattern `model` → `repository` and/or `service` → `facade`, ensuring separation of concerns.
 - **View Layer** (`view/`): Handles all user interaction (input/output) and coordinates between multiple facade objects.
 - **Main Class**: Bootstraps the entire application by instantiating all repositories, services, facades, and views, then starts the application session.
 
 #### Component Responsibilities
 
 - **Models**: Data structures representing business entities
-- **Repositories**: Persist and retrieve data (CSV file handling)
+- **Repositories**: Persist and retrieve runtime data from binary files and seed/reference data from CSV where needed
 - **Services**: Business logic and operations on models
 - **Facades**: Simplified interfaces for views to interact with multiple services
 - **Views**: Handle user interaction, display information, and coordinate facade calls
@@ -238,10 +252,10 @@ src/main/java/
 
 ### Data Management
 
-New features may require CSV files in the `data/csv/` directory for test data. Ensure:
-- CSV files follow the existing naming convention
-- Headers match the corresponding model classes
-- Test data is realistic and covers edge cases
+The application uses the `data/bin/` directory for runtime data, `data/csv/` for seed/reference data, and `data/report/` for exported report output. Ensure:
+- Binary and CSV files follow the existing naming convention
+- Seed data matches the corresponding model classes
+- Generated reports remain under `data/report/` so they can be viewed after export
 
 ### Best Practices
 
