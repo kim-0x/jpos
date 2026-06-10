@@ -4,35 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JPOS Reports Dashboard</title>
-    <style>
-      
-    </style>
+    <link rel="stylesheet" href="./style.css">
   </head>
 
   <body>
-    <header>
-      <h1>JPOS Reporting Dashboard</h1>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Reports</p>
+        <h1>JPOS Reporting Dashboard</h1>
+        <p class="page-description">Review monthly inventory and sales performance in one printable report view.</p>
+      </div>
+      <div class="report-meta">
+        <div class="meta-item">
+          <span class="meta-label">Report</span>
+          <strong id="currentReportLabel">Inventory Report</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Period</span>
+          <strong id="currentReportDate">Loading...</strong>
+        </div>
+      </div>
     </header>
 
-    <div class="container">
+    <main class="container">
+      <section class="controls-panel screen-only">
+        <div class="controls-header">
+          <div>
+            <p class="section-kicker">Filters</p>
+            <h2>Choose a report view</h2>
+          </div>
+          <button type="button" class="print-button" onclick="window.print()">Print Report</button>
+        </div>
 
-      <div class="controls">
-        <label>Report Month:
-          <select id="monthFilter" onchange="handleFilterChange()"></select>
-        </label>
-        <label>Report Year:
-          <select id="yearFilter" onchange="handleYearChange()"></select>
-        </label>
-        <button onclick="showReport('inventory')">Inventory Report</button>
-        <button onclick="showReport('sales')">Sales Report</button>
-        <input id="search" placeholder="Search product..." oninput="renderCurrent()">
-      </div>
+        <div class="controls">
+          <label class="control-field">Report Month
+            <select id="monthFilter" onchange="handleFilterChange()"></select>
+          </label>
+          <label class="control-field">Report Year
+            <select id="yearFilter" onchange="handleYearChange()"></select>
+          </label>
+          <label class="control-field search-field">Search Product
+            <input id="search" placeholder="Search product..." oninput="renderCurrent()">
+          </label>
+        </div>
 
-      <div id="summary"></div>
+        <div class="report-switch" aria-label="Report type">
+          <button id="inventoryButton" type="button" class="report-button" onclick="showReport('inventory')">Inventory Report</button>
+          <button id="salesButton" type="button" class="report-button" onclick="showReport('sales')">Sales Report</button>
+        </div>
+      </section>
 
-      <div id="report"></div>
+      <section class="summary-section">
+        <div class="section-heading">
+          <p class="section-kicker">Overview</p>
+          <h2>Summary</h2>
+        </div>
+        <div id="summary"></div>
+      </section>
 
-    </div>
+      <section class="report-section">
+        <div class="section-heading">
+          <p class="section-kicker">Details</p>
+          <h2 id="reportSectionTitle">Inventory Report</h2>
+        </div>
+        <div id="report"></div>
+      </section>
+    </main>
 
     <script>
       const reportData = {
@@ -84,6 +121,17 @@
         renderCurrent();
       }
 
+      function updateReportButtons() {
+        const inventoryButton = document.getElementById("inventoryButton");
+        const salesButton = document.getElementById("salesButton");
+        const isInventory = current === "inventory";
+
+        inventoryButton.classList.toggle("active", isInventory);
+        salesButton.classList.toggle("active", !isInventory);
+        inventoryButton.setAttribute("aria-pressed", String(isInventory));
+        salesButton.setAttribute("aria-pressed", String(!isInventory));
+      }
+
       function splitReportDate(reportDate) {
         const [month, year] = reportDate.split("-");
         return { month, year };
@@ -128,6 +176,18 @@
         renderCurrent();
       }
 
+      function updateReportMeta(reportDate) {
+        const reportLabel = document.getElementById("currentReportLabel");
+        const reportDateLabel = document.getElementById("currentReportDate");
+        const reportSectionTitle = document.getElementById("reportSectionTitle");
+        const reportName = current === "inventory" ? "Inventory Report" : "Sales Report";
+
+        reportLabel.textContent = reportName;
+        reportDateLabel.textContent = reportDate && reportDate !== "-" ? reportDate : "No data available";
+        reportSectionTitle.textContent = reportName;
+        updateReportButtons();
+      }
+
       function getReportByDate(list, reportDate) {
         return list.find(item => item.reportDate === reportDate) || null;
       }
@@ -137,10 +197,12 @@
         const summary = document.getElementById("summary");
         summary.innerHTML = "";
         report.innerHTML = `
-          <table>
-            <tr><th>Name</th><th class="money-header">Qty</th><th>Status/Revenue</th><th class="money-header">Cost</th><th class="money-header">Value/Profit</th></tr>
-            <tr><td class="empty" colspan="5">${message}</td></tr>
-          </table>
+          <div class="report-card">
+            <table class="report-table">
+              <tr><th>Name</th><th class="qty">Qty</th><th>Status/Revenue</th><th class="money-header">Cost</th><th class="money-header">Value/Profit</th></tr>
+              <tr><td class="empty" colspan="5">${message}</td></tr>
+            </table>
+          </div>
         `;
       }
 
@@ -150,6 +212,7 @@
         const summary = document.getElementById("summary");
 
         const selectedReportDate = getSelectedReportDate();
+        updateReportMeta(selectedReportDate);
 
         if (!selectedReportDate || selectedReportDate === "-") {
           renderNoData("No data available");
@@ -166,25 +229,38 @@
 
           summary.innerHTML = `
             <div class="cards">
-                <div class="card"><h3>Total Inventory Value</h3><h2>${money(data.totalInventoryValue)}</h2></div>
-                <div class="card"><h3>Products</h3><h2>${data.items.length}</h2></div>
-                <div class="card"><h3>Report Date</h3><h2>${data.reportDate}</h2></div>
+                <article class="card">
+                  <span class="card-label">Total Inventory Value</span>
+                  <strong class="card-value">${money(data.totalInventoryValue)}</strong>
+                </article>
+                <article class="card">
+                  <span class="card-label">Products</span>
+                  <strong class="card-value">${data.items.length}</strong>
+                </article>
+                <article class="card">
+                  <span class="card-label">Report Date</span>
+                  <strong class="card-value">${data.reportDate}</strong>
+                </article>
             </div>
           `;
 
           report.innerHTML = `
-            <table>
-              <tr><th>Name</th><th class="money-header">Qty</th><th>Status</th><th class="money-header">Latest Cost</th><th class="money-header">Stock Value</th></tr>
-              ${items.length === 0 ? `<tr><td class="empty" colspan="5">No data available</td></tr>` : ""}
-              ${items.map(i => `
-                  <tr>
-                    <td>${i.name}</td>
-                    <td>${i.qty}</td>
-                    <td>${i.status}</td>
-                    <td class="money">${money(i.cost)}</td>
-                    <td class="money">${money(i.value)}</td>
-                  </tr>`).join("")}
-            </table>
+            <div class="report-card">
+              <div class="table-wrap">
+                <table class="report-table">
+                  <tr><th>Name</th><th class="qty">Qty</th><th>Status</th><th class="money-header">Latest Cost</th><th class="money-header">Stock Value</th></tr>
+                  ${items.length === 0 ? `<tr><td class="empty" colspan="5">No data available</td></tr>` : ""}
+                  ${items.map(i => `
+                      <tr>
+                        <td>${i.name}</td>
+                        <td class="qty">${i.qty}</td>
+                        <td><span class="status-pill">${i.status}</span></td>
+                        <td class="money">${money(i.cost)}</td>
+                        <td class="money">${money(i.value)}</td>
+                      </tr>`).join("")}
+                </table>
+              </div>
+            </div>
           `;
         } else {
           const data = getReportByDate(reportData.sales, selectedReportDate);
@@ -196,25 +272,38 @@
 
           summary.innerHTML = `
             <div class="cards">
-                <div class="card"><h3>Total Revenue</h3><h2>${money(data.totalRevenue)}</h2></div>
-                <div class="card"><h3>Total Cost</h3><h2>${money(data.totalCost)}</h2></div>
-                <div class="card"><h3>Total Profit</h3><h2>${money(data.totalProfit)}</h2></div>
+                <article class="card">
+                  <span class="card-label">Total Revenue</span>
+                  <strong class="card-value">${money(data.totalRevenue)}</strong>
+                </article>
+                <article class="card">
+                  <span class="card-label">Total Cost</span>
+                  <strong class="card-value">${money(data.totalCost)}</strong>
+                </article>
+                <article class="card">
+                  <span class="card-label">Total Profit</span>
+                  <strong class="card-value">${money(data.totalProfit)}</strong>
+                </article>
             </div>
           `;
 
           report.innerHTML = `
-            <table>
-              <tr><th>Name</th><th class="money-header">Qty</th><th class="money-header">Revenue</th><th class="money-header">Cost</th><th class="money-header">Profit</th></tr>
-              ${items.length === 0 ? `<tr><td class="empty" colspan="5">No data available</td></tr>` : ""}
-              ${items.map(i => `
-                  <tr>
-                    <td>${i.name}</td>
-                    <td>${i.qty}</td>
-                    <td class="money">${money(i.revenue)}</td>
-                    <td class="money">${money(i.cost)}</td>
-                    <td class="money">${money(i.profit)}</td>
-                  </tr>`).join("")}
-            </table>
+            <div class="report-card">
+              <div class="table-wrap">
+                <table class="report-table">
+                  <tr><th>Name</th><th class="qty">Qty</th><th class="money-header">Revenue</th><th class="money-header">Cost</th><th class="money-header">Profit</th></tr>
+                  ${items.length === 0 ? `<tr><td class="empty" colspan="5">No data available</td></tr>` : ""}
+                  ${items.map(i => `
+                      <tr>
+                        <td>${i.name}</td>
+                        <td class="qty">${i.qty}</td>
+                        <td class="money">${money(i.revenue)}</td>
+                        <td class="money">${money(i.cost)}</td>
+                        <td class="money">${money(i.profit)}</td>
+                      </tr>`).join("")}
+                </table>
+              </div>
+            </div>
           `;
         }
       }
