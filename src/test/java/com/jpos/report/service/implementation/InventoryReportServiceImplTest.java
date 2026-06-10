@@ -56,7 +56,7 @@ public class InventoryReportServiceImplTest {
         InventoryReport report = service.getReport(fromDate, toDate);
         String json = service.toJson(report);
 
-        assertTrue(json.contains("\"fromDate\":\"Dec-1969\""));
+        assertTrue(json.contains("\"reportDate\":\"Dec-1969\""));
         assertTrue(json.contains("\"totalInventoryValue\":68.0"));
         assertTrue(json.contains("\"items\":["));
         assertTrue(json.contains("\"name\":\"Lemons\""));

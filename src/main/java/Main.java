@@ -6,14 +6,8 @@ import com.jpos.inventory.repository.implementation.file.BinProductRepository;
 import com.jpos.inventory.service.InventoryService;
 import com.jpos.inventory.service.implementation.InventoryServiceImpl;
 import com.jpos.report.ReportFacade;
-import com.jpos.report.service.InventoryReportGateway;
-import com.jpos.report.service.InventoryReportService;
-import com.jpos.report.service.SaleReportGateway;
-import com.jpos.report.service.SaleReportService;
-import com.jpos.report.service.implementation.InventoryReportGatewayImpl;
-import com.jpos.report.service.implementation.InventoryReportServiceImpl;
-import com.jpos.report.service.implementation.SaleReportGatewayImpl;
-import com.jpos.report.service.implementation.SaleReportServiceImpl;
+import com.jpos.report.service.*;
+import com.jpos.report.service.implementation.*;
 import com.jpos.sale.SaleFacade;
 import com.jpos.sale.repository.PriceBookRepository;
 import com.jpos.sale.repository.SaleHeaderRepository;
@@ -65,7 +59,8 @@ public class Main {
         SaleReportService saleReportService = new SaleReportServiceImpl(saleReportGateway, inventoryGateway);
         InventoryReportGateway inventoryReportGateway = new InventoryReportGatewayImpl(inventoryService);
         InventoryReportService inventoryReportService = new InventoryReportServiceImpl(inventoryReportGateway);
-        ReportFacade saleReportFacade = new ReportFacade(saleReportService, inventoryReportService);
+        ReportFilterService reportFilterService = new ReportFilterServiceImpl();
+        ReportFacade saleReportFacade = new ReportFacade(saleReportService, inventoryReportService, reportFilterService);
         ReportFeature reportFeatureView = new ReportFeatureView(saleReportFacade);
 
         AppView appView = new AppView(appMenuView,

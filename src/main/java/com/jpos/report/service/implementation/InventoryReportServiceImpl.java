@@ -41,8 +41,7 @@ public class InventoryReportServiceImpl implements InventoryReportService {
 
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{");
-        jsonBuilder.append("\"fromDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(inventoryReport.getFromDate()))).append(',');
-        jsonBuilder.append("\"toDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(inventoryReport.getToDate()))).append(',');
+        jsonBuilder.append("\"reportDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(inventoryReport.getFromDate()))).append(',');
         jsonBuilder.append("\"totalInventoryValue\":").append(inventoryReport.getTotalInventoryValue()).append(',');
         jsonBuilder.append("\"items\":[");
 

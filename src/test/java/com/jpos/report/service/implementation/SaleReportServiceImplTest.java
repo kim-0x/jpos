@@ -201,7 +201,7 @@ public class SaleReportServiceImplTest {
         SaleReport report = service.getReport(fromDate, toDate);
         String json = service.toJson(report);
 
-        assertTrue(json.contains("\"fromDate\":\"Dec-1969\""));
+        assertTrue(json.contains("\"reportDate\":\"Dec-1969\""));
         assertTrue(json.contains("\"totalRevenue\":70.0"));
         assertTrue(json.contains("\"totalCost\":35.0"));
         assertTrue(json.contains("\"totalProfit\":35.0"));

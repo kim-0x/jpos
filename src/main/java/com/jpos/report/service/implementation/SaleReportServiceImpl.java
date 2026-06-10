@@ -67,8 +67,7 @@ public class SaleReportServiceImpl implements SaleReportService {
 
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append('{');
-        jsonBuilder.append("\"fromDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(saleReport.getFromDate()))).append(',');
-        jsonBuilder.append("\"toDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(saleReport.getToDate()))).append(',');
+        jsonBuilder.append("\"reportDate\":").append(JsonWriter.toJsonString(JsonWriter.formatDate(saleReport.getFromDate()))).append(',');
         jsonBuilder.append("\"totalRevenue\":").append(summary.getTotalRevenue()).append(',');
         jsonBuilder.append("\"totalCost\":").append(summary.getTotalCost()).append(',');
         jsonBuilder.append("\"totalProfit\":").append(summary.getTotalProfit()).append(',');
