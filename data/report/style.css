@@ -18,7 +18,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: var(--page-bg);
   color: var(--text);
 }
@@ -229,6 +229,11 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   text-align: left;
+}
+
+.report-table th.money-header,
+.report-table th.qty {
+  text-align: right;
 }
 
 .report-table tr:nth-child(even) td {
