@@ -136,6 +136,19 @@ Reports are exported to and viewed from:
 data/report/
 ```
 
+To serve and view the generated report in your browser:
+
+```sh
+cd data/report
+java -m jdk.httpserver
+```
+
+Then open:
+
+```text
+http://localhost:8000/
+```
+
 ## Test setup
 
 This project uses **Maven** and **JUnit 4** for unit testing. Test files are located under `src/test/java`.
