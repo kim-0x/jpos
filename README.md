@@ -4,6 +4,8 @@
 
 JPOS is a point of sale system for small grocery stores. It helps store owners manage products, inventory, pricing, sales activity, and reporting from a single Java application.
 
+The latest implementation supports multiple repository backends (`CSV`, `BIN`, and `JDBC/SQLite`), with `JDBC/SQLite` configured as the default for the main app.
+
 ## Overview
 
 The application is designed to support day-to-day store operations with role-based access for different types of users:
@@ -47,8 +49,9 @@ mvn -version
 src/main/java   Application source code
 src/test/java   JUnit test source code
 data/           Application data root
-data/bin/       Binary application data used by the app at runtime
+data/bin/       Binary repository files (`*.dat`)
 data/csv/       CSV seed/reference data
+data/db/        SQLite database files (default: `jpos.db`)
 data/report/    Exported report output and generated report assets
 pom.xml         Maven build configuration
 ```
@@ -63,17 +66,43 @@ cd jpos
 ```
 
 1. Clone the repository.
-2. Open the project in your preferred Java IDE, or use the terminal.
+2. Open the project in VS Code.
 3. Make sure Java 17 and Maven are installed.
 
-## Run the application
+Recommended extension:
 
-From the project root:
+- Extension Pack for Java (Microsoft)
+
+## Repository implementations
+
+JPOS supports three repository implementations:
+
+- `JDBC` (SQLite via `sqlite-jdbc`) - default implementation for the main app
+- `BIN` (binary `*.dat` files under `data/bin`)
+- `CSV` (CSV files under `data/csv`)
+
+Default database location for JDBC mode:
+
+```text
+data/db/jpos.db
+```
+
+## Run the main application (default: JDBC/SQLite)
+
+Recommended for contributors: run from VS Code using the launch configuration.
+
+1. Open **Run and Debug** in VS Code.
+2. Select **Main**.
+3. Click **Start Debugging** (or press `F5`).
+
+Optional terminal run (dependency-aware):
 
 ```sh
 mvn compile
-java -cp target/classes Main
+mvn "-Dexec.mainClass=Main" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
 ```
+
+Do not use `java -cp target/classes Main` for this project, because it excludes Maven dependencies such as `sqlite-jdbc`.
 
 Default admin login credentials:
 
@@ -82,7 +111,65 @@ username: admin
 password: admin
 ```
 
-If the app is using `DatUserRepository`, these credentials are auto-seeded into `data/dat/user/users.dat` when the DAT file exists but is empty.
+Note: Use lowercase credentials (`admin` / `admin`) for local runs.
+
+## Migration app: BIN to SQLite
+
+Use the migration app to copy data from binary repositories (`data/bin/*.dat`) into SQLite (`data/db/jpos.db`).
+
+Recommended: run from VS Code **Run and Debug** with configuration **BinToSqliteMigration**.
+
+Incremental migration (safe to rerun; uses `INSERT OR IGNORE`):
+
+```sh
+mvn compile
+mvn "-Dexec.mainClass=com.jpos.migration.BinToSqliteMigration" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+```
+
+Reset SQLite tables, then migrate:
+
+```sh
+mvn "-Dexec.mainClass=com.jpos.migration.BinToSqliteMigration" "-Dexec.args=--reset" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+```
+
+## Concurrent cashier simulation app
+
+The simulation app stress-tests sale transaction processing with multiple cashier threads.
+
+Recommended: run from VS Code **Run and Debug** with one of:
+
+- `ConcurrentCashierSimulation (JDBC)`
+- `ConcurrentCashierSimulation (Bin)`
+- `ConcurrentCashierSimulation (Csv)`
+
+Examples:
+
+```sh
+mvn compile
+mvn "-Dexec.mainClass=com.jpos.simulation.ConcurrentCashierSimulation" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+mvn "-Dexec.mainClass=com.jpos.simulation.ConcurrentCashierSimulation" "-Dexec.args=--datasource=jdbc --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+mvn "-Dexec.mainClass=com.jpos.simulation.ConcurrentCashierSimulation" "-Dexec.args=--datasource=bin --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+mvn "-Dexec.mainClass=com.jpos.simulation.ConcurrentCashierSimulation" "-Dexec.args=--datasource=csv --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin" org.codehaus.mojo:exec-maven-plugin:3.3.0:java
+```
+
+Available options:
+
+```text
+--datasource=csv|bin|jdbc   default: jdbc
+--cashiers=N                default: 5
+--transactions=N            default: 3
+--margin=0.25               default: 0.25
+--admin-username=admin      default: admin
+--admin-password=admin      default: admin
+--stock=500                 default: 500
+--maxRetries=10             default: 10 (JDBC mode)
+--retryBackoffMs=50         default: 50 (JDBC mode)
+```
+
+Behavior notes:
+
+- In `JDBC` mode, SQLite WAL mode is enabled to improve concurrent read/write behavior.
+- In `CSV` and `BIN` mode, writes are serialized because file-based repositories are not thread-safe.
 
 ## Generate seed data for BIN repositories
 
@@ -119,7 +206,7 @@ Notes:
 - Use `--append` to add more generated data without clearing existing BIN sales/inventory data.
 - Use `--exportCsvDir=<path>` to export BIN records (`product`, `inventory`, `pricebook`, `saletransaction`, `saleitem`) as CSV files for verification in spreadsheet tools.
 
-The application now loads its users, products, inventory, pricing, and sales data from the binary repository files in:
+When using BIN repositories, data is stored in:
 
 ```text
 data/bin/user.dat
@@ -129,6 +216,29 @@ data/bin/pricebook.dat
 data/bin/saleitem.dat
 data/bin/saletransaction.dat
 ```
+
+When using JDBC repositories (default main app), runtime data is stored in:
+
+```text
+data/db/jpos.db
+```
+
+## VS Code launch configurations
+
+This repository includes predefined Java launch configurations in `.vscode/launch.json` for the new apps:
+
+- `Main`
+- `BinToSqliteMigration`
+- `BinToSqliteMigration (reset)`
+- `ConcurrentCashierSimulation (JDBC)`
+- `ConcurrentCashierSimulation (Bin)`
+- `ConcurrentCashierSimulation (Csv)`
+
+To run any of them in VS Code:
+
+1. Open **Run and Debug**.
+2. Select one of the configurations above.
+3. Click **Start Debugging**.
 
 Reports are exported to and viewed from:
 
@@ -265,7 +375,16 @@ src/main/java/
 
 ### Data Management
 
-The application uses the `data/bin/` directory for runtime data, `data/csv/` for seed/reference data, and `data/report/` for exported report output. Ensure:
+The application uses:
+
+- `data/db/` for JDBC/SQLite runtime data (default)
+- `data/bin/` for BIN runtime data
+- `data/csv/` for seed/reference data
+- `data/report/` for exported report output
+
+Ensure:
+
+- SQLite schema and file paths remain consistent with repository code
 - Binary and CSV files follow the existing naming convention
 - Seed data matches the corresponding model classes
 - Generated reports remain under `data/report/` so they can be viewed after export
