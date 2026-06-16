@@ -16,15 +16,15 @@ import com.jpos.sale.service.implementation.InventoryGatewayImpl;
 import com.jpos.sale.service.implementation.SaleTransactionServiceImpl;
 import com.jpos.user.UserFacade;
 import com.jpos.user.repository.UserRepository;
-import factory.RepositoryConfiguration;
-import factory.RepositoryFactory;
+import com.jpos.configuration.RepositoryConfiguration;
+import com.jpos.configuration.RepositoryFactory;
 import utils.WelcomeMessage;
 import view.*;
 import view.implementation.*;
 
 public class Main {
     public static void main(String[] args) {
-        RepositoryFactory factory = new RepositoryConfiguration(RepositoryConfiguration.RepositoryType.BIN).createFactory();
+        RepositoryFactory factory = new RepositoryConfiguration(RepositoryConfiguration.RepositoryType.JDBC).createFactory();
 
         UserRepository userRepository = factory.createUserRepository();
         UserFacade userFacade = new UserFacade(userRepository);

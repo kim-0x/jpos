@@ -1,4 +1,4 @@
-package factory;
+package com.jpos.configuration;
 
 import com.jpos.inventory.repository.InventoryRepository;
 import com.jpos.inventory.repository.ProductRepository;

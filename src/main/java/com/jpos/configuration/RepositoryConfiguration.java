@@ -1,4 +1,4 @@
-package factory;
+package com.jpos.configuration;
 
 public class RepositoryConfiguration {
 
