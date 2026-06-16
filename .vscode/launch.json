@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "Main",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
       "name": "BinToSqliteMigration",
       "request": "launch",
       "mainClass": "com.jpos.migration.BinToSqliteMigration",
@@ -29,7 +36,7 @@
       "name": "ConcurrentCashierSimulation (Bin)",
       "request": "launch",
       "mainClass": "com.jpos.simulation.ConcurrentCashierSimulation",
-      "args": "--datasource=bin --cashiers=3 --transactions=20 --admin-username=admin --admin-password=admin",
+      "args": "--datasource=bin --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin",
       "cwd": "${workspaceFolder}"
     },
     {
