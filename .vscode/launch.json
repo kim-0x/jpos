@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "BinToSqliteMigration",
+      "request": "launch",
+      "mainClass": "com.jpos.migration.BinToSqliteMigration",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "BinToSqliteMigration (reset)",
+      "request": "launch",
+      "mainClass": "com.jpos.migration.BinToSqliteMigration",
+      "args": "--reset",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
