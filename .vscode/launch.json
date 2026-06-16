@@ -15,6 +15,30 @@
       "mainClass": "com.jpos.migration.BinToSqliteMigration",
       "args": "--reset",
       "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "ConcurrentCashierSimulation (JDBC)",
+      "request": "launch",
+      "mainClass": "com.jpos.simulation.ConcurrentCashierSimulation",
+      "args": "--datasource=jdbc --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "ConcurrentCashierSimulation (Bin)",
+      "request": "launch",
+      "mainClass": "com.jpos.simulation.ConcurrentCashierSimulation",
+      "args": "--datasource=bin --cashiers=3 --transactions=20 --admin-username=admin --admin-password=admin",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "ConcurrentCashierSimulation (Csv)",
+      "request": "launch",
+      "mainClass": "com.jpos.simulation.ConcurrentCashierSimulation",
+      "args": "--datasource=csv --cashiers=10 --transactions=100 --admin-username=admin --admin-password=admin",
+      "cwd": "${workspaceFolder}"
     }
   ]
 }
