@@ -5,9 +5,9 @@ import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.SaleItemRepository;
+import com.jpos.sale.repository.TransactionSalePersistence;
 import com.jpos.sale.service.SaleTransactionService;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -93,6 +93,10 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
         Objects.requireNonNull(transaction, "transaction must not be null");
         
         try {
+            if (saleHeaderRepository instanceof TransactionSalePersistence transactionSalePersistence) {
+                transactionSalePersistence.addTransaction(transaction);
+                return true;
+            }
             // Save the header
             saleHeaderRepository.add(transaction.getHeader());
             
