@@ -3,7 +3,7 @@ package com.jpos.inventory.repository.implementation.jdbc;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.model.StockItem;
 import com.jpos.inventory.repository.InventoryRepository;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +17,9 @@ public class JdbcInventoryRepository implements InventoryRepository {
 
     private static final float LOW_STOCK_LEVEL = 3.0f;
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcInventoryRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcInventoryRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 

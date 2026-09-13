@@ -2,7 +2,7 @@ package com.jpos.sale.repository.implementation.jdbc;
 
 import com.jpos.sale.model.PriceBook;
 import com.jpos.sale.repository.PriceBookRepository;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,9 +14,9 @@ import java.util.UUID;
 
 public class JdbcPriceBookRepository implements PriceBookRepository {
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcPriceBookRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcPriceBookRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 

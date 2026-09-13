@@ -7,17 +7,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Opens JDBC connections to the SQLite database file.
- * Each call to {@link #getConnection()} returns a new, independent connection
- * that the caller is responsible for closing (use try-with-resources).
- * Foreign-key enforcement is switched on for every connection.
+ * Opens JDBC connections for the configured database URL.
  */
-public final class SqliteConnectionProvider {
+public final class SqliteConnectionProvider implements ConnectionProvider {
 
     private static final String DEFAULT_DB_SUB_DIR = "db";
-    private static final String DEFAULT_DB_FILE    = "jpos.db";
+    private static final String DEFAULT_DB_FILE = "jpos.db";
 
     private final String jdbcUrl;
+    private final String connectionInitSql;
 
     /** Uses the default {@code data/db/jpos.db} path resolved from the project root. */
     public SqliteConnectionProvider() {
@@ -30,17 +28,23 @@ public final class SqliteConnectionProvider {
     }
 
     public SqliteConnectionProvider(String jdbcUrl) {
+        this(jdbcUrl, jdbcUrl != null && jdbcUrl.startsWith("jdbc:sqlite:") ? "PRAGMA foreign_keys = ON" : null);
+    }
+
+    public SqliteConnectionProvider(String jdbcUrl, String connectionInitSql) {
         this.jdbcUrl = jdbcUrl;
+        this.connectionInitSql = connectionInitSql;
     }
 
     /**
-     * Returns a new {@link Connection}.  The caller must close it (try-with-resources).
-     * Foreign keys are enabled on the connection before it is returned.
+     * Returns a new {@link Connection}. The caller must close it.
      */
     public Connection getConnection() throws SQLException {
         Connection connection = DriverManager.getConnection(jdbcUrl);
-        try (var stmt = connection.createStatement()) {
-            stmt.execute("PRAGMA foreign_keys = ON");
+        if (connectionInitSql != null && !connectionInitSql.isBlank()) {
+            try (var stmt = connection.createStatement()) {
+                stmt.execute(connectionInitSql);
+            }
         }
         return connection;
     }

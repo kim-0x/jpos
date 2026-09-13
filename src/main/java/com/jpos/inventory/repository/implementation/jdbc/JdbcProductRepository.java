@@ -4,7 +4,7 @@ import com.jpos.inventory.model.Product;
 import com.jpos.inventory.model.ProductCategory;
 import com.jpos.inventory.model.ProductQuery;
 import com.jpos.inventory.repository.ProductRepository;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,9 +15,9 @@ import java.util.UUID;
 
 public class JdbcProductRepository implements ProductRepository {
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcProductRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcProductRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 
