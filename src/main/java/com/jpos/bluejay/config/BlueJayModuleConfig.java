@@ -40,14 +40,15 @@ import com.jpos.user.service.implementation.UserServiceImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
+import utils.JdbcConnectionProvider;
 
 @Configuration
 @EnableConfigurationProperties(BlueJayDataProperties.class)
 public class BlueJayModuleConfig {
 
     @Bean
-    SqliteConnectionProvider connectionProvider(BlueJayDataProperties props) {
+    ConnectionProvider connectionProvider(BlueJayDataProperties props) {
         try {
             if (props.getDriverClassName() != null && !props.getDriverClassName().isBlank()) {
                 Class.forName(props.getDriverClassName());
@@ -55,36 +56,36 @@ public class BlueJayModuleConfig {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Database driver class not found: " + props.getDriverClassName(), e);
         }
-        return new SqliteConnectionProvider(props.getUrl());
+        return new JdbcConnectionProvider(props.getUrl());
     }
 
     @Bean
-    UserRepository userRepository(SqliteConnectionProvider connectionProvider) {
+    UserRepository userRepository(ConnectionProvider connectionProvider) {
         return new JdbcUserRepository(connectionProvider);
     }
 
     @Bean
-    ProductRepository productRepository(SqliteConnectionProvider connectionProvider) {
+    ProductRepository productRepository(ConnectionProvider connectionProvider) {
         return new JdbcProductRepository(connectionProvider);
     }
 
     @Bean
-    InventoryRepository inventoryRepository(SqliteConnectionProvider connectionProvider) {
+    InventoryRepository inventoryRepository(ConnectionProvider connectionProvider) {
         return new JdbcInventoryRepository(connectionProvider);
     }
 
     @Bean
-    SaleHeaderRepository saleHeaderRepository(SqliteConnectionProvider connectionProvider) {
+    SaleHeaderRepository saleHeaderRepository(ConnectionProvider connectionProvider) {
         return new JdbcSaleHeaderRepository(connectionProvider);
     }
 
     @Bean
-    SaleItemRepository saleItemRepository(SqliteConnectionProvider connectionProvider) {
+    SaleItemRepository saleItemRepository(ConnectionProvider connectionProvider) {
         return new JdbcSaleItemRepository(connectionProvider);
     }
 
     @Bean
-    PriceBookRepository priceBookRepository(SqliteConnectionProvider connectionProvider) {
+    PriceBookRepository priceBookRepository(ConnectionProvider connectionProvider) {
         return new JdbcPriceBookRepository(connectionProvider);
     }
 

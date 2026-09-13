@@ -9,6 +9,7 @@ import com.jpos.sale.model.SaleTransaction;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,12 +67,14 @@ public class SaleController {
     @PutMapping("/prices")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setPrice(@Valid @RequestBody SetPriceRequest request) {
+        validateIdentifier(request.productId(), request.barcode());
         saleFacade.setProductPrice(toProductQuery(request.productId(), request.barcode()), request.margin());
     }
 
     @GetMapping("/prices/current")
     public CurrentPriceResponse getCurrentPrice(@RequestParam(required = false) UUID productId,
                                                 @RequestParam(required = false) String barcode) {
+        validateIdentifier(productId, barcode);
         PriceBook priceBook = saleFacade.getCurrentProductPrice(toProductQuery(productId, barcode));
         if (priceBook == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Price not found");
@@ -92,11 +95,23 @@ public class SaleController {
 
     @GetMapping("/products/{productId}/name")
     public ProductNameResponse getProductName(@PathVariable UUID productId) {
-        return new ProductNameResponse(productId.toString(), saleFacade.getProductName(productId));
+        String name = saleFacade.getProductName(productId);
+        if (name == null || name.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        }
+        return new ProductNameResponse(productId.toString(), name);
     }
 
     private ProductQuery toProductQuery(UUID productId, String barcode) {
         return new ProductQuery(productId, barcode);
+    }
+
+    private void validateIdentifier(UUID productId, String barcode) {
+        boolean hasProductId = productId != null;
+        boolean hasBarcode = barcode != null && !barcode.isBlank();
+        if (hasProductId == hasBarcode) {
+            throw new IllegalArgumentException("Provide exactly one identifier: either productId or barcode.");
+        }
     }
 
     private SaleTransactionResponse toResponse(SaleTransaction transaction) {
@@ -120,7 +135,7 @@ public class SaleController {
     }
 
     public record ProcessSaleRequest(@NotBlank String receiptNumber,
-                                     List<SaleItemRequest> items,
+                                     @NotEmpty List<@Valid SaleItemRequest> items,
                                      Long transactionDateEpochMs) {
     }
 
@@ -147,7 +162,7 @@ public class SaleController {
 
     public record SetPriceRequest(UUID productId,
                                   String barcode,
-                                  @DecimalMin(value = "0.0") float margin) {
+                                  @DecimalMin(value = "0.0", inclusive = false) float margin) {
     }
 
     public record CurrentPriceResponse(String productId,

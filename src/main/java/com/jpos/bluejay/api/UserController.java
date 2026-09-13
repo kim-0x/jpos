@@ -42,7 +42,17 @@ public class UserController {
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest request, Authentication authentication) {
         String currentRole = currentRole(authentication);
         userService.addUser(request.username(), request.password(), request.role().getValue(), currentRole);
-        return new UserResponse(null, request.username(), request.role().getValue());
+
+        User created = Arrays.stream(userService.getUsers(currentRole))
+                .filter(u -> request.username().equals(u.getUsername()))
+                .findFirst()
+                .orElse(null);
+
+        return new UserResponse(
+                created == null || created.getId() == null ? null : created.getId().toString(),
+                request.username(),
+                request.role().getValue()
+        );
     }
 
     private String currentRole(Authentication authentication) {

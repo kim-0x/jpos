@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * Opens JDBC connections for the configured database URL.
  */
-public final class SqliteConnectionProvider {
+public final class SqliteConnectionProvider implements ConnectionProvider {
 
     private static final String DEFAULT_DB_SUB_DIR = "db";
     private static final String DEFAULT_DB_FILE = "jpos.db";

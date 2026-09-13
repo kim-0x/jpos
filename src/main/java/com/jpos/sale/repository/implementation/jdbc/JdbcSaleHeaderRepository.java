@@ -5,7 +5,7 @@ import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.model.SaleTransaction;
 import com.jpos.sale.repository.SaleHeaderRepository;
 import com.jpos.sale.repository.TransactionSalePersistence;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +17,9 @@ import java.util.UUID;
 
 public class JdbcSaleHeaderRepository implements SaleHeaderRepository , TransactionSalePersistence {
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcSaleHeaderRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcSaleHeaderRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 

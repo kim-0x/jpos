@@ -2,7 +2,7 @@ package com.jpos.sale.repository.implementation.jdbc;
 
 import com.jpos.sale.model.SaleItem;
 import com.jpos.sale.repository.SaleItemRepository;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public class JdbcSaleItemRepository implements SaleItemRepository {
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcSaleItemRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcSaleItemRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 

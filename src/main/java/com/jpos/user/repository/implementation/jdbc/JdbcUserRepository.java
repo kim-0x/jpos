@@ -7,7 +7,7 @@ import com.jpos.user.model.User;
 import com.jpos.user.model.UserRole;
 import com.jpos.user.repository.UserRepository;
 import com.jpos.user.utils.UserBuilder;
-import utils.SqliteConnectionProvider;
+import utils.ConnectionProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,9 +18,9 @@ import java.util.UUID;
 
 public class JdbcUserRepository implements UserRepository {
 
-    private final SqliteConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
-    public JdbcUserRepository(SqliteConnectionProvider connectionProvider) {
+    public JdbcUserRepository(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 

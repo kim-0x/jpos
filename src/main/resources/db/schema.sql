@@ -5,9 +5,6 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL
 );
 
-INSERT OR IGNORE INTO users (id, username, role, password)
-VALUES ('00000000-0000-0000-0000-000000000001', 'admin', 'Admin', 'admin');
-
 CREATE TABLE IF NOT EXISTS products (
     id               TEXT PRIMARY KEY,
     barcode          TEXT UNIQUE,
@@ -17,36 +14,36 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS inventory (
     id               TEXT PRIMARY KEY,
-    number_in_stock  REAL,
-    cost             REAL,
-    product_id       TEXT,
-    created_at       INTEGER,
+    number_in_stock  REAL NOT NULL,
+    cost             REAL NOT NULL,
+    product_id       TEXT NOT NULL,
+    created_at       INTEGER NOT NULL,
     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE TABLE IF NOT EXISTS price_books (
-    product_id   TEXT,
-    cost         REAL,
-    margin       REAL,
-    sale_price   REAL,
-    effective_at INTEGER,
+    product_id   TEXT NOT NULL,
+    cost         REAL NOT NULL,
+    margin       REAL NOT NULL,
+    sale_price   REAL NOT NULL,
+    effective_at INTEGER NOT NULL,
     PRIMARY KEY (product_id, effective_at),
     FOREIGN KEY (product_id) REFERENCES products (id)
 );
 
 CREATE TABLE IF NOT EXISTS sale_transactions (
     transaction_id   TEXT PRIMARY KEY,
-    receipt_number   TEXT,
-    grand_total      REAL,
-    transaction_date INTEGER
+    receipt_number   TEXT NOT NULL,
+    grand_total      REAL NOT NULL,
+    transaction_date INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sale_items (
-    product_id     TEXT,
-    transaction_id TEXT,
-    quantity       REAL,
-    cost           REAL,
-    price          REAL,
+    product_id     TEXT NOT NULL,
+    transaction_id TEXT NOT NULL,
+    quantity       REAL NOT NULL,
+    cost           REAL NOT NULL,
+    price          REAL NOT NULL,
     PRIMARY KEY (product_id, transaction_id),
     FOREIGN KEY (product_id) REFERENCES products (id),
     FOREIGN KEY (transaction_id) REFERENCES sale_transactions (transaction_id)

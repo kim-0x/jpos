@@ -17,9 +17,16 @@ public class JwtService {
     private final SecretKey signingKey;
     private final long expirationSeconds;
 
-    public JwtService(@Value("${bluejay.security.jwt.secret}") String secret,
+    public JwtService(@Value("${bluejay.security.jwt.secret:}") String secret,
                       @Value("${bluejay.security.jwt.expiration-seconds:3600}") long expirationSeconds) {
-        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("Missing required JWT secret configuration: bluejay.security.jwt.secret");
+        }
+        byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (secretBytes.length < 32) {
+            throw new IllegalStateException("JWT secret must be at least 32 bytes in UTF-8");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(secretBytes);
         this.expirationSeconds = expirationSeconds;
     }
 
