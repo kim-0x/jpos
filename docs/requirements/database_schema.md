@@ -1,4 +1,4 @@
-# Datbase Schema Design: jpos (SQLite)
+# Database Schema Design: jpos (SQLite)
 
 **Author:** Kimleng LIM
 **Target Engine:** SQLite 3
@@ -26,7 +26,7 @@ Product catalog for Point of Sale items.
 
 ## Table: inventory
 
-Historial of stock items flow in and out.
+Historical of stock items flow in and out.
 
 - `id`: TEXT, PRIMARY KEY
 - `number_in_stock`: REAL
@@ -36,7 +36,7 @@ Historial of stock items flow in and out.
 
 ## Table: price_books
 
-Historial price changes of product.
+Historical price changes of product.
 
 - `product_id`: TEXT
 - `cost`: REAL
@@ -58,7 +58,7 @@ Detail items for sale transactions
 
 ## Table: sale_transactions
 
-Historial sale transactions
+Historical sale transactions
 
 - `transaction_id`: TEXT, PRIMARY KEY
 - `receipt_number`: TEXT,
