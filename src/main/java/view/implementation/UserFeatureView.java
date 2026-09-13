@@ -12,6 +12,7 @@ import utils.IO;
 import view.UserFeature;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class UserFeatureView implements UserFeature {
     private final UserFacade userFacade;
@@ -24,12 +25,18 @@ public class UserFeatureView implements UserFeature {
     public void loginForm() {
         while (true) {
             var username = IO.readln("Enter username:");
+            char[] password;
             var console = System.console();
             if (console == null) {
-                IO.println("Console not available. Please run this program from a terminal.");
-                return;
+                IO.println("Console not available.");
+                IO.println("Use native graphical debugger for development purpose. Password is visible.");
+                System.out.print("Enter password: ");
+                Scanner scanner = new Scanner(System.in);
+                password = scanner.next().toCharArray();
+            } else {
+                password = console.readPassword("Enter password:");
             }
-            char[] password = console.readPassword("Enter password:");
+
             boolean isSucceed = userFacade.signIn(username, String.valueOf(password));
 
             if (!isSucceed) {
