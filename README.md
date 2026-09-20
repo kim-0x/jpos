@@ -73,7 +73,7 @@ Recommended extension:
 
 - Extension Pack for Java (Microsoft)
 
-## Web UI prototype (Angular Material)
+## Web UI prototype (static HTML/CSS/JavaScript)
 
 A prototype web UI is available in:
 
@@ -85,7 +85,6 @@ Run it locally:
 
 ```sh
 cd web-ui
-npm install
 npm start
 ```
 
@@ -94,6 +93,8 @@ Then open:
 ```text
 http://localhost:4200/
 ```
+
+You can also deploy the files in `web-ui/` directly to any static host without a build step.
 
 ## Repository implementations
 
