@@ -21,4 +21,6 @@ Upload these files to any static host:
 - `app.js`
 - `favicon.ico`
 
+Host the files from the `web-ui/` directory root. Navigation uses hash routes (for example `#dashboard`), so no server-side route rewrites are required.
+
 No build step is required.

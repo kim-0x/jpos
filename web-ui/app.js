@@ -149,10 +149,11 @@ function renderInventory() {
                   aria-valuemin="0"
                   aria-valuemax="100"
                   aria-valuenow="${item.level}"
+                  aria-valuetext="${item.status}, ${item.level}%"
                 >
-                  <div class="progress-bar" style="width: ${item.level}%"></div>
+                    <div class="progress-bar" style="width: ${item.level}%"></div>
+                  </div>
                 </div>
-              </div>
             `
           )
           .join('')}
