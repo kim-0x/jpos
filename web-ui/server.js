@@ -14,7 +14,16 @@ const contentTypes = {
 
 http
   .createServer((request, response) => {
-    const rawPath = (request.url || '/').split('?')[0];
+    let rawPath;
+
+    try {
+      rawPath = decodeURIComponent((request.url || '/').split('?')[0]);
+    } catch {
+      response.writeHead(400);
+      response.end('Bad request');
+      return;
+    }
+
     const relativePath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '');
     const filePath = path.resolve(root, relativePath);
     const resolvedRelativePath = path.relative(root, filePath);

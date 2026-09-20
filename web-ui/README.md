@@ -4,9 +4,7 @@ This prototype uses plain HTML, CSS, and JavaScript so it can be deployed as sta
 
 ## Run locally
 
-Option 1: open `index.html` directly in your browser.
-
-Option 2: run the lightweight local server:
+Run the lightweight local server:
 
 ```bash
 npm start
