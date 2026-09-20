@@ -21,5 +21,6 @@ Upload these files to any static host:
 - `index.html`
 - `styles.css`
 - `app.js`
+- `public/`
 
 No build step is required.

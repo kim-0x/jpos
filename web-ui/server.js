@@ -17,8 +17,9 @@ http
     const rawPath = (request.url || '/').split('?')[0];
     const relativePath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '');
     const filePath = path.resolve(root, relativePath);
+    const resolvedRelativePath = path.relative(root, filePath);
 
-    if (!filePath.startsWith(root)) {
+    if (resolvedRelativePath.startsWith('..') || path.isAbsolute(resolvedRelativePath)) {
       response.writeHead(403);
       response.end('Forbidden');
       return;
