@@ -212,6 +212,11 @@ select {
   color: var(--text);
 }
 
+.topbar-link.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
 .table-wrap {
   overflow-x: auto;
 }

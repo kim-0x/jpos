@@ -142,7 +142,14 @@ function renderInventory() {
                   <span>${item.item}</span>
                   <span class="status-badge ${item.statusClass}">${item.status} · ${item.level}%</span>
                 </div>
-                <div class="progress-track">
+                <div
+                  class="progress-track"
+                  role="progressbar"
+                  aria-label="${item.item} stock level"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="${item.level}"
+                >
                   <div class="progress-bar" style="width: ${item.level}%"></div>
                 </div>
               </div>
