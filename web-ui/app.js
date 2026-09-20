@@ -98,10 +98,10 @@ function renderProducts() {
         <table>
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
+              <th scope="col">Code</th>
+              <th scope="col">Name</th>
+              <th scope="col">Category</th>
+              <th scope="col">Price</th>
             </tr>
           </thead>
           <tbody>
