@@ -73,6 +73,28 @@ Recommended extension:
 
 - Extension Pack for Java (Microsoft)
 
+## Web UI prototype (Angular Material)
+
+A prototype web UI is available in:
+
+```text
+web-ui/
+```
+
+Run it locally:
+
+```sh
+cd web-ui
+npm install
+npm start
+```
+
+Then open:
+
+```text
+http://localhost:4200/
+```
+
 ## Repository implementations
 
 JPOS supports three repository implementations:

@@ -1,0 +1,25 @@
+<section class="page-header">
+  <h2>Dashboard</h2>
+  <mat-chip-set>
+    <mat-chip color="primary">Prototype mode</mat-chip>
+  </mat-chip-set>
+</section>
+
+<section class="metric-grid">
+  @for (metric of metrics; track metric.label) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ metric.label }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="metric-value">
+          @if (metric.label === 'Today Revenue') {
+            {{ metric.value | currency }}
+          } @else {
+            {{ metric.value }}
+          }
+        </p>
+      </mat-card-content>
+    </mat-card>
+  }
+</section>

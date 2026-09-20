@@ -1,0 +1,33 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-nav {
+  width: 240px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.page-content {
+  padding: 1.5rem;
+}
+
+.active-link {
+  background: rgba(63, 81, 181, 0.12);
+  border-radius: 8px;
+}

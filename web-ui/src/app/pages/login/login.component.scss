@@ -1,0 +1,14 @@
+.login-wrapper {
+  display: grid;
+  place-items: center;
+}
+
+mat-card {
+  width: min(460px, 100%);
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
