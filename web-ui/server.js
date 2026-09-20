@@ -24,6 +24,12 @@ http
       return;
     }
 
+    if (rawPath !== '/' && rawPath.endsWith('/')) {
+      response.writeHead(404);
+      response.end('Not found');
+      return;
+    }
+
     const relativePath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '');
     const filePath = path.resolve(root, relativePath);
     const resolvedRelativePath = path.relative(root, filePath);
@@ -36,8 +42,8 @@ http
 
     fs.readFile(filePath, (error, data) => {
       if (error) {
-        response.writeHead(404);
-        response.end('Not found');
+        response.writeHead(error.code === 'ENOENT' ? 404 : 500);
+        response.end(error.code === 'ENOENT' ? 'Not found' : 'Internal server error');
         return;
       }
 

@@ -38,6 +38,12 @@ const reportItems = [
   'Low stock reorder list'
 ];
 
+const generatedAt = `${new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'UTC'
+}).format(new Date())} UTC`;
+
 function renderNav() {
   const nav = document.getElementById('nav');
   nav.innerHTML = navItems
@@ -163,8 +169,7 @@ function renderSales() {
             <label for="quantity">Qty</label>
             <input id="quantity" type="number" min="1" value="1">
           </div>
-          <div class="field">
-            <label>&nbsp;</label>
+          <div class="field actions-field">
             <button class="button button-primary" type="button">Add item</button>
           </div>
         </form>
@@ -199,7 +204,7 @@ function renderReports() {
       <div class="section-header">
         <div>
           <h2>Reports</h2>
-          <p>Generated ${new Date().toLocaleString()}</p>
+          <p>Generated ${generatedAt}</p>
         </div>
       </div>
       <ul class="list">
