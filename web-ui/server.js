@@ -48,8 +48,9 @@ http
         return;
       }
 
+      const extension = path.extname(filePath).toLowerCase();
       response.writeHead(200, {
-        'Content-Type': contentTypes[path.extname(filePath)] || 'application/octet-stream'
+        'Content-Type': contentTypes[extension] || 'application/octet-stream'
       });
       response.end(data);
     });
