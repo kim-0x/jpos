@@ -42,8 +42,9 @@ http
 
     fs.readFile(filePath, (error, data) => {
       if (error) {
-        response.writeHead(error.code === 'ENOENT' ? 404 : 500);
-        response.end(error.code === 'ENOENT' ? 'Not found' : 'Internal server error');
+        const isNotFound = error.code === 'ENOENT' || error.code === 'EISDIR';
+        response.writeHead(isNotFound ? 404 : 500);
+        response.end(isNotFound ? 'Not found' : 'Internal server error');
         return;
       }
 
