@@ -298,6 +298,13 @@ th {
   margin: 20px 0;
 }
 
+.payment-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin: 20px 0;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -330,6 +337,28 @@ th {
 
 .helper-text {
   margin: 20px 0 0;
+  color: var(--text-muted);
+}
+
+.change-panel {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-muted);
+}
+
+.change-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+
+.change-breakdown {
+  margin: 16px 0 0;
+  padding-left: 20px;
   color: var(--text-muted);
 }
 
@@ -460,7 +489,8 @@ th {
   }
 
   .split-grid,
-  .form-grid {
+  .form-grid,
+  .payment-grid {
     grid-template-columns: 1fr;
   }
 }
