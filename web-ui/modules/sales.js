@@ -33,90 +33,158 @@ function nextTransactionId(transactions) {
   return `TX-${String(1100 + transactions.length + 1).padStart(4, '0')}`;
 }
 
-export function mountSales(container, { products, state, formatCurrency }) {
+function renderTransactionsTable() {
+  return `
+    <article class="card">
+      <h2>Sales Transactions</h2>
+      <p class="card-subtitle">Completed transactions for the current session.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Transaction</th>
+              <th scope="col">Items</th>
+              <th scope="col">Total</th>
+              <th scope="col">Cash</th>
+              <th scope="col">Change</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-body"></tbody>
+        </table>
+      </div>
+    </article>
+  `;
+}
+
+export function mountSales(container, { currentUser, products, state, formatCurrency }) {
+  const role = currentUser?.role;
+  const showTerminal = role === 'Cashier';
+  const showTransactions = role === 'Admin';
+
   container.innerHTML = `
     <div class="grid split-grid">
-      <article class="card">
-        <h2>Sales Terminal</h2>
-        <p class="card-subtitle">Prototype cashier workflow for grocery checkout.</p>
-        <form id="sales-form" class="form-grid">
-          <div class="field">
-            <label for="barcode">Barcode</label>
-            <input id="barcode" type="text" placeholder="Scan product barcode" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label for="quantity">Qty</label>
-            <input id="quantity" type="number" min="1" value="1">
-          </div>
-          <div class="field actions-field">
-            <button class="button button-primary" type="submit">Add item</button>
-          </div>
-        </form>
-        <p id="sales-feedback" class="sales-feedback" aria-live="polite"></p>
-        <div class="table-wrap cart-table">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Price</th>
-                <th scope="col">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody id="cart-body"></tbody>
-          </table>
-        </div>
-      </article>
+      ${
+        showTerminal
+          ? `
+            <article class="card">
+              <h2>Sales Terminal</h2>
+              <p class="card-subtitle">Prototype cashier workflow for grocery checkout.</p>
+              <form id="sales-form" class="form-grid">
+                <div class="field">
+                  <label for="barcode">Barcode</label>
+                  <input id="barcode" type="text" placeholder="Scan product barcode" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="quantity">Qty</label>
+                  <input id="quantity" type="number" min="1" value="1">
+                </div>
+                <div class="field actions-field">
+                  <button class="button button-primary" type="submit">Add item</button>
+                </div>
+              </form>
+              <p id="sales-feedback" class="sales-feedback" aria-live="polite"></p>
+              <div class="table-wrap cart-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cart-body"></tbody>
+                </table>
+              </div>
+            </article>
+          `
+          : `
+            <article class="card">
+              <h2>Sales</h2>
+              <p class="card-subtitle">Transaction oversight for the current session.</p>
+            </article>
+          `
+      }
       <div class="sales-sidebar">
-        <article class="card total-card">
-          <p class="total-label">Grand Total</p>
-          <p id="grand-total" class="grand-total-value">${formatCurrency(0)}</p>
-          <p class="card-subtitle">Clearly visible for both cashier and customer.</p>
-        </article>
-        <article class="card">
-          <h2>Payment</h2>
-          <p class="card-subtitle">Collect cash and confirm the optimal change breakdown.</p>
-          <form id="payment-form" class="payment-grid">
-            <div class="field">
-              <label for="cash-received">Cash Received</label>
-              <input id="cash-received" type="number" min="0" step="0.01" placeholder="0.00">
-            </div>
-            <div class="field actions-field">
-              <button class="button button-primary" type="submit">Pay</button>
-            </div>
-          </form>
-          <p id="payment-feedback" class="sales-feedback" aria-live="polite"></p>
-          <div class="change-panel">
-            <div class="change-summary">
-              <span>Change Due</span>
-              <strong id="change-due">${formatCurrency(0)}</strong>
-            </div>
-            <ul id="change-breakdown" class="change-breakdown">
-              <li>No change breakdown yet.</li>
-            </ul>
-          </div>
-        </article>
-        <article class="card">
-          <h2>Sales Transactions</h2>
-          <p class="card-subtitle">Completed transactions for the current session.</p>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Transaction</th>
-                  <th scope="col">Items</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Cash</th>
-                  <th scope="col">Change</th>
-                </tr>
-              </thead>
-              <tbody id="transaction-body"></tbody>
-            </table>
-          </div>
-        </article>
+        ${
+          showTerminal
+            ? `
+              <article class="card total-card">
+                <p class="total-label">Grand Total</p>
+                <p id="grand-total" class="grand-total-value">${formatCurrency(0)}</p>
+              </article>
+              <article class="card">
+                <h2>Payment</h2>
+                <p class="card-subtitle">Collect cash and confirm the optimal change breakdown.</p>
+                <form id="payment-form" class="payment-grid">
+                  <div class="field">
+                    <label for="cash-received">Cash Received</label>
+                    <input id="cash-received" type="number" min="0" step="0.01" placeholder="0.00">
+                  </div>
+                  <div class="field actions-field">
+                    <button class="button button-primary" type="submit">Pay</button>
+                  </div>
+                </form>
+                <p id="payment-feedback" class="sales-feedback" aria-live="polite"></p>
+                <div class="change-panel">
+                  <div class="change-summary">
+                    <span>Change Due</span>
+                    <strong id="change-due">${formatCurrency(0)}</strong>
+                  </div>
+                  <ul id="change-breakdown" class="change-breakdown">
+                    <li>No change breakdown yet.</li>
+                  </ul>
+                </div>
+              </article>
+            `
+            : ''
+        }
+        ${showTransactions ? renderTransactionsTable() : ''}
       </div>
     </div>
   `;
+
+  const transactionBody = container.querySelector('#transaction-body');
+
+  function renderTransactions() {
+    if (!transactionBody) {
+      return;
+    }
+
+    transactionBody.textContent = '';
+
+    if (state.transactions.length === 0) {
+      const emptyRow = document.createElement('tr');
+      const emptyCell = document.createElement('td');
+      emptyCell.colSpan = 5;
+      emptyCell.className = 'empty-state-cell';
+      emptyCell.textContent = 'No completed sales yet.';
+      emptyRow.appendChild(emptyCell);
+      transactionBody.appendChild(emptyRow);
+      return;
+    }
+
+    state.transactions.forEach((transaction) => {
+      const row = document.createElement('tr');
+      [
+        transaction.id,
+        String(transaction.items),
+        formatCurrency(transaction.total),
+        formatCurrency(transaction.cashReceived),
+        formatCurrency(transaction.changeDue)
+      ].forEach((value) => {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      transactionBody.appendChild(row);
+    });
+  }
+
+  if (!showTerminal) {
+    renderTransactions();
+    return;
+  }
 
   const salesForm = container.querySelector('#sales-form');
   const barcodeInput = container.querySelector('#barcode');
@@ -129,7 +197,6 @@ export function mountSales(container, { products, state, formatCurrency }) {
   const paymentFeedback = container.querySelector('#payment-feedback');
   const changeDue = container.querySelector('#change-due');
   const changeBreakdown = container.querySelector('#change-breakdown');
-  const transactionBody = container.querySelector('#transaction-body');
 
   function renderCart() {
     cartBody.textContent = '';
@@ -168,37 +235,6 @@ export function mountSales(container, { products, state, formatCurrency }) {
       const item = document.createElement('li');
       item.textContent = line;
       changeBreakdown.appendChild(item);
-    });
-  }
-
-  function renderTransactions() {
-    transactionBody.textContent = '';
-
-    if (state.transactions.length === 0) {
-      const emptyRow = document.createElement('tr');
-      const emptyCell = document.createElement('td');
-      emptyCell.colSpan = 5;
-      emptyCell.className = 'empty-state-cell';
-      emptyCell.textContent = 'No completed sales yet.';
-      emptyRow.appendChild(emptyCell);
-      transactionBody.appendChild(emptyRow);
-      return;
-    }
-
-    state.transactions.forEach((transaction) => {
-      const row = document.createElement('tr');
-      [
-        transaction.id,
-        String(transaction.items),
-        formatCurrency(transaction.total),
-        formatCurrency(transaction.cashReceived),
-        formatCurrency(transaction.changeDue)
-      ].forEach((value) => {
-        const cell = document.createElement('td');
-        cell.textContent = value;
-        row.appendChild(cell);
-      });
-      transactionBody.appendChild(row);
     });
   }
 
@@ -292,9 +328,7 @@ export function mountSales(container, { products, state, formatCurrency }) {
     state.cart = [];
     cashReceivedInput.value = '';
     renderCart();
-    renderTransactions();
   });
 
   renderCart();
-  renderTransactions();
 }

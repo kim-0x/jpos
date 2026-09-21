@@ -38,6 +38,10 @@ select {
   grid-template-columns: 260px 1fr;
 }
 
+.app-shell.sidebar-hidden {
+  grid-template-columns: 1fr;
+}
+
 .sidebar {
   background: #0f172a;
   color: #fff;
@@ -45,6 +49,10 @@ select {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+.app-shell.sidebar-hidden .sidebar {
+  display: none;
 }
 
 .brand {
@@ -305,6 +313,13 @@ th {
   margin: 20px 0;
 }
 
+.stock-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(140px, 1fr) minmax(140px, 1fr) auto;
+  gap: 12px;
+  margin: 20px 0;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -338,6 +353,16 @@ th {
 .helper-text {
   margin: 20px 0 0;
   color: var(--text-muted);
+}
+
+.stock-entry-panel {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.hidden-panel {
+  display: none;
 }
 
 .change-panel {
@@ -490,7 +515,8 @@ th {
 
   .split-grid,
   .form-grid,
-  .payment-grid {
+  .payment-grid,
+  .stock-entry-grid {
     grid-template-columns: 1fr;
   }
 }

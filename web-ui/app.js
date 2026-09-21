@@ -7,7 +7,7 @@ import {
   stockHealth
 } from './data/app-data.js';
 import { renderDashboard } from './modules/dashboard.js';
-import { renderInventory, renderProducts } from './modules/inventory.js';
+import { mountInventory, renderProducts } from './modules/inventory.js';
 import { renderLogin, bindLoginInteractions } from './modules/login.js';
 import { mountSales } from './modules/sales.js';
 import { renderReports } from './modules/reports.js';
@@ -26,7 +26,8 @@ const navItems = [
 const appState = {
   currentUser: null,
   cart: [],
-  transactions: []
+  transactions: [],
+  stockEntries: []
 };
 
 const generatedAt = `${new Intl.DateTimeFormat('en-US', {
@@ -43,18 +44,22 @@ function formatCurrency(value) {
 }
 
 function getUserHomePage() {
-  return appState.currentUser?.homePage || 'dashboard';
+  return appState.currentUser?.homePage || 'login';
 }
 
 function getVisibleNavItems() {
   if (!appState.currentUser) {
-    return navItems.filter((item) => item.id !== 'users');
+    return [];
   }
 
   return navItems.filter((item) => appState.currentUser.allowedPages.includes(item.id));
 }
 
 function resolvePage(pageId) {
+  if (!appState.currentUser) {
+    return 'login';
+  }
+
   const fallbackPage = getUserHomePage();
   const visiblePageIds = getVisibleNavItems().map((item) => item.id);
   return visiblePageIds.includes(pageId) ? pageId : fallbackPage;
@@ -93,6 +98,11 @@ function updateTopbarAction() {
   }
 }
 
+function updateAccessChrome() {
+  const appShell = document.querySelector('.app-shell');
+  appShell?.classList.toggle('sidebar-hidden', !appState.currentUser);
+}
+
 function activatePage(pageId) {
   const resolvedPage = resolvePage(pageId);
 
@@ -110,8 +120,14 @@ function activatePage(pageId) {
 function renderPages() {
   renderDashboard(document.getElementById('page-dashboard'), dashboardMetrics);
   renderProducts(document.getElementById('page-products'), products, formatCurrency);
-  renderInventory(document.getElementById('page-inventory'), stockHealth);
+  mountInventory(document.getElementById('page-inventory'), {
+    formatCurrency,
+    products,
+    state: appState,
+    stockHealth
+  });
   mountSales(document.getElementById('page-sales'), {
+    currentUser: appState.currentUser,
     formatCurrency,
     products,
     state: appState
@@ -125,6 +141,8 @@ function renderPages() {
     onLogin: (user) => {
       appState.currentUser = user;
       renderNav();
+      updateAccessChrome();
+      renderPages();
       updateTopbarAction();
       window.location.hash = user.homePage;
       activatePage(user.homePage);
@@ -148,6 +166,7 @@ function bindTopbarAction() {
     appState.currentUser = null;
     appState.cart = [];
     renderNav();
+    updateAccessChrome();
     updateTopbarAction();
     renderPages();
     window.location.hash = 'login';
@@ -166,6 +185,7 @@ document.querySelector('.topbar h1').textContent = `${APP_NAME} Web UI Prototype
 
 renderNav();
 renderPages();
+updateAccessChrome();
 updateTopbarAction();
 bindTopbarAction();
 syncPageWithHash();
