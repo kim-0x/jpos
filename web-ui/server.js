@@ -32,9 +32,9 @@ http
 
     const relativePath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '');
     const filePath = path.resolve(root, relativePath);
-    const resolvedRelativePath = path.relative(root, filePath);
+    const rootWithSeparator = `${root}${path.sep}`;
 
-    if (resolvedRelativePath.startsWith('..') || path.isAbsolute(resolvedRelativePath)) {
+    if (filePath !== root && !filePath.startsWith(rootWithSeparator)) {
       response.writeHead(403);
       response.end('Forbidden');
       return;
@@ -50,7 +50,8 @@ http
 
       const extension = path.extname(filePath).toLowerCase();
       response.writeHead(200, {
-        'Content-Type': contentTypes[extension] || 'application/octet-stream'
+        'Content-Type': contentTypes[extension] || 'application/octet-stream',
+        'X-Content-Type-Options': 'nosniff'
       });
       response.end(data);
     });

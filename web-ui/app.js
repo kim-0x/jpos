@@ -15,9 +15,16 @@ const dashboardMetrics = [
 ];
 
 const productRows = [
-  { code: 'PRD-001', name: 'Premium Rice 5kg', category: 'Grocery', price: '$11.90' },
-  { code: 'PRD-002', name: 'Cooking Oil 2L', category: 'Grocery', price: '$8.20' },
-  { code: 'PRD-003', name: 'Laundry Soap', category: 'Household', price: '$2.10' }
+  { code: 'PRD-001', barcode: '1001001', name: 'Premium Rice 5kg', category: 'Grocery', price: 11.9 },
+  { code: 'PRD-002', barcode: '1001002', name: 'Cooking Oil 2L', category: 'Grocery', price: 8.2 },
+  { code: 'PRD-003', barcode: '1001003', name: 'Laundry Soap', category: 'Household', price: 2.1 },
+  { code: 'PRD-004', barcode: '1001004', name: 'Brown Sugar 1kg', category: 'Grocery', price: 1.85 },
+  { code: 'PRD-005', barcode: '1001005', name: 'Instant Noodles Pack', category: 'Grocery', price: 3.4 },
+  { code: 'PRD-006', barcode: '1001006', name: 'Milk 1L', category: 'Dairy', price: 2.65 },
+  { code: 'PRD-007', barcode: '1001007', name: 'Eggs 12pcs', category: 'Dairy', price: 3.95 },
+  { code: 'PRD-008', barcode: '1001008', name: 'Orange Juice 1L', category: 'Beverage', price: 2.8 },
+  { code: 'PRD-009', barcode: '1001009', name: 'Dishwashing Liquid', category: 'Household', price: 4.35 },
+  { code: 'PRD-010', barcode: '1001010', name: 'Bath Tissue 6 Rolls', category: 'Household', price: 5.6 }
 ];
 
 const stockHealth = [
@@ -38,15 +45,77 @@ const reportItems = [
   'Low stock reorder list'
 ];
 
+const demoUsers = [
+  {
+    username: 'admin',
+    password: 'admin123',
+    displayName: 'Ava Admin',
+    role: 'Admin',
+    homePage: 'dashboard',
+    allowedPages: ['dashboard']
+  },
+  {
+    username: 'stock.manager',
+    password: 'stock123',
+    displayName: 'Milo Stock Manager',
+    role: 'Stock Manager',
+    homePage: 'inventory',
+    allowedPages: ['inventory']
+  },
+  {
+    username: 'cashier',
+    password: 'cashier123',
+    displayName: 'Casey Cashier',
+    role: 'Cashier',
+    homePage: 'sales',
+    allowedPages: ['sales']
+  }
+];
+
+const appState = {
+  currentUser: null,
+  cart: []
+};
+
 const generatedAt = `${new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC'
 }).format(new Date())} UTC`;
 
+function formatCurrency(value) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(value);
+}
+
+function getUserHomePage() {
+  return appState.currentUser?.homePage || 'dashboard';
+}
+
+function getVisibleNavItems() {
+  if (!appState.currentUser) {
+    return navItems;
+  }
+
+  return navItems.filter((item) => appState.currentUser.allowedPages.includes(item.id));
+}
+
+function resolvePage(pageId) {
+  const fallbackPage = getUserHomePage();
+  const visiblePageIds = getVisibleNavItems().map((item) => item.id);
+
+  if (visiblePageIds.includes(pageId)) {
+    return pageId;
+  }
+
+  return fallbackPage;
+}
+
 function renderNav() {
   const nav = document.getElementById('nav');
-  nav.innerHTML = navItems
+  nav.innerHTML = getVisibleNavItems()
     .map(
       (item) => `
         <a class="nav-link" data-page-link="${item.id}" href="#${item.id}">
@@ -99,6 +168,7 @@ function renderProducts() {
           <thead>
             <tr>
               <th scope="col">Code</th>
+              <th scope="col">Barcode</th>
               <th scope="col">Name</th>
               <th scope="col">Category</th>
               <th scope="col">Price</th>
@@ -110,9 +180,10 @@ function renderProducts() {
                 (row) => `
                   <tr>
                     <td>${row.code}</td>
+                    <td>${row.barcode}</td>
                     <td>${row.name}</td>
                     <td>${row.category}</td>
-                    <td>${row.price}</td>
+                    <td>${formatCurrency(row.price)}</td>
                   </tr>
                 `
               )
@@ -140,7 +211,10 @@ function renderInventory() {
               <div class="progress-row">
                 <div class="progress-meta">
                   <span>${item.item}</span>
-                  <span class="status-badge ${item.statusClass}">${item.status} · ${item.level}%</span>
+                  <div class="progress-indicators">
+                    <span class="progress-value">${item.level}%</span>
+                    <span class="status-badge ${item.statusClass}">${item.status}</span>
+                  </div>
                 </div>
                 <div
                   class="progress-track"
@@ -168,40 +242,85 @@ function renderSales() {
       <article class="card">
         <h2>POS Terminal</h2>
         <p class="card-subtitle">Prototype cashier workflow.</p>
-        <form class="form-grid">
+        <form id="sales-form" class="form-grid">
           <div class="field">
             <label for="barcode">Barcode</label>
-            <input id="barcode" type="text" placeholder="Scan product">
+            <input id="barcode" type="text" placeholder="Scan product barcode" inputmode="numeric">
           </div>
           <div class="field">
             <label for="quantity">Qty</label>
             <input id="quantity" type="number" min="1" value="1">
           </div>
           <div class="field actions-field">
-            <button class="button button-primary" type="button">Add item</button>
+            <button class="button button-primary" type="submit">Add item</button>
           </div>
         </form>
+        <p id="sales-feedback" class="sales-feedback" aria-live="polite"></p>
+        <div class="table-wrap product-reference">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Barcode</th>
+                <th scope="col">Product</th>
+                <th scope="col">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${productRows
+                .map(
+                  (product) => `
+                    <tr>
+                      <td>${product.barcode}</td>
+                      <td>${product.name}</td>
+                      <td>${formatCurrency(product.price)}</td>
+                    </tr>
+                  `
+                )
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap cart-table">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody id="cart-body"></tbody>
+          </table>
+        </div>
       </article>
-      <article class="card">
-        <h2>Recent Transactions</h2>
-        <p class="card-subtitle">Latest activity from the checkout counter.</p>
-        <ul class="list">
-          ${recentSales
-            .map(
-              (sale) => `
-                <li class="list-item">
-                  <div>
-                    <strong>${sale.id}</strong>
-                    <br>
-                    <small>${sale.items} items</small>
-                  </div>
-                  <strong>${sale.total}</strong>
-                </li>
-              `
-            )
-            .join('')}
-        </ul>
-      </article>
+      <div class="sales-sidebar">
+        <article class="card total-card">
+          <p class="total-label">Grand Total</p>
+          <p id="grand-total" class="grand-total-value">${formatCurrency(0)}</p>
+          <p class="card-subtitle">Clearly visible for both cashier and customer.</p>
+        </article>
+        <article class="card">
+          <h2>Recent Transactions</h2>
+          <p class="card-subtitle">Latest activity from the checkout counter.</p>
+          <ul class="list">
+            ${recentSales
+              .map(
+                (sale) => `
+                  <li class="list-item">
+                    <div>
+                      <strong>${sale.id}</strong>
+                      <br>
+                      <small>${sale.items} items</small>
+                    </div>
+                    <strong>${sale.total}</strong>
+                  </li>
+                `
+              )
+              .join('')}
+          </ul>
+        </article>
+      </div>
     </div>
   `;
 }
@@ -240,28 +359,42 @@ function renderLogin() {
     <div class="login-layout">
       <article class="card">
         <h2>Sign in to JPOS</h2>
-        <p class="card-subtitle">Prototype login form (UI only).</p>
+        <p class="card-subtitle">Choose one of the mock users below. The role is resolved automatically from the account.</p>
         <form id="login-form" class="login-form">
           <div class="field">
             <label for="username">Username</label>
-            <input id="username" type="text" placeholder="admin">
+            <select id="username">
+              ${demoUsers
+                .map(
+                  (user) => `
+                    <option value="${user.username}">${user.username}</option>
+                  `
+                )
+                .join('')}
+            </select>
           </div>
           <div class="field">
             <label for="password">Password</label>
-            <input id="password" type="password" placeholder="••••••••">
-          </div>
-          <div class="field">
-            <label for="role">Role</label>
-            <select id="role">
-              <option value="admin">Admin</option>
-              <option value="manager">Store manager</option>
-              <option value="cashier">Cashier</option>
-            </select>
+            <input id="password" type="password" placeholder="Enter password" value="${demoUsers[0].password}">
           </div>
         </form>
+        <div class="demo-user-list">
+          ${demoUsers
+            .map(
+              (user) => `
+                <div class="demo-user-card">
+                  <strong>${user.displayName}</strong>
+                  <span>${user.username}</span>
+                  <span class="status-badge status-ok">${user.role}</span>
+                </div>
+              `
+            )
+            .join('')}
+        </div>
+        <p id="login-feedback" class="login-feedback" aria-live="polite"></p>
         <div class="login-actions">
           <button class="button button-secondary" type="reset" form="login-form">Reset</button>
-          <button class="button button-primary" type="button">Sign in</button>
+          <button id="sign-in-button" class="button button-primary" type="submit" form="login-form">Sign in</button>
         </div>
       </article>
     </div>
@@ -269,19 +402,204 @@ function renderLogin() {
 }
 
 function activatePage(pageId) {
-  const resolvedPage = navItems.some((item) => item.id === pageId) ? pageId : 'dashboard';
+  const resolvedPage = resolvePage(pageId);
 
   document.querySelectorAll('.page').forEach((page) => {
     page.classList.toggle('active', page.id === `page-${resolvedPage}`);
   });
 
   document.querySelectorAll('[data-page-link]').forEach((link) => {
-    link.classList.toggle('active', link.dataset.pageLink === resolvedPage);
+    const isActive = link.dataset.pageLink === resolvedPage;
+    link.classList.toggle('active', isActive);
+    link.setAttribute('aria-current', isActive ? 'page' : 'false');
+  });
+}
+
+function updateTopbarAction() {
+  const topbarLink = document.querySelector('.topbar-link');
+
+  if (!topbarLink) {
+    return;
+  }
+
+  if (appState.currentUser) {
+    topbarLink.textContent = `${appState.currentUser.displayName} · Sign out`;
+    topbarLink.href = '#';
+    topbarLink.removeAttribute('data-page-link');
+    topbarLink.classList.remove('active');
+    topbarLink.removeAttribute('aria-current');
+  } else {
+    topbarLink.textContent = 'Sign in';
+    topbarLink.href = '#login';
+    topbarLink.dataset.pageLink = 'login';
+  }
+}
+
+function renderCart() {
+  const cartBody = document.getElementById('cart-body');
+  const grandTotal = document.getElementById('grand-total');
+
+  if (!cartBody || !grandTotal) {
+    return;
+  }
+
+  cartBody.textContent = '';
+
+  if (appState.cart.length === 0) {
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 4;
+    emptyCell.className = 'empty-state-cell';
+    emptyCell.textContent = 'No items in the cart yet.';
+    emptyRow.appendChild(emptyCell);
+    cartBody.appendChild(emptyRow);
+  } else {
+    appState.cart.forEach((item) => {
+      const row = document.createElement('tr');
+      const subtotal = item.price * item.quantity;
+
+      [item.name, String(item.quantity), formatCurrency(item.price), formatCurrency(subtotal)].forEach((value) => {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+
+      cartBody.appendChild(row);
+    });
+  }
+
+  const total = appState.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  grandTotal.textContent = formatCurrency(total);
+}
+
+function bindSalesInteractions() {
+  const salesForm = document.getElementById('sales-form');
+  const barcodeInput = document.getElementById('barcode');
+  const quantityInput = document.getElementById('quantity');
+  const feedback = document.getElementById('sales-feedback');
+
+  if (!salesForm || !barcodeInput || !quantityInput || !feedback) {
+    return;
+  }
+
+  renderCart();
+
+  salesForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const barcode = barcodeInput.value.trim();
+    const quantity = Number(quantityInput.value);
+    const product = productRows.find((item) => item.barcode === barcode);
+
+    if (!product) {
+      feedback.textContent = 'Barcode not found. Use one of the products listed below.';
+      feedback.dataset.state = 'error';
+      return;
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      feedback.textContent = 'Quantity must be a whole number greater than zero.';
+      feedback.dataset.state = 'error';
+      return;
+    }
+
+    const existingItem = appState.cart.find((item) => item.code === product.code);
+
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      appState.cart.push({
+        code: product.code,
+        name: product.name,
+        price: product.price,
+        quantity
+      });
+    }
+
+    feedback.textContent = `${product.name} added to cart.`;
+    feedback.dataset.state = 'success';
+    barcodeInput.value = '';
+    quantityInput.value = '1';
+    renderCart();
+    barcodeInput.focus();
+  });
+}
+
+function bindLoginInteractions() {
+  const loginForm = document.getElementById('login-form');
+  const usernameField = document.getElementById('username');
+  const passwordField = document.getElementById('password');
+  const feedback = document.getElementById('login-feedback');
+
+  if (!loginForm || !usernameField || !passwordField || !feedback) {
+    return;
+  }
+
+  usernameField.addEventListener('change', () => {
+    const matchedUser = demoUsers.find((user) => user.username === usernameField.value);
+
+    if (matchedUser) {
+      passwordField.value = matchedUser.password;
+    }
+  });
+
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const matchedUser = demoUsers.find((user) => user.username === usernameField.value);
+
+    if (!matchedUser || passwordField.value !== matchedUser.password) {
+      feedback.textContent = 'Use one of the mock usernames and matching passwords shown above.';
+      feedback.dataset.state = 'error';
+      return;
+    }
+
+    appState.currentUser = matchedUser;
+    feedback.textContent = '';
+    renderNav();
+    updateTopbarAction();
+    window.location.hash = matchedUser.homePage;
+    activatePage(matchedUser.homePage);
+  });
+
+  loginForm.addEventListener('reset', () => {
+    window.setTimeout(() => {
+      usernameField.value = demoUsers[0].username;
+      passwordField.value = demoUsers[0].password;
+      feedback.textContent = '';
+      delete feedback.dataset.state;
+    }, 0);
+  });
+}
+
+function bindTopbarAction() {
+  const topbarLink = document.querySelector('.topbar-link');
+
+  if (!topbarLink) {
+    return;
+  }
+
+  topbarLink.addEventListener('click', (event) => {
+    if (!appState.currentUser) {
+      return;
+    }
+
+    event.preventDefault();
+    appState.currentUser = null;
+    appState.cart = [];
+    renderNav();
+    updateTopbarAction();
+    renderSales();
+    renderLogin();
+    bindSalesInteractions();
+    bindLoginInteractions();
+    window.location.hash = 'login';
+    activatePage('login');
   });
 }
 
 function syncPageWithHash() {
-  activatePage(window.location.hash.replace('#', '') || 'dashboard');
+  activatePage(window.location.hash.replace('#', '') || getUserHomePage());
 }
 
 renderNav();
@@ -291,6 +609,10 @@ renderInventory();
 renderSales();
 renderReports();
 renderLogin();
+updateTopbarAction();
+bindSalesInteractions();
+bindLoginInteractions();
+bindTopbarAction();
 syncPageWithHash();
 
 window.addEventListener('hashchange', syncPageWithHash);

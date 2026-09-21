@@ -159,6 +159,11 @@ select {
   grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
 }
 
+.sales-sidebar {
+  display: grid;
+  gap: 20px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -221,6 +226,11 @@ select {
   overflow-x: auto;
 }
 
+.product-reference,
+.cart-table {
+  margin-top: 20px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -257,6 +267,17 @@ th {
   font-weight: 600;
 }
 
+.progress-indicators {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-value {
+  min-width: 48px;
+  text-align: right;
+}
+
 .progress-track {
   width: 100%;
   height: 10px;
@@ -289,6 +310,23 @@ th {
 
 .actions-field {
   align-self: end;
+}
+
+.sales-feedback,
+.login-feedback {
+  min-height: 24px;
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+.sales-feedback[data-state='error'],
+.login-feedback[data-state='error'] {
+  color: var(--danger);
+}
+
+.sales-feedback[data-state='success'],
+.login-feedback[data-state='success'] {
+  color: var(--success);
 }
 
 .field input,
@@ -343,6 +381,30 @@ th {
   margin-top: 20px;
 }
 
+.demo-user-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.demo-user-card {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-muted);
+}
+
+.demo-user-card span {
+  color: var(--text-muted);
+}
+
+.demo-user-card .status-badge {
+  justify-self: start;
+  color: var(--success);
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -365,6 +427,35 @@ th {
 .status-critical {
   background: #fde8e6;
   color: var(--danger);
+}
+
+.total-card {
+  background: linear-gradient(135deg, #1638c8, #3455db);
+  color: #fff;
+}
+
+.total-card .card-subtitle {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.total-label {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grand-total-value {
+  margin: 10px 0;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.empty-state-cell {
+  color: var(--text-muted);
+  text-align: center;
 }
 
 @media (max-width: 960px) {
