@@ -226,7 +226,6 @@ select {
   overflow-x: auto;
 }
 
-.product-reference,
 .cart-table {
   margin-top: 20px;
 }
@@ -329,6 +328,11 @@ th {
   color: var(--success);
 }
 
+.helper-text {
+  margin: 20px 0 0;
+  color: var(--text-muted);
+}
+
 .field input,
 .field select {
   width: 100%;
@@ -379,30 +383,6 @@ th {
   display: grid;
   gap: 16px;
   margin-top: 20px;
-}
-
-.demo-user-list {
-  display: grid;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.demo-user-card {
-  display: grid;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface-muted);
-}
-
-.demo-user-card span {
-  color: var(--text-muted);
-}
-
-.demo-user-card .status-badge {
-  justify-self: start;
-  color: var(--success);
 }
 
 .status-badge {

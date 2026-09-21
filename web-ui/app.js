@@ -4,6 +4,7 @@ const navItems = [
   { id: 'inventory', label: 'Inventory' },
   { id: 'sales', label: 'Sales' },
   { id: 'reports', label: 'Reports' },
+  { id: 'users', label: 'Users' },
   { id: 'login', label: 'Login' }
 ];
 
@@ -52,7 +53,7 @@ const demoUsers = [
     displayName: 'Ava Admin',
     role: 'Admin',
     homePage: 'dashboard',
-    allowedPages: ['dashboard']
+    allowedPages: ['dashboard', 'products', 'inventory', 'sales', 'reports', 'users']
   },
   {
     username: 'stock.manager',
@@ -60,7 +61,7 @@ const demoUsers = [
     displayName: 'Milo Stock Manager',
     role: 'Stock Manager',
     homePage: 'inventory',
-    allowedPages: ['inventory']
+    allowedPages: ['dashboard', 'products', 'inventory']
   },
   {
     username: 'cashier',
@@ -96,7 +97,7 @@ function getUserHomePage() {
 
 function getVisibleNavItems() {
   if (!appState.currentUser) {
-    return navItems;
+    return navItems.filter((item) => item.id !== 'users');
   }
 
   return navItems.filter((item) => appState.currentUser.allowedPages.includes(item.id));
@@ -256,30 +257,6 @@ function renderSales() {
           </div>
         </form>
         <p id="sales-feedback" class="sales-feedback" aria-live="polite"></p>
-        <div class="table-wrap product-reference">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Barcode</th>
-                <th scope="col">Product</th>
-                <th scope="col">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${productRows
-                .map(
-                  (product) => `
-                    <tr>
-                      <td>${product.barcode}</td>
-                      <td>${product.name}</td>
-                      <td>${formatCurrency(product.price)}</td>
-                    </tr>
-                  `
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </div>
         <div class="table-wrap cart-table">
           <table>
             <thead>
@@ -354,43 +331,60 @@ function renderReports() {
   `;
 }
 
+function renderUsers() {
+  document.getElementById('page-users').innerHTML = `
+    <article class="card">
+      <div class="section-header">
+        <div>
+          <h2>Users</h2>
+          <p>Mock user accounts with their assigned role permissions.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Role</th>
+              <th scope="col">Allowed Pages</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${demoUsers
+              .map(
+                (user) => `
+                  <tr>
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>${user.allowedPages.join(', ')}</td>
+                  </tr>
+                `
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+    </article>
+  `;
+}
+
 function renderLogin() {
   document.getElementById('page-login').innerHTML = `
     <div class="login-layout">
       <article class="card">
         <h2>Sign in to JPOS</h2>
-        <p class="card-subtitle">Choose one of the mock users below. The role is resolved automatically from the account.</p>
+        <p class="card-subtitle">Enter a mock account username and password. The role is resolved automatically from the account.</p>
         <form id="login-form" class="login-form">
           <div class="field">
             <label for="username">Username</label>
-            <select id="username">
-              ${demoUsers
-                .map(
-                  (user) => `
-                    <option value="${user.username}">${user.username}</option>
-                  `
-                )
-                .join('')}
-            </select>
+            <input id="username" type="text" placeholder="Enter username" autocomplete="username">
           </div>
           <div class="field">
             <label for="password">Password</label>
-            <input id="password" type="password" placeholder="Enter password" value="${demoUsers[0].password}">
+            <input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
           </div>
         </form>
-        <div class="demo-user-list">
-          ${demoUsers
-            .map(
-              (user) => `
-                <div class="demo-user-card">
-                  <strong>${user.displayName}</strong>
-                  <span>${user.username}</span>
-                  <span class="status-badge status-ok">${user.role}</span>
-                </div>
-              `
-            )
-            .join('')}
-        </div>
+        <p class="helper-text">Use the configured mock credentials for this prototype.</p>
         <p id="login-feedback" class="login-feedback" aria-live="polite"></p>
         <div class="login-actions">
           <button class="button button-secondary" type="reset" form="login-form">Reset</button>
@@ -535,21 +529,14 @@ function bindLoginInteractions() {
     return;
   }
 
-  usernameField.addEventListener('change', () => {
-    const matchedUser = demoUsers.find((user) => user.username === usernameField.value);
-
-    if (matchedUser) {
-      passwordField.value = matchedUser.password;
-    }
-  });
-
   loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    const matchedUser = demoUsers.find((user) => user.username === usernameField.value);
+    const username = usernameField.value.trim();
+    const matchedUser = demoUsers.find((user) => user.username === username);
 
     if (!matchedUser || passwordField.value !== matchedUser.password) {
-      feedback.textContent = 'Use one of the mock usernames and matching passwords shown above.';
+      feedback.textContent = 'Enter a valid mock username and matching password.';
       feedback.dataset.state = 'error';
       return;
     }
@@ -564,8 +551,8 @@ function bindLoginInteractions() {
 
   loginForm.addEventListener('reset', () => {
     window.setTimeout(() => {
-      usernameField.value = demoUsers[0].username;
-      passwordField.value = demoUsers[0].password;
+      usernameField.value = '';
+      passwordField.value = '';
       feedback.textContent = '';
       delete feedback.dataset.state;
     }, 0);
@@ -608,6 +595,7 @@ renderProducts();
 renderInventory();
 renderSales();
 renderReports();
+renderUsers();
 renderLogin();
 updateTopbarAction();
 bindSalesInteractions();
