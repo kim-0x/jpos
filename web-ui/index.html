@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bluejay Web UI Prototype</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">Bluejay</div>
+      <nav class="nav" id="nav" aria-label="Primary"></nav>
+    </aside>
+
+    <div class="content-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Retail operations prototype</p>
+          <h1>Bluejay Web UI Prototype</h1>
+        </div>
+        <a class="button button-secondary topbar-link" data-page-link="login" href="#login">Sign in</a>
+      </header>
+
+      <main class="page-content">
+        <section id="page-dashboard" class="page active"></section>
+        <section id="page-products" class="page"></section>
+        <section id="page-inventory" class="page"></section>
+        <section id="page-sales" class="page"></section>
+        <section id="page-reports" class="page"></section>
+        <section id="page-users" class="page"></section>
+        <section id="page-login" class="page"></section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
